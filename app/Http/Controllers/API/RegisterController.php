@@ -20,6 +20,7 @@ class RegisterController extends BaseController
         $validator = Validator::make($request->all(), [
             'name' => 'required',
             'email' => 'required|email',
+            'mobile_number' => 'required',
             'password' => 'required',
             'c_password' => 'required|same:password',
         ]);
@@ -43,8 +44,17 @@ class RegisterController extends BaseController
      * @return \Illuminate\Http\Response
      */
     public function login(Request $request)
-    {
-        if(Auth::attempt(['email' => $request->email, 'password' => $request->password])){ 
+    {   
+        $validator = Validator::make($request->all(), [
+            'mobile_number' => 'required',
+            'password' => 'required',
+         ]);
+   
+        if($validator->fails()){
+            return $this->sendError('Validation Error.', $validator->errors());       
+        }
+
+        if(Auth::attempt(['mobile_number' => $request->mobile_number, 'password' => $request->password])){ 
             $user = Auth::user(); 
             $success['token'] =  $user->createToken('MyApp')-> accessToken; 
             $success['name'] =  $user->name;

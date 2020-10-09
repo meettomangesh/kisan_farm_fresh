@@ -17,7 +17,7 @@ class User extends Authenticatable implements MustVerifyEmail
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password',
+        'name', 'email','mobile_number', 'password',
     ];
   
     /**
@@ -28,4 +28,20 @@ class User extends Authenticatable implements MustVerifyEmail
     protected $hidden = [
         'password', 'remember_token',
     ];
+
+    protected $casts = [
+        'mobile_number_verified_at' => 'datetime',
+    ];
+
+    public function hasVerifiedMobileNumber()
+    {
+        return ! is_null($this->mobile_number_verified_at);
+    }
+
+    public function markMobileNumberAsVerified()
+    {
+        return $this->forceFill([
+            'mobile_number_verified_at' => $this->freshTimestamp(),
+        ])->save();
+    }
 }

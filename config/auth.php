@@ -42,9 +42,9 @@ return [
         ],
 
         'api' => [
-            'driver' => 'passport',
-            'provider' => 'users',
-            'hash' => false,
+            'driver' => 'session',
+            'provider' => 'api',
+          //  'hash' => false,
         ],
     ],
 
@@ -70,6 +70,10 @@ return [
             'driver' => 'eloquent',
             'model' => App\User::class,
         ],
+        'api' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\CustomerLoyalty::class,
+        ],
 
         // 'users' => [
         //     'driver' => 'database',
@@ -93,8 +97,8 @@ return [
     */
 
     'passwords' => [
-        'users' => [
-            'provider' => 'users',
+        'api' => [
+            'provider' => 'api',
             'table' => 'password_resets',
             'expire' => 60,
             'throttle' => 60,

@@ -5,9 +5,11 @@ namespace App\Http\Controllers\API;
 use Illuminate\Http\Request;
 use App\Http\Controllers\API\BaseController as BaseController;
 use App\User;
+use App\Models\CustomerLoyalty;
 use Illuminate\Support\Facades\Auth;
 use Validator;
-   
+use App\Helper\DataHelper;
+
 class RegisterController extends BaseController
 {
     /**
@@ -19,10 +21,10 @@ class RegisterController extends BaseController
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required',
-            'email' => 'required|email',
+            'email_address' => 'required|email',
             'mobile_number' => 'required',
             'password' => 'required',
-            'c_password' => 'required|same:password',
+            'confirm_password' => 'required|same:password',
         ]);
    
         if($validator->fails()){
@@ -31,8 +33,11 @@ class RegisterController extends BaseController
    
         $input = $request->all();
         $input['password'] = bcrypt($input['password']);
-        $user = User::create($input);
-        $success['token'] =  $user->createToken('MyApp')->accessToken;
+        $input['referral_code'] = DataHelper::generateBarcodeString(9);
+        $input['email_verify_key'] = DataHelper::emailVerifyKey();
+        $input['created_by'] = 1;
+        $user = CustomerLoyalty::create($input);
+        $success['token'] =  $user->createToken(getenv('APP_NAME'))->accessToken;
         $success['name'] =  $user->name;
    
         return $this->sendResponse($success, 'User register successfully.');
@@ -53,10 +58,12 @@ class RegisterController extends BaseController
         if($validator->fails()){
             return $this->sendError('Validation Error.', $validator->errors());       
         }
-
-        if(Auth::attempt(['mobile_number' => $request->mobile_number, 'password' => $request->password])){ 
-            $user = Auth::user(); 
-            $success['token'] =  $user->createToken('MyApp')-> accessToken; 
+        
+        // echo "on line 61 => ".Auth::guard('api')->attempt(['mobile_number' => $request->mobile_number, 'password' => $request->password]);
+        // exit;
+        if(Auth::guard('api')->attempt(['mobile_number' => $request->mobile_number, 'password' => $request->password])){ 
+            $user = Auth::guard('api')->user(); 
+            $success['token'] =  $user->createToken(getenv('APP_NAME'))-> accessToken; 
             $success['name'] =  $user->name;
    
             return $this->sendResponse($success, 'User login successfully.');

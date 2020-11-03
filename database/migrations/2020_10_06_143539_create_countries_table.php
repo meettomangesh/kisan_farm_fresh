@@ -16,11 +16,12 @@ class CreateCountriesTable extends Migration
         Schema::create('countries', function (Blueprint $table) {
             $table->increments('id')->unsigned();
             $table->string('name', 50)->unique()->index();
+            $table->string('short_code');
             $table->tinyInteger('status')->default(1)->unsigned()->index()->comment = "1: Active, 0: Inactive";
-            $table->integer('created_by')->unsigned();
+            $table->integer('created_by')->default(0)->unsigned();
             $table->integer('updated_by')->default(0)->unsigned();
-            $table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP'));
-            $table->timestamp('updated_at')->default(DB::raw('null ON UPDATE CURRENT_TIMESTAMP'))->nullable();
+            $table->timestamps();
+            $table->softDeletes();
         });
     }
 

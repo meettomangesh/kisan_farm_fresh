@@ -42,8 +42,8 @@ class CreateCustomerLoyaltyTable extends Migration
             $table->rememberToken();
             $table->integer('created_by')->unsigned();
             $table->integer('updated_by')->default(0)->unsigned();
-            $table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP'));
-            $table->timestamp('updated_at')->default(DB::raw('null ON UPDATE CURRENT_TIMESTAMP'))->nullable();
+            $table->timestamps();
+            $table->softDeletes();
         });
     }
 

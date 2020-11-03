@@ -1,47 +1,82 @@
 <?php
 
 namespace App;
-  
-use Illuminate\Notifications\Notifiable;
+
+use Carbon\Carbon;
+use Hash;
+use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Laravel\Passport\HasApiTokens;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-  
-class User extends Authenticatable implements MustVerifyEmail
+use Illuminate\Notifications\Notifiable;
+use Laravel\Passport\HasApiTokens;
+use \DateTimeInterface;
+
+class User extends Authenticatable
 {
-    use HasApiTokens, Notifiable;
-  
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
-    protected $fillable = [
-        'name', 'email','mobile_number', 'password',
-    ];
-  
-    /**
-     * The attributes that should be hidden for arrays.
-     *
-     * @var array
-     */
+    use SoftDeletes, Notifiable, HasApiTokens;
+
+    public $table = 'users';
+
     protected $hidden = [
-        'password', 'remember_token',
+        'remember_token',
+        'password',
     ];
 
-    protected $casts = [
-        'mobile_number_verified_at' => 'datetime',
+    protected $dates = [
+        'email_verified_at',
+        'created_at',
+        'updated_at',
+        'deleted_at',
     ];
 
-    public function hasVerifiedMobileNumber()
+    protected $fillable = [
+        'name',
+        'email',
+        'email_verified_at',
+        'mobile_number',
+        'mobile_number_verified_at',
+        'password',
+        'remember_token',
+        'created_at',
+        'updated_at',
+        'deleted_at',
+    ];
+
+    protected function serializeDate(DateTimeInterface $date)
     {
-        return ! is_null($this->mobile_number_verified_at);
+        return $date->format('Y-m-d H:i:s');
     }
 
-    public function markMobileNumberAsVerified()
+    public function getIsAdminAttribute()
     {
-        return $this->forceFill([
-            'mobile_number_verified_at' => $this->freshTimestamp(),
-        ])->save();
+        return $this->roles()->where('id', 1)->exists();
+    }
+
+    public function getEmailVerifiedAtAttribute($value)
+    {
+        return $value ? Carbon::createFromFormat('Y-m-d H:i:s', $value)->format(config('panel.date_format') . ' ' . config('panel.time_format')) : null;
+    }
+
+    public function setEmailVerifiedAtAttribute($value)
+    {
+        $this->attributes['email_verified_at'] = $value ? Carbon::createFromFormat(config('panel.date_format') . ' ' . config('panel.time_format'), $value)->format('Y-m-d H:i:s') : null;
+    }
+
+    public function setPasswordAttribute($input)
+    {
+        if ($input) {
+            $this->attributes['password'] = app('hash')->needsRehash($input) ? Hash::make($input) : $input;
+        }
+    }
+
+    public function sendPasswordResetNotification($token)
+    {
+        $this->notify(new ResetPassword($token));
+    }
+
+    public function roles()
+    {
+        return $this->belongsToMany(Role::class);
     }
 }

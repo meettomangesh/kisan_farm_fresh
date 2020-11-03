@@ -17,7 +17,8 @@ class CreateCustomerLoginLogsTable extends Migration
             $table->increments('id')->unsigned();
             $table->integer('customer_id')->unsigned()->index();
             $table->tinyInteger('login_through')->unsigned()->index();
-            $table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP'));
+            $table->timestamps();
+            $table->softDeletes();
         });
     }
 

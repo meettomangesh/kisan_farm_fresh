@@ -1,5 +1,5 @@
 <?php
 
 return [
-    'site_title' => 'Travel',
+    'site_title' => 'Kisan Farm Fresh',
 ];

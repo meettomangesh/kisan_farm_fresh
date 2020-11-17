@@ -20,7 +20,7 @@ class RegisterController extends BaseController
     public function register(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'required',
+            'first_name' => 'required',
             'email_address' => 'required|email|unique:customer_loyalty,email_address',
             'mobile_number' => 'required|unique:customer_loyalty,mobile_number',
             'password' => 'required',
@@ -38,7 +38,7 @@ class RegisterController extends BaseController
         $input['created_by'] = 1;
         $user = CustomerLoyalty::create($input);
         $success['token'] =  $user->createToken(getenv('APP_NAME'))->accessToken;
-        $success['name'] =  $user->name;
+        $success['name'] =  $user->first_name. " " .$user->last_name;
 
         return $this->sendResponse($success, 'User register successfully.');
     }
@@ -62,7 +62,7 @@ class RegisterController extends BaseController
         if (Auth::guard('api')->attempt(['mobile_number' => $request->mobile_number, 'password' => $request->password])) {
             $user = Auth::guard('api')->user();
             $success['token'] =  $user->createToken(getenv('APP_NAME'))->accessToken;
-            $success['name'] =  $user->name;
+            $success['name'] =  $user->first_name. " " .$user->last_name;
 
             return $this->sendResponse($success, 'User login successfully.');
         } else {

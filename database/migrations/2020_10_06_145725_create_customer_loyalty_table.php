@@ -15,7 +15,8 @@ class CreateCustomerLoyaltyTable extends Migration
     {
         Schema::create('customer_loyalty', function (Blueprint $table) {
             $table->increments('id')->unsigned();
-            $table->string('name', 100)->index();
+            $table->string('first_name', 100)->index();
+            $table->string('last_name', 100)->default(null)->nullable();
             $table->string('mobile_number', 20)->unique()->index();
             $table->tinyInteger('mobile_verified')->default(0)->unsigned()->index()->comment = "1: Yes, 0: No";
             $table->string('email_address', 100)->index();

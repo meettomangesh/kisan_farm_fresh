@@ -27,7 +27,7 @@ class CustomerLoyalty  extends Authenticatable implements MustVerifyEmail
      * @var array
      */
     protected $fillable = [
-        'name', 'mobile_number', 'email_address', 'password', 'email_verify_key', 'referral_code', 'created_by'
+        'first_name','last_name', 'mobile_number', 'email_address', 'password', 'email_verify_key', 'referral_code', 'created_by'
     ];
 
     public function getAuthPassword()

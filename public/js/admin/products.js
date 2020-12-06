@@ -988,10 +988,10 @@ siteObjJs.admin.productMerchantJs = function () {
         }
         $(".form_datetime").datepicker({
             autoclose: true,
-            isRTL: Metronic.isRTL(),
+            isRTL: true,
             format: "dd MM yyyy",
             startDate: '+0d',
-            pickerPosition: (Metronic.isRTL() ? "bottom-right" : "bottom-left")
+            pickerPosition: "bottom-left"
         })
     };
 
@@ -1535,10 +1535,10 @@ siteObjJs.admin.productMerchantJs = function () {
             fetchProductImagesForView();
             fetchProductLocationInventory();
             fetchProductInventory();
-            changeSpecialPrice('create-product-merchant');
-            handleCustomTextEvents('create-product-merchant');
+            changeSpecialPrice('create-product');
+            handleCustomTextEvents('create-product');
             //bind the validation method to 'add' form on load
-            siteObjJs.validation.formValidateInit('#create-product-merchant', handleAjaxRequest);
+            siteObjJs.validation.formValidateInit('#create-product', handleAjaxRequest);
         }
 
     };

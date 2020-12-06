@@ -20,6 +20,13 @@
     <link href="https://unpkg.com/@coreui/coreui@2.1.16/dist/css/coreui.min.css" rel="stylesheet" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css" rel="stylesheet" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.5.1/min/dropzone.min.css" rel="stylesheet" />
+    <link href="{{ asset('global/plugins/simple-line-icons/simple-line-icons.min.css') }}" rel="stylesheet" />
+    <link href="{{ asset('global/plugins/uniform/css/uniform.default.min.css') }}" rel="stylesheet" />
+    <link href="{{ asset('global/css/components-md.css') }}" rel="stylesheet" />
+    <link href="{{ asset('global/css/plugins-md.css') }}" rel="stylesheet" />
+    @yield('global-level-styles')
+    @yield('page-level-styles')
+    @yield('template-level-styles')
     <link href="{{ asset('css/custom.css') }}" rel="stylesheet" />
     @yield('styles')
 </head>
@@ -87,6 +94,7 @@
             {{ csrf_field() }}
         </form>
     </div>
+    <script src="{{ asset('js/siteobj.js') }}"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
@@ -107,11 +115,19 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.17.47/js/bootstrap-datetimepicker.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.5/js/select2.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.5.1/min/dropzone.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.2/jquery.validate.min.js"></script>
+    <script src="{{ asset('global/plugins/bootbox/bootbox.min.js') }}"></script>
+    <script src="{{ asset('global/plugins/jquery-validation/js/jquery.validate.min.js') }}"></script>
+    <script src="{{ asset('global/plugins/jquery-validation/js/additional-methods.min.js') }}"></script>
+    <script src="{{ asset('global/plugins/jquery-migrate.min.js') }}"></script>
+    <!-- IMPORTANT! Load jquery-ui.min.js before bootstrap.min.js to fix bootstrap tooltip conflict with jquery ui tooltip -->
+    <script src="{{ asset('global/plugins/jquery-ui/jquery-ui.min.js') }}"></script>
+    <script src="{{ asset('global/plugins/bootstrap-hover-dropdown/bootstrap-hover-dropdown.min.js') }}"></script>
+    <script src="{{ asset('global/plugins/jquery-slimscroll/jquery.slimscroll.min.js') }}"></script>
+    <script src="{{ asset('global/plugins/jquery.blockui.min.js') }}"></script>
+    <script src="{{ asset('global/plugins/uniform/jquery.uniform.min.js') }}"></script>
     <script src="{{ asset('js/main.js') }}"></script>
-    <!-- script src="{{ asset('js/siteobj.js') }}"></script>
     <script src="{{ asset('js/admin/common.js') }}"></script>
-    <script src="{{ asset('js/validation.js') }}"></script -->
+    <script src="{{ asset('js/validation.js') }}"></script>
     <script>
         $(function() {
   let copyButtonTrans = '{{ trans('global.datatables.copy') }}'
@@ -226,6 +242,9 @@
 });
 
     </script>
+    @yield('global-level-scripts')
+    @yield('page-level-scripts')
+    @yield('template-level-scripts')
     @yield('scripts')
 </body>
 

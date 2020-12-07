@@ -27,6 +27,56 @@
                         <th>{{ trans('cruds.product.fields.sku') }}</th>
                         <td>{{ $product->sku }}</td>
                     </tr>
+                    <tr>
+                        <th>{{ trans('cruds.product.fields.short_description') }}</th>
+                        <td>{{ $product->short_description }}</td>
+                    </tr>
+                    <tr>
+                        <th>{{ trans('cruds.product.fields.opening_quantity') }}</th>
+                        <td>{{ $product->current_quantity }}</td>
+                    </tr>
+                    <tr>
+                        <th>{{ trans('cruds.product.fields.expiry_date') }}</th>
+                        <td>{{ $product->expiry_date }}</td>
+                    </tr>
+                    <tr>
+                        <th>{{ trans('cruds.product.fields.voucher_value') }}</th>
+                        <td>{{ $product->voucher_value }}</td>
+                    </tr>
+                    <tr>
+                        <th>{{ trans('cruds.product.fields.selling_price') }}</th>
+                        <td>{{ $product->selling_price }}</td>
+                    </tr>
+                    <tr>
+                        <th>{{ trans('cruds.product.fields.special_price') }}</th>
+                        <td>{{ $product->special_price }}</td>
+                    </tr>
+                    <tr>
+                        <th>{{ trans('cruds.product.fields.special_price_start_date') }}</th>
+                        <td>{{ $product->special_price_start_date }}</td>
+                    </tr>
+                    <tr>
+                        <th>{{ trans('cruds.product.fields.special_price_end_date') }}</th>
+                        <td>{{ $product->special_price_end_date }}</td>
+                    </tr>
+                    <tr>
+                        <th>{{ trans('cruds.product.fields.min_quantity') }}</th>
+                        <td>{{ $product->min_quantity }}</td>
+                    </tr>
+                    <tr>
+                        <th>{{ trans('cruds.product.fields.max_quantity') }}</th>
+                        <td>{{ $product->max_quantity }}</td>
+                    </tr>
+                    <tr>
+                        <th>{{ trans('cruds.product.fields.status') }}</th>
+                        <td>
+                            @if($product->status == 1)
+                                {{ trans('cruds.product.fields.active') }}
+                            @else
+                                {{ trans('cruds.product.fields.inactive') }}
+                            @endif
+                        </td>
+                    </tr>
                 </tbody>
             </table>
             <div class="form-group">

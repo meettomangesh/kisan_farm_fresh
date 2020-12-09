@@ -39,7 +39,7 @@ class BaseController extends Controller
     const INVENTORY_RESTRICTION_FAILURE_RESPONSE_CODE = 108;
     //SMS transaction type
     const SMS_MSG_TEMPLATES = [201 => "IN_REGISTER_OTP", 202  => "IN_LOGIN_OTP" ];
-
+    CONST VALIDATION_ERROR = 'Validation Error.';
         /**
      * Create a new controller instance.
      *

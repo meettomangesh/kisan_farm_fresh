@@ -28,7 +28,7 @@ class SmsController extends BaseController
             'transactionType' => 'required',
         ]);
         if ($validator->fails()) {
-            return $this->sendError('Validation Error.', $validator->errors());
+            return $this->sendError(parent::VALIDATION_ERROR, $validator->errors());
         }
 
         try {
@@ -120,7 +120,7 @@ class SmsController extends BaseController
                 'mobile_number' => 'required',
             ]);
             if ($validator->fails()) {
-                return $this->sendError('Validation Error.', $validator->errors());
+                return $this->sendError(parent::VALIDATION_ERROR, $validator->errors());
             }
 
             if (isset($request->mobile_number)) {

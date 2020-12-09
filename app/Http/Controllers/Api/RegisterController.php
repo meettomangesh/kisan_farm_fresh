@@ -25,6 +25,7 @@ class RegisterController extends BaseController
             'mobile_number' => 'required|unique:customer_loyalty,mobile_number',
             'password' => 'required',
             'confirm_password' => 'required|same:password',
+            'otp_verified' => 'required'
         ]);
 
         if ($validator->fails()) {

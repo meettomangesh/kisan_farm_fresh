@@ -20,7 +20,9 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 Route::post('register', 'API\RegisterController@register');
 Route::post('login', 'API\RegisterController@login');
-   
+Route::post('getOtp', 'Api\SmsController@getOtp');
+Route::post('verifyOtp', 'Api\SmsController@verifyOtp');
+// Route::post('getOtp',\Api\SmsController::class . '@getOtp');
 Route::middleware('auth:api')->group( function () {
     Route::resource('products', 'API\ProductController');
 });

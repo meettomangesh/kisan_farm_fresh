@@ -24,9 +24,9 @@
                             </span>
                         </div>
 
-                        <input id="email" name="mobile_number" type="text" class="form-control{{ $errors->has('mobile_number') ? ' is-invalid' : '' }}" required autocomplete="email" autofocus placeholder="{{ trans('global.login_mobile_number') }}" value="{{ old('mobile_number', null) }}">
+                        <input id="mobile_number" name="mobile_number" type="text" class="form-control{{ $errors->has('mobile_number') ? ' is-invalid' : '' }}" required autocomplete="mobile_number" autofocus placeholder="{{ trans('global.login_mobile_number') }}" value="{{ old('mobile_number', null) }}">
 
-                        @if($errors->has('email'))
+                        @if($errors->has('mobile_number'))
                             <div class="invalid-feedback">
                                 {{ $errors->first('mobile_number') }}
                             </div>

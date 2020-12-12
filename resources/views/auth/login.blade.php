@@ -4,18 +4,21 @@
     <div class="col-md-6">
         <div class="card mx-4">
             <div class="card-body p-4">
-                <h1>{{ trans('panel.site_title') }}</h1>
 
-                <p class="text-muted">{{ trans('global.login') }}</p>
 
                 @if(session('message'))
-                    <div class="alert alert-info" role="alert">
-                        {{ session('message') }}
-                    </div>
+                <div class="alert alert-info" role="alert">
+                    {{ session('message') }}
+                </div>
                 @endif
 
                 <form method="POST" action="{{ route('login') }}">
                     @csrf
+                    <div class="input-group mb-3 login-logo-container">
+
+                        <img src="{!! URL::asset('images/logo.png') !!}" alt="" class="logo-default img-responsive" />
+
+                    </div>
 
                     <div class="input-group mb-3">
                         <div class="input-group-prepend">
@@ -27,9 +30,9 @@
                         <input id="mobile_number" name="mobile_number" type="text" class="form-control{{ $errors->has('mobile_number') ? ' is-invalid' : '' }}" required autocomplete="mobile_number" autofocus placeholder="{{ trans('global.login_mobile_number') }}" value="{{ old('mobile_number', null) }}">
 
                         @if($errors->has('mobile_number'))
-                            <div class="invalid-feedback">
-                                {{ $errors->first('mobile_number') }}
-                            </div>
+                        <div class="invalid-feedback">
+                            {{ $errors->first('mobile_number') }}
+                        </div>
                         @endif
                     </div>
 
@@ -41,9 +44,9 @@
                         <input id="password" name="password" type="password" class="form-control{{ $errors->has('password') ? ' is-invalid' : '' }}" required placeholder="{{ trans('global.login_password') }}">
 
                         @if($errors->has('password'))
-                            <div class="invalid-feedback">
-                                {{ $errors->first('password') }}
-                            </div>
+                        <div class="invalid-feedback">
+                            {{ $errors->first('password') }}
+                        </div>
                         @endif
                     </div>
 
@@ -64,9 +67,9 @@
                         </div>
                         <div class="col-6 text-right">
                             @if(Route::has('password.request'))
-                                <a class="btn btn-link px-0" href="{{ route('password.request') }}">
-                                    {{ trans('global.forgot_password') }}
-                                </a><br>
+                            <a class="btn btn-link px-0" href="{{ route('password.request') }}">
+                                {{ trans('global.forgot_password') }}
+                            </a><br>
                             @endif
 
                         </div>

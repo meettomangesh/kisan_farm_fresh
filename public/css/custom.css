@@ -132,3 +132,8 @@ table.dataTable thead .sorting_desc {
 .form-group {
     margin-bottom: 2rem;
 }
+
+#page-logo {
+    width: auto;
+    height: auto;
+}

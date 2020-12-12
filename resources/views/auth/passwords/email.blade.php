@@ -4,14 +4,15 @@
     <div class="col-md-6">
         <div class="card mx-4">
             <div class="card-body p-4">
-                <h1>{{ trans('panel.site_title') }}</h1>
+                <div class="input-group mb-3 login-logo-container">
 
-                <p class="text-muted">{{ trans('global.reset_password') }}</p>
+                    <img src="{!! URL::asset('images/logo.png') !!}" alt="" class="logo-default img-responsive" />
 
+                </div>
                 @if(session('status'))
-                    <div class="alert alert-success" role="alert">
-                        {{ session('status') }}
-                    </div>
+                <div class="alert alert-success" role="alert">
+                    {{ session('status') }}
+                </div>
                 @endif
 
                 <form method="POST" action="{{ route('password.email') }}">
@@ -21,9 +22,9 @@
                         <input id="email" type="email" class="form-control{{ $errors->has('email') ? ' is-invalid' : '' }}" name="email" required autocomplete="email" autofocus placeholder="{{ trans('global.login_email') }}" value="{{ old('email') }}">
 
                         @if($errors->has('email'))
-                            <div class="invalid-feedback">
-                                {{ $errors->first('email') }}
-                            </div>
+                        <div class="invalid-feedback">
+                            {{ $errors->first('email') }}
+                        </div>
                         @endif
                     </div>
 

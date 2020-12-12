@@ -59,6 +59,11 @@ Route::group([
     // Categories
     Route::delete('categories/destroy', 'CategoriesController@massDestroy')->name('categories.massDestroy');
     Route::resource('categories', 'CategoriesController');
+
+    // Categories
+    Route::delete('customers/destroy', 'CustomersController@massDestroy')->name('customers.massDestroy');
+    Route::resource('customers', 'CustomersController');
+
 });
 Route::group(['prefix' => 'profile', 'as' => 'profile.', 'namespace' => 'Auth', 'middleware' => ['auth']], function () {
 // Change password

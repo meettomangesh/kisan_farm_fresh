@@ -98,6 +98,14 @@
                 </a>
             </li>
             @endcan
+            @can('customers_access')
+            <li class="nav-item">
+                <a href="{{ route("admin.customers.index") }}" class="nav-link {{ request()->is('admin/customers') || request()->is('admin/customers/*') ? 'active' : '' }}">
+                    <i class="fa-fw fas fa-cogs nav-icon"></i>
+                    {{ trans('cruds.customers.title') }}
+                </a>
+            </li>
+            @endcan
             @if(file_exists(app_path('Http/Controllers/Auth/ChangePasswordController.php')))
             @can('profile_password_edit')
             <li class="nav-item">

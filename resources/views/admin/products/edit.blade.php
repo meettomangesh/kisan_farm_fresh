@@ -205,7 +205,7 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-group">
-                        <label class="control-label col-md-4 required" for="max_quantity">{{ trans('cruds.product.fields.status') }}</label>
+                        <label class="control-label col-md-4 required" for="status">{{ trans('cruds.product.fields.status') }}</label>
                         <div class="col-md-8 float-right">
                             <div class="radio-list">
                                 <label class="radio-inline"><input type="radio" name="status" value="{{ old('status', '1') }}" required> {!! trans('cruds.product.fields.active') !!}</label>

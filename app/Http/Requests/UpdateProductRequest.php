@@ -6,18 +6,19 @@ use App\Product;
 use Gate;
 use Illuminate\Foundation\Http\FormRequest;
 use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Support\Facades\Auth;
 
 class UpdateProductRequest extends FormRequest
 {
     public function authorize()
     {
         abort_if(Gate::denies('product_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-
         return true;
     }
 
     public function rules()
     {
+        $this->sanitize();
         $segments = $this->segments();
         $id = $segments[sizeof($segments) - 1];
         $startDate = strtotime('-1 days', strtotime($this->all()['special_price_start_date']));
@@ -26,6 +27,7 @@ class UpdateProductRequest extends FormRequest
             $this->request->set('special_price_start_date', null);
             $this->request->set('special_price_end_date', null);
         }
+        $this->request->set('updated_by', Auth::id());
 
         $validationRules = [
             /* 'special_price' => ['required_with:special_price_start_date, special_price_end_date'],
@@ -40,5 +42,11 @@ class UpdateProductRequest extends FormRequest
             $validationRules['custom_text'] = ['required','max:20'];
         }
         return $validationRules;
+    }
+
+    public function sanitize() {
+        $input = $this->all();
+        $input['updated_by'] = Auth::id();
+        $this->merge($input);
     }
 }

@@ -13,12 +13,12 @@ class StoreProductRequest extends FormRequest
     public function authorize()
     {
         abort_if(Gate::denies('product_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-
         return true;
     }
 
     public function rules()
     {
+        $this->sanitize();
         $startDate = strtotime('-1 days', strtotime($this->all()['special_price_start_date']));
         $startDateNew = date('d F Y', $startDate);
         if (!$this->request->get('special_price')) {
@@ -40,5 +40,11 @@ class StoreProductRequest extends FormRequest
             $validationRules['custom_text'] = ['required','max:20'];
         }
         return $validationRules;
+    }
+
+    public function sanitize() {
+        $input = $this->all();
+        $input['created_by'] = Auth::id();
+        $this->merge($input);
     }
 }

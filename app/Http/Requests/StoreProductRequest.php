@@ -6,6 +6,7 @@ use App\Product;
 use Gate;
 use Illuminate\Foundation\Http\FormRequest;
 use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Support\Facades\Auth;
 
 class StoreProductRequest extends FormRequest
 {
@@ -24,6 +25,7 @@ class StoreProductRequest extends FormRequest
             $this->request->set('special_price_start_date', null);
             $this->request->set('special_price_end_date', null);
         }
+        $this->request->set('created_by', Auth::id());
 
         $validationRules = [
             /* 'special_price' => ['required_with:special_price_start_date, special_price_end_date'],

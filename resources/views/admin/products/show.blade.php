@@ -39,10 +39,10 @@
                         <th>{{ trans('cruds.product.fields.expiry_date') }}</th>
                         <td>{{ $product->expiry_date }}</td>
                     </tr>
-                    <tr>
+                    <!-- <tr>
                         <th>{{ trans('cruds.product.fields.voucher_value') }}</th>
                         <td>{{ $product->voucher_value }}</td>
-                    </tr>
+                    </tr> -->
                     <tr>
                         <th>{{ trans('cruds.product.fields.selling_price') }}</th>
                         <td>{{ $product->selling_price }}</td>

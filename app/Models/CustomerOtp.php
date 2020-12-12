@@ -27,7 +27,7 @@ class CustomerOtp extends Model
 
     public function generateOtp()
     {
-        $digit = 4;
+        $digit = 6;
         $otpNumber = rand(pow(10, $digit - 1), pow(10, $digit) - 1);
         return $otpNumber;
     }

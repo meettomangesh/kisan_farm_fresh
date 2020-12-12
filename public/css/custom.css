@@ -138,6 +138,10 @@ table.dataTable thead .sorting_desc {
     height: auto;
 }
 
+#page-logo  img {
+    width: 200px;
+}
+
 .login-logo-container {
     text-align: center;
     display: block;

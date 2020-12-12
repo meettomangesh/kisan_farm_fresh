@@ -85,10 +85,16 @@
             @can('product_access')
             <li class="nav-item">
                 <a href="{{ route("admin.products.index") }}" class="nav-link {{ request()->is('admin/products') || request()->is('admin/products/*') ? 'active' : '' }}">
-                    <i class="fa-fw fas fa-cogs nav-icon">
-
-                    </i>
+                    <i class="fa-fw fas fa-cogs nav-icon"></i>
                     {{ trans('cruds.product.title') }}
+                </a>
+            </li>
+            @endcan
+            @can('category_access')
+            <li class="nav-item">
+                <a href="{{ route("admin.categories.index") }}" class="nav-link {{ request()->is('admin/categories') || request()->is('admin/categories/*') ? 'active' : '' }}">
+                    <i class="fa-fw fas fa-cogs nav-icon"></i>
+                    {{ trans('cruds.category.title') }}
                 </a>
             </li>
             @endcan

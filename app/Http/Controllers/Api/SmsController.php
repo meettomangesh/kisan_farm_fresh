@@ -127,7 +127,7 @@ class SmsController extends BaseController
                 $ismobilePresent = 1;
                 $mobileNumber = $request->mobile_number;
             }
-            $smsValidityTime = env('SMS_VALIDITY_TIME_MINUTES');
+            $smsValidityTime = getenv('SMS_VALIDITY_TIME_MINUTES');
 
             $customerOtp = new CustomerOtp();
             $result = $customerOtp->validateOtp($request->otp, $mobileNumber, $request->id, $request->platform, $ismobilePresent, $smsValidityTime);

@@ -18,7 +18,7 @@ class Category extends Model
         'deleted_at',
     ];
 
-    protected $fillable = ['cat_name','status','created_by','updated_by'];
+    protected $fillable = ['cat_name','status','cat_description','created_by','updated_by'];
 
     protected function serializeDate(DateTimeInterface $date)
     {

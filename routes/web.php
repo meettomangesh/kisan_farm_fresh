@@ -60,9 +60,13 @@ Route::group([
     Route::delete('categories/destroy', 'CategoriesController@massDestroy')->name('categories.massDestroy');
     Route::resource('categories', 'CategoriesController');
 
-    // Categories
+    // Customers
     Route::delete('customers/destroy', 'CustomersController@massDestroy')->name('customers.massDestroy');
     Route::resource('customers', 'CustomersController');
+
+    // States
+    Route::delete('states/destroy', 'StatesController@massDestroy')->name('states.massDestroy');
+    Route::resource('states', 'StatesController');
 
 });
 Route::group(['prefix' => 'profile', 'as' => 'profile.', 'namespace' => 'Auth', 'middleware' => ['auth']], function () {

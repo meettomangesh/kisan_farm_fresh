@@ -52,26 +52,50 @@
                 </ul>
             </li>
             @endcan
-            <!-- @can('country_access')
-            <li class="nav-item">
-                <a href="{{ route("admin.countries.index") }}" class="nav-link {{ request()->is('admin/countries') || request()->is('admin/countries/*') ? 'active' : '' }}">
-                    <i class="fa-fw fas fa-flag nav-icon">
+
+            @can('territories_access')
+            <li class="nav-item nav-dropdown">
+                <a class="nav-link  nav-dropdown-toggle" href="#">
+                    <i class="fa-fw fas fa-users nav-icon">
 
                     </i>
-                    {{ trans('cruds.country.title') }}
+                    {{ trans('cruds.territories.title') }}
                 </a>
-            </li>
+                <ul class="nav-dropdown-items">
+                    @can('country_access')
+                    <li class="nav-item">
+                        <a href="{{ route("admin.countries.index") }}" class="nav-link {{ request()->is('admin/countries') || request()->is('admin/countries/*') ? 'active' : '' }}">
+                            <i class="fa-fw fas fa-flag nav-icon">
+
+                            </i>
+                            {{ trans('cruds.country.title') }}
+                        </a>
+                    </li>
+                    @endcan
+                    @can('state_access')
+                    <li class="nav-item">
+                        <a href="{{ route("admin.states.index") }}" class="nav-link {{ request()->is('admin/states') || request()->is('admin/states/*') ? 'active' : '' }}">
+                            <i class="fa-fw fas fa-flag nav-icon">
+
+                            </i>
+                            {{ trans('cruds.state.title') }}
+                        </a>
+                    </li>
+                    @endcan
+                    @can('city_access')
+                    <li class="nav-item">
+                        <a href="{{ route("admin.cities.index") }}" class="nav-link {{ request()->is('admin/cities') || request()->is('admin/cities/*') ? 'active' : '' }}">
+                            <i class="fa-fw fas fa-cogs nav-icon">
+
+                            </i>
+                            {{ trans('cruds.city.title') }}
+                        </a>
+                    </li>
+                    @endcan
+                </ul>
+            <li>
             @endcan
-            @can('city_access')
-            <li class="nav-item">
-                <a href="{{ route("admin.cities.index") }}" class="nav-link {{ request()->is('admin/cities') || request()->is('admin/cities/*') ? 'active' : '' }}">
-                    <i class="fa-fw fas fa-cogs nav-icon">
-
-                    </i>
-                    {{ trans('cruds.city.title') }}
-                </a>
-            </li>
-            @endcan -->
+            
             <!-- @can('trip_access')
             <li class="nav-item">
                 <a href="{{ route("admin.trips.index") }}" class="nav-link {{ request()->is('admin/trips') || request()->is('admin/trips/*') ? 'active' : '' }}">

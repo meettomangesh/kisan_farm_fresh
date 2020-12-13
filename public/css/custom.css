@@ -146,3 +146,7 @@ table.dataTable thead .sorting_desc {
     text-align: center;
     display: block;
   }
+
+  .sidebar-toggler:focus {
+      outline:none;
+  }

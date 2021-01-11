@@ -9,10 +9,10 @@ class AddRelationshipFieldsToCitiesTable extends Migration
     public function up()
     {
         Schema::table('cities', function (Blueprint $table) {
-            $table->unsignedInteger('country_id');
+
             $table->foreign('country_id', 'country_fk_1586974')->references('id')->on('countries');
-			$table->unsignedInteger('state_id');
-            $table->foreign('state_id', 'state_fk_1586974')->references('id')->on('states');
+
+            $table->foreign('state_id', 'state_fk_158676974')->references('id')->on('states');
         });
     }
 }

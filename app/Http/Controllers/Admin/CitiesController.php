@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\City;
 use App\Country;
+use App\State;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\MassDestroyCityRequest;
 use App\Http\Requests\StoreCityRequest;
@@ -11,6 +12,8 @@ use App\Http\Requests\UpdateCityRequest;
 use Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
+use DB;
+
 
 class CitiesController extends Controller
 {
@@ -47,7 +50,11 @@ class CitiesController extends Controller
 
         $city->load('country');
 
-        return view('admin.cities.edit', compact('countries', 'city'));
+        $states = State::all()->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+
+        $city->load('state');
+
+        return view('admin.cities.edit', compact('countries', 'states', 'city'));
     }
 
     public function update(UpdateCityRequest $request, City $city)
@@ -80,5 +87,11 @@ class CitiesController extends Controller
         City::whereIn('id', request('ids'))->delete();
 
         return response(null, Response::HTTP_NO_CONTENT);
+    }
+
+    public function getStates($id)
+    {
+        $states = DB::table("states")->where("country_id", $id)->pluck("name", "id");
+        return json_encode($states);
     }
 }

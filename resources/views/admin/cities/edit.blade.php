@@ -34,6 +34,37 @@
                 @endif
                 <span class="help-block">{{ trans('cruds.city.fields.country_helper') }}</span>
             </div>
+
+            <div class="form-group">
+                <label class="required" for="country_id">{{ trans('cruds.city.fields.state') }}</label>
+                <select class="form-control select2 {{ $errors->has('country') ? 'is-invalid' : '' }}" name="state_id" id="state_id" required>
+                    @foreach($states as $id => $state)
+                        <option value="{{ $id }}" {{ ($city->state ? $city->state->id : old('state_id')) == $id ? 'selected' : '' }}>{{ $state }}</option>
+                    @endforeach
+                </select>
+                @if($errors->has('state'))
+                    <div class="invalid-feedback">
+                        {{ $errors->first('state') }}
+                    </div>
+                @endif
+                <span class="help-block">{{ trans('cruds.city.fields.state_helper') }}</span>
+            </div>
+
+            <!-- <div class="form-group">
+                <label class="required" for="state_id">{{ trans('cruds.city.fields.state') }}</label>
+                
+                <select class="form-control select2 {{ $errors->has('state') ? 'is-invalid' : '' }}" name="state_id" id="state_id" required>
+
+                    <option>Please select</option>
+                </select>
+                @if($errors->has('state'))
+                <div class="invalid-feedback">
+                    {{ $errors->first('state') }}
+                </div>
+                @endif
+                <span class="help-block">{{ trans('cruds.city.fields.state_helper') }}</span>
+            </div> -->
+
             <div class="form-group">
                 <button class="btn btn-danger" type="submit">
                     {{ trans('global.save') }}
@@ -45,4 +76,33 @@
 
 
 
+@endsection
+
+@section('scripts')
+@parent
+<script>
+    $(document).ready(function() {
+        $('select[name="country_id"]').on('change', function() {
+            var countryID = $(this).val();
+            var url = '{{ route("admin.cities.getStates", "") }}';
+            url = url+'/'+countryID;
+
+            if (countryID) {
+                $.ajax({
+                    url: url,
+                    type: "GET",
+                    dataType: "json",
+                    success: function(data) {
+                        $('select[name="state_id"]').empty();
+                        $.each(data, function(key, value) {
+                            $('select[name="state_id"]').append('<option value="' + key + '">' + value + '</option>');
+                        });
+                    }
+                });
+            } else {
+                $('select[name="state_id"]').empty();
+            }
+        });
+    });
+</script>
 @endsection

@@ -92,6 +92,16 @@
                         </a>
                     </li>
                     @endcan
+                    @can('pin_code_access')
+                    <li class="nav-item">
+                        <a href="{{ route("admin.pincodes.index") }}" class="nav-link {{ request()->is('admin/pincodes') || request()->is('admin/pincodes/*') ? 'active' : '' }}">
+                            <i class="fa-fw fas fa-cogs nav-icon">
+
+                            </i>
+                            {{ trans('cruds.pin_code.title') }}
+                        </a>
+                    </li>
+                    @endcan
                 </ul>
             <li>
             @endcan

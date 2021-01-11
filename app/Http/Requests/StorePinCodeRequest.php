@@ -7,11 +7,11 @@ use Gate;
 use Illuminate\Foundation\Http\FormRequest;
 use Symfony\Component\HttpFoundation\Response;
 
-class StoreCityRequest extends FormRequest
+class StorePinCodeRequest extends FormRequest
 {
     public function authorize()
     {
-        abort_if(Gate::denies('city_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+        abort_if(Gate::denies('pin_code_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         return true;
     }
@@ -19,7 +19,7 @@ class StoreCityRequest extends FormRequest
     public function rules()
     {
         return [
-            'name'       => [
+            'pin_code'       => [
                 'required',
             ],
             'country_id' => [
@@ -27,6 +27,10 @@ class StoreCityRequest extends FormRequest
                 'integer',
             ],
             'state_id' => [
+                'required',
+                'integer',
+            ],
+            'city_id' => [
                 'required',
                 'integer',
             ],

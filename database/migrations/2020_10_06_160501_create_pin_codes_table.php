@@ -16,9 +16,11 @@ class CreatePinCodesTable extends Migration
         Schema::create('pin_codes', function (Blueprint $table) {
             $table->increments('id')->unsigned();
             $table->string('pin_code', 15)->index();
+            $table->integer('country_id')->default(0)->unsigned()->index();
+            $table->integer('state_id')->default(0)->unsigned()->index();
             $table->integer('city_id')->default(0)->unsigned()->index();
             $table->tinyInteger('status')->default(1)->unsigned()->index()->comment = "1: Active, 0: Inactive";
-            $table->integer('created_by')->unsigned();
+            $table->integer('created_by')->default(0)->unsigned();
             $table->integer('updated_by')->default(0)->unsigned();
             $table->timestamps();
             $table->softDeletes();

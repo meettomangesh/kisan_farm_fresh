@@ -6,11 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use \DateTimeInterface;
 
-class City extends Model
+class PinCode extends Model
 {
     use SoftDeletes;
 
-    public $table = 'cities';
+    public $table = 'pin_codes';
 
     protected $dates = [
         'created_at',
@@ -19,9 +19,10 @@ class City extends Model
     ];
 
     protected $fillable = [
-        'name',
+        'pin_code',
         'country_id',
         'state_id',
+        'city_id',
         'created_at',
         'updated_at',
         'deleted_at',
@@ -40,5 +41,10 @@ class City extends Model
     public function state()
     {
         return $this->belongsTo(State::class, 'state_id');
+    }
+
+    public function city()
+    {
+        return $this->belongsTo(City::class, 'city_id');
     }
 }

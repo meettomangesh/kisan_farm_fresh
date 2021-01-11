@@ -1,13 +1,13 @@
 <?php
 
 Route::redirect('/', '/login');
-Route::get('/home', function () {
-    if (session('status')) {
-        return redirect()->route('admin.home')->with('status', session('status'));
-    }
+// Route::get('/home', function () {
+//     if (session('status')) {
+//         return redirect()->route('admin.home')->with('status', session('status'));
+//     }
 
-    return redirect()->route('admin.home');
-});
+//     return redirect()->route('admin.home');
+// });
 
 Auth::routes(['register' => false]);
 // Admin
@@ -45,7 +45,16 @@ Route::group([
     Route::resource('countries', 'CountriesController');
 
     // Cities
+    
+    Route::delete('pincodes/destroy', 'PinCodesController@massDestroy')->name('pincodes.massDestroy');
+    Route::get('pincodes/getStates/{cid?}', 'PinCodesController@getStates')->name('pincodes.getStates');
+    Route::get('pincodes/getCities/{cid?}/{sid?}', 'PinCodesController@getCities')->name('pincodes.getCities');
+    Route::resource('pincodes', 'PinCodesController');
+
+    // Cities
+    
     Route::delete('cities/destroy', 'CitiesController@massDestroy')->name('cities.massDestroy');
+    Route::get('cities/getStates/{cid?}', 'CitiesController@getStates')->name('cities.getStates');
     Route::resource('cities', 'CitiesController');
 
     // Trips

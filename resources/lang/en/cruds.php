@@ -39,6 +39,25 @@ return [
             'deleted_at_helper'  => '',
         ],
     ],
+    'region'           => [
+        'title'          => 'Regions',
+        'title_singular' => 'Region',
+        'fields'         => [
+            'id'                 => 'ID',
+            'id_helper'          => '',
+            'region_name'              => 'Name',
+            'region_name_helper'       => '',
+            'pin_codes'        => 'Pin Codes',
+            'pin_codes_helper' => '',
+            'created_at'         => 'Created at',
+            'created_at_helper'  => '',
+            'updated_at'         => 'Updated at',
+            'updated_at_helper'  => '',
+            'deleted_at'         => 'Deleted at',
+            'deleted_at_helper'  => '',
+
+        ],
+    ],
     'user'           => [
         'title'          => 'Users',
         'title_singular' => 'User',

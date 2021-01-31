@@ -102,6 +102,16 @@
                         </a>
                     </li>
                     @endcan
+                    @can('region_access')
+                    <li class="nav-item">
+                        <a href="{{ route("admin.regions.index") }}" class="nav-link {{ request()->is('admin/regions') || request()->is('admin/regions/*') ? 'active' : '' }}">
+                            <i class="fa-fw fas fa-cogs nav-icon">
+
+                            </i>
+                            {{ trans('cruds.region.title') }}
+                        </a>
+                    </li>
+                    @endcan
                 </ul>
             <li>
             @endcan

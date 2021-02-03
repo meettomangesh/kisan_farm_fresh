@@ -116,16 +116,16 @@
             <li>
             @endcan
             
-            <!-- @can('trip_access')
+            @can('deliveryboy_access')
             <li class="nav-item">
-                <a href="{{ route("admin.trips.index") }}" class="nav-link {{ request()->is('admin/trips') || request()->is('admin/trips/*') ? 'active' : '' }}">
+                <a href="{{ route("admin.deliveryboys.index") }}" class="nav-link {{ request()->is('admin/deliveryboys') || request()->is('admin/deliveryboys/*') ? 'active' : '' }}">
                     <i class="fa-fw fas fa-cogs nav-icon">
 
                     </i>
-                    {{ trans('cruds.trip.title') }}
+                    {{ trans('cruds.deliveryboy.title') }}
                 </a>
             </li>
-            @endcan -->
+            @endcan
             @can('product_access')
             <li class="nav-item">
                 <a href="{{ route("admin.products.index") }}" class="nav-link {{ request()->is('admin/products') || request()->is('admin/products/*') ? 'active' : '' }}">

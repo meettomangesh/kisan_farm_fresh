@@ -43,7 +43,7 @@ class DeliveryBoysController extends Controller
 
     public function store(StoreDeliveryBoyRequest $request)
     {
-        $user = DeliveryBoy::create($request->all());
+        $user = User::create($request->all());
         $user->roles()->sync($request->input('roles', []));
         $user->regions()->sync($request->input('regions', []));
 

@@ -79,4 +79,8 @@ class DeliveryBoy extends Authenticatable
     {
         return $this->belongsToMany(Role::class);
     }
+    public function regions()
+    {
+        return $this->belongsToMany(Region::class);
+    }
 }

@@ -57,6 +57,16 @@
                             @endforeach
                         </td>
                     </tr>
+                    <tr>
+                        <th>
+                            {{ trans('cruds.deliveryboy.fields.regions') }}
+                        </th>
+                        <td>
+                            @foreach($deliveryboy->regions as $key => $regions)
+                                <span class="label label-info">{{ $regions->region_name }}</span>
+                            @endforeach
+                        </td>
+                    </tr>
                 </tbody>
             </table>
             <div class="form-group">

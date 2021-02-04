@@ -102,6 +102,8 @@ return [
             'password_helper'          => '',
             'roles'                    => 'Roles',
             'roles_helper'             => '',
+            'regions'                  => 'Regions',
+            'regions_helper'             => '',
             'remember_token'           => 'Remember Token',
             'remember_token_helper'    => '',
             'created_at'               => 'Created at',

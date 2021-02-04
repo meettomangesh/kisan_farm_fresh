@@ -9,6 +9,7 @@ use App\Http\Requests\UpdateDeliveryBoyRequest;
 use App\Role;
 use App\DeliveryBoy;
 use App\User;
+use App\Region;
 use Gate;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -25,8 +26,9 @@ class DeliveryBoysController extends Controller
                 $q->where('title', 'Delivery Boy');
             }
         )->get();
+        $regions = Region::all()->where('status', 1)->pluck('region_name', 'id');
 
-        return view('admin.deliveryboys.index', compact('deliveryboys'));
+        return view('admin.deliveryboys.index', compact('deliveryboys','regions'));
     }
 
     public function create()
@@ -34,14 +36,17 @@ class DeliveryBoysController extends Controller
         abort_if(Gate::denies('deliveryboy_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         $roles = Role::all()->where('title', 'Delivery Boy')->pluck('title', 'id');
-
-        return view('admin.deliveryboys.create', compact('roles'));
+        $regions = Region::all()->where('status', 1)->pluck('region_name', 'id');
+         
+        return view('admin.deliveryboys.create', compact('roles','regions'));
     }
 
     public function store(StoreDeliveryBoyRequest $request)
     {
         $user = DeliveryBoy::create($request->all());
         $user->roles()->sync($request->input('roles', []));
+        $user->regions()->sync($request->input('regions', []));
+
 
         return redirect()->route('admin.deliveryboys.index');
     }
@@ -50,18 +55,20 @@ class DeliveryBoysController extends Controller
     {
         abort_if(Gate::denies('deliveryboy_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $roles = Role::all()->pluck('title', 'id');
+        $roles = Role::all()->where('title', 'Delivery Boy')->pluck('title', 'id');
+        $regions = Region::all()->where('status', 1)->pluck('region_name', 'id');
 
         $deliveryboy->load('roles');
+        $deliveryboy->load('regions');
 
-        return view('admin.deliveryboys.edit', compact('roles', 'deliveryboy'));
+        return view('admin.deliveryboys.edit', compact('roles', 'deliveryboy','regions'));
     }
 
     public function update(UpdateDeliveryBoyRequest $request, User $deliveryboy)
     {
         $deliveryboy->update($request->all());
         $deliveryboy->roles()->sync($request->input('roles', []));
-
+        $deliveryboy->regions()->sync($request->input('regions', []));
         return redirect()->route('admin.deliveryboys.index');
     }
 
@@ -70,6 +77,7 @@ class DeliveryBoysController extends Controller
         abort_if(Gate::denies('deliveryboy_show'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         $deliveryboy->load('roles');
+        $deliveryboy->load('regions');
 
         return view('admin.deliveryboys.show', compact('deliveryboy'));
     }

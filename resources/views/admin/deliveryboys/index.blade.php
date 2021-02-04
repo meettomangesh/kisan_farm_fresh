@@ -36,6 +36,9 @@
                             {{ trans('cruds.deliveryboy.fields.mobile_number') }}
                         </th>
                         <th>
+                            {{ trans('cruds.deliveryboy.fields.regions') }}
+                        </th>
+                        <th>
                             &nbsp;
                         </th>
                     </tr>
@@ -58,11 +61,11 @@
                             <td>
                                 {{ $deliveryboy->mobile_number ?? '' }}
                             </td>
-                            <!-- <td>
-                                @foreach($deliveryboy->roles as $key => $item)
-                                    <span class="badge badge-info">{{ $item->title }}</span>
+                            <td>
+                                @foreach($deliveryboy->regions as $key => $item)
+                                    <span class="badge badge-info">{{ $item->region_name }}</span>
                                 @endforeach
-                            </td> -->
+                            </td>
                             <td>
                                 @can('deliveryboy_show')
                                     <a class="btn btn-xs btn-primary" href="{{ route('admin.deliveryboys.show', $deliveryboy->id) }}">

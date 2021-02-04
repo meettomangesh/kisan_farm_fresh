@@ -6,11 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use \DateTimeInterface;
 
-class RegionDeliveryBoy extends Model
+class RegionUser extends Model
 {
     use SoftDeletes;
 
-    public $table = 'region_delivery_boy';
+    public $table = 'region_user';
 
     protected $dates = [
         'created_at',
@@ -20,7 +20,7 @@ class RegionDeliveryBoy extends Model
 
     protected $fillable = [
         'region_id',
-        'delivery_boy_id',
+        'user_id',
         'status',
         'created_at',
         'updated_at',

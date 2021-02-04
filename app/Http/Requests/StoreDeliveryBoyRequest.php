@@ -40,6 +40,13 @@ class StoreDeliveryBoyRequest extends FormRequest
                 'required',
                 'array',
             ],
+            'regions.*'  => [
+                'integer',
+            ],
+            'regions'    => [
+                'required',
+                'array',
+            ],
         ];
     }
 }

@@ -20,6 +20,10 @@
                         <td>{{ $product->id }}</td>
                     </tr>
                     <tr>
+                        <th>{{ trans('cruds.product.fields.product_image') }}</th>
+                        <td><img src="{{ asset($product->images) }}" alt="" width="50" height="50"></td>
+                    </tr>
+                    <tr>
                         <th>{{ trans('cruds.product.fields.product_name') }}</th>
                         <td>{{ $product->product_name }}</td>
                     </tr>
@@ -45,11 +49,11 @@
                     </tr> -->
                     <tr>
                         <th>{{ trans('cruds.product.fields.selling_price') }}</th>
-                        <td>{{ $product->selling_price }}</td>
+                        <td>{{ number_format((float)$product->selling_price, 2, '.', '') }}</td>
                     </tr>
                     <tr>
                         <th>{{ trans('cruds.product.fields.special_price') }}</th>
-                        <td>{{ $product->special_price }}</td>
+                        <td>{{ number_format((float)$product->special_price, 2, '.', '') }}</td>
                     </tr>
                     <tr>
                         <th>{{ trans('cruds.product.fields.special_price_start_date') }}</th>
@@ -66,6 +70,16 @@
                     <tr>
                         <th>{{ trans('cruds.product.fields.max_quantity') }}</th>
                         <td>{{ $product->max_quantity }}</td>
+                    </tr>
+                    <tr>
+                        <th>{{ trans('cruds.product.fields.stock_availability') }}</th>
+                        <td>
+                            @if($product->status == 1)
+                                {{ trans('cruds.product.fields.in_stock') }}
+                            @else
+                                {{ trans('cruds.product.fields.out_of_stock') }}
+                            @endif
+                        </td>
                     </tr>
                     <tr>
                         <th>{{ trans('cruds.product.fields.status') }}</th>

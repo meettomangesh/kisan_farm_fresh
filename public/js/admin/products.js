@@ -3,9 +3,10 @@ siteObjJs.admin.productMerchantJs = function () {
     var storedNewFiles = [];
     var removedFileNames = [];
     var maxImageSize = 2097152;
-    var maxImagesSelect = 6;
+    var maxImagesSelect = 5;
     var imageNamesArr = [];
     var rowNumber;
+    var removedImagesIds = [];
 // Initialize all the page-specific event listeners here.
 
     var initializeListener = function (formId) {
@@ -106,8 +107,95 @@ siteObjJs.admin.productMerchantJs = function () {
             $('.form-group').removeClass('has-success');
         });
 
+        /* $('#create-product').on('submit', function() {
+            // return $('#testForm').jqxValidator('validate');
+            var formElement = $(this);// Retrive form from DOM and convert it to jquery object
+            var formData = formElement.serializeArray();
+            var formId = formElement.attr("id");
+            var form = new FormData();
+            if (storedFiles.length > 0) {
+                $.each(storedFiles, function (key, value) {
+                    form.append('images[]', value);
+                });
+                $('#' + formId + " span#file-error-container").text("").removeClass('help-block-error');
+            } else {
+                $('#' + formId + " span#file-error-container").text("Please select at least one image.").addClass('help-block-error');
+                return false;
+            }
+        }); */
+
+        $('#edit-product').on('submit', function() {
+            if($("#dvPreview").children().length == 0 && $('input[type="file"]').val() == '') {
+                $("#edit-product span#file-error-container").attr("style", "color: red").text("Please select at least one image.").addClass('help-block-error red');
+                setTimeout(function(){
+                    $("#edit-product span#file-error-container").text("").removeClass('help-block-error');
+                }, 3000);
+                return false;
+            }
+        });
+
+        $("body").on('click', '#remove-btn', function () {
+            var r = confirm("Are you sure you want to delete this image?");
+            if (r == true) {
+                var rowId = $(this).attr('data-image-id');
+                $("#blank-row-"+rowId).remove();
+                removedImagesIds.push(rowId);
+                $("#removed_images").val(removedImagesIds);
+                if($("#dvPreview").children().length == 0) {
+                    $(".product-image-div").remove();
+                }
+            }
+        });
 
         imageNamesArr = [];
+
+        $("body").on('change', '.product_images', function () {
+            var billSelectError = '';
+            var form = $(this).closest("form");
+            var formId = form.attr("id");
+            if (typeof (FileReader) != "undefined") {
+                var regex = /^([a-zA-Z0-9\s_\\.\-:])+(.jpg|.jpeg|.png|.bmp)$/;
+                var i = 0;
+                $($(this)[0].files).each(function () {
+                    // To select same image in chrome browser
+                    var file = $(this);
+                    if (regex.test(file[0].name.toLowerCase())) {
+                        // Select bill image whose name is not exists for current bill.
+                        // Select bill image whose size is less than 2MB.
+                        // Select maximum 5 bill images.
+                        if ($.inArray(file[0].name, imageNamesArr) == -1 && file[0].size < maxImageSize && imageNamesArr.length < maxImagesSelect) {
+                            imageNamesArr.push(file[0].name);
+                        } else {
+                            if ($.inArray(file[0].name, imageNamesArr) >= 0 && !$.isEmptyObject(imageNamesArr)) {
+                                billSelectError += file[0].name + ' is already exists.';
+                            }
+                            if (file[0].size > maxImageSize) {
+                                billSelectError += file[0].name + ' is not selected. Maximum image size allowed is 2MB only.';
+                            }
+                            if (imageNamesArr.length >= maxImagesSelect) {
+                                billSelectError += 'Maximum ' + maxImagesSelect + ' images allowed.';
+                            }
+                            $('input[type="file"]').val(null);
+                            $('#' + formId + " span#file-error-container").attr("style", "color: red").text(billSelectError).addClass('help-block-error');
+                            setTimeout(function(){
+                                $('#' + formId + " span#file-error-container").text("").removeClass('help-block-error');
+                            }, 3000);
+                            return false;
+                        }
+                    } else {
+                        $('input[type="file"]').val(null);
+                        $('#' + formId + " span#file-error-container").attr("style", "color: red").text(file[0].name + " is not a valid image file.").addClass('help-block-error');
+                        setTimeout(function(){
+                            $('#' + formId + " span#file-error-container").text("").removeClass('help-block-error');
+                        }, 3000);
+                        return false;
+                    }
+                    i++;
+                });
+            } else {
+                console.log("This browser does not support HTML5 FileReader.");
+            }
+        });
 
         $("body").on('change', '.fileupload', function () {
             var billSelectError = '';
@@ -141,7 +229,7 @@ siteObjJs.admin.productMerchantJs = function () {
                                 var colDivRemove = $("<td width='15%'>");
 
                                 var img = $("<img />");
-                                img.attr("style", "height:100%;width:100%;");
+                                img.attr("style", "width:100%;");
                                 img.attr("src", e.target.result);
                                 colDivPreview.append(img);
 

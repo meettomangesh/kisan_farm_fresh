@@ -21,6 +21,7 @@
                     <tr>
                         <th width="10"></th>
                         <th>{{ trans('cruds.product.fields.id') }}</th>
+                        <th>{{ trans('cruds.product.fields.product_image') }}</th>
                         <th>{{ trans('cruds.product.fields.product_name') }}</th>
                         <th>{{ trans('cruds.product.fields.sku') }}</th>
                         <th>{{ trans('cruds.product.fields.actions') }}</th>
@@ -31,6 +32,7 @@
                         <tr data-entry-id="{{ $product->id }}">
                             <td></td>
                             <td>{{ $product->id ?? '' }}</td>
+                            <td><img src="{{ asset($product->images) }}" alt="" width="60" height="60"></td>
                             <td>{{ $product->product_name ?? '' }}</td>
                             <td>{{ $product->sku ?? '' }}</td>
                             <td>

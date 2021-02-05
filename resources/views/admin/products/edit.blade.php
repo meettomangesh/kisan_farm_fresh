@@ -72,7 +72,7 @@
                     <div class="form-group">
                         <label class="control-label col-md-4 required" for="current_quantity">{{ trans('cruds.product.fields.opening_quantity') }}</label>
                         <div class="col-md-8 float-right">
-                            <input class="form-control {{ $errors->has('current_quantity') ? 'is-invalid' : '' }}" name="current_quantity" id="current_quantity" value="{{ old('current_quantity', $product->current_quantity) }}" greaterThanZero = "true" numberOnly="true" required>
+                            <input class="form-control {{ $errors->has('current_quantity') ? 'is-invalid' : '' }}" name="current_quantity" id="current_quantity" value="{{ old('current_quantity', $product->current_quantity) }}" greaterThanZero = "true" numberOnly="true" disabled>
                             @if($errors->has('current_quantity'))
                                 <div class="invalid-feedback">
                                     {{ $errors->first('current_quantity') }}
@@ -139,7 +139,7 @@
                                 <span class="input-group-addon">
                                     <i class="fa fa-inr"></i>
                                 </span>
-                                <input class="form-control {{ $errors->has('special_price') ? 'is-invalid' : '' }}" name="special_price" id="special_price" value="{{ old('special_price', round($product->special_price, 2)) }}" greaterThanZero = "true" numberOnly="true" maxlength="10" autocomplete="off">
+                                <input class="form-control {{ $errors->has('special_price') ? 'is-invalid' : '' }}" name="special_price" id="special_price" value="{{ old('special_price', $product->special_price > 0 ? round($product->special_price, 2) : '') }}" greaterThanZero = "true" numberOnly="true" maxlength="10" autocomplete="off">
                             </div>
                             <span class="help-block">{{ trans('cruds.product.fields.special_price_helper') }}</span>
                         </div>
@@ -205,21 +205,81 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-group">
+                        <label class="control-label col-md-4 required" for="stock_availability">{{ trans('cruds.product.fields.stock_availability') }}</label>
+                        <div class="col-md-8 float-right">
+                            <div class="radio-list">
+                                <label class="radio-inline"><input type="radio" name="stock_availability" value="{{ old('stock_availability', '1') }}" {{ $product->stock_availability == '1' ? 'checked' : '' }} required> {!! trans('cruds.product.fields.in_stock') !!}</label>
+                                <label class="radio-inline"><input type="radio" name="stock_availability" value="{{ old('stock_availability', '0') }}" {{ $product->stock_availability == '0' ? 'checked' : '' }} required> {!! trans('cruds.product.fields.out_of_stock') !!}</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
                         <label class="control-label col-md-4 required" for="status">{{ trans('cruds.product.fields.status') }}</label>
                         <div class="col-md-8 float-right">
                             <div class="radio-list">
-                                <label class="radio-inline"><input type="radio" name="status" value="{{ old('status', '1') }}" required> {!! trans('cruds.product.fields.active') !!}</label>
-                                <label class="radio-inline"><input type="radio" name="status" value="{{ old('status', '0') }}" required> {!! trans('cruds.product.fields.inactive') !!}</label>
+                                <label class="radio-inline"><input type="radio" name="status" value="{{ old('status', '1') }}" {{ $product->status == '1' ? 'checked' : '' }} required> {!! trans('cruds.product.fields.active') !!}</label>
+                                <label class="radio-inline"><input type="radio" name="status" value="{{ old('status', '0') }}" {{ $product->status == '0' ? 'checked' : '' }} required> {!! trans('cruds.product.fields.inactive') !!}</label>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="fileupload-buttonbar form-group">
+                        <label class="col-md-4 control-label required">{{ trans('cruds.product.fields.product_images') }}</label>
+                        <div class="col-md-8 float-right">
+                            <input type="file" name="product_images[]" class="product_images" accept="image/*"  multiple/>
+                            <span class="fileupload-process"></span>
+                            <span id="file-error-container"></span>
+                            <span class="help-block">{{ trans('cruds.product.fields.product_images_helper') }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            @if(sizeof($productImages) > 0)
+            <div class="row product-image-div">
+                <div class="col-md-8">
+                    <div class="form-group">
+                        <div class="col-md-12 col-xs-offset-3">
+                            <div class="files-table table-container">
+                                <table role="presentation" class="table table-striped table-bordered clearfix table-border-separate" id="image-preview-table">
+                                    <thead>
+                                        <tr>
+                                            <th width="1%" class="text-center">#</th>
+                                            <th class="text-center">{{ trans('cruds.product.fields.preview') }}</th>
+                                            <!-- th>{{ trans('cruds.product.fields.file_name') }}</th>
+                                            <th>{{ trans('cruds.product.fields.image_description') }}</th>
+                                            <th>{{ trans('cruds.product.fields.display_order') }}</th -->
+                                            <th class="text-center">{{ trans('cruds.product.fields.actions') }}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="files" id="dvPreview">
+                                        @foreach($productImages as $key => $image)
+                                            <tr class="row-for-blank" id="blank-row-{{ $image->id }}">
+                                                <td class="text-center">{{ $srNo = $srNo + 1 }}</td>
+                                                <td class="text-center"><img src="{{ asset($image->image_name) }}" alt="" width="60" height="60"></td>
+                                                <td class="text-center"><span class="btn red" id="remove-btn" data-display-order="{{ $image->display_order }}" data-image-id="{{ $image->id }}">Remove</span></td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @endif
+
             <div class="form-group">
                 <button class="btn btn-danger" type="submit">
                     {{ trans('global.save') }}
                 </button>
+                <input type="hidden" name="removed_images" id="removed_images" />
             </div>
         </form>
     </div>

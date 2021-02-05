@@ -185,7 +185,7 @@
                     <div class="form-group">
                         <label class="control-label col-md-4 required" for="min_quantity">{{ trans('cruds.product.fields.min_quantity') }}</label>
                         <div class="col-md-8 float-right">
-                            <input class="form-control {{ $errors->has('min_quantity') ? 'is-invalid' : '' }}" name="min_quantity" id="min_quantity" value="{{ old('min_quantity', '') }}" greaterThanZero = "true" numberOnly="true" maxlength="10" autocomplete="off" required>
+                            <input class="form-control {{ $errors->has('min_quantity') ? 'is-invalid' : '' }}" name="min_quantity" id="min_quantity" value="{{ old('min_quantity', '1') }}" greaterThanZero = "true" numberOnly="true" maxlength="10" autocomplete="off" required>
                             <span class="help-block">{{ trans('cruds.product.fields.min_quantity_helper') }}</span>
                         </div>
                     </div>
@@ -215,10 +215,58 @@
                 </div>
             </div>
 
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="fileupload-buttonbar form-group">
+                        <label class="col-md-4 control-label required">{{ trans('cruds.product.fields.product_images') }}</label>
+                        <div class="col-md-8 float-right">
+                            <!-- span class="btn green fileinput-button">
+                                <i class="fa fa-plus"></i>
+                                <span>{{ trans('cruds.product.fields.select_images') }}</span>
+                                <input type="file" name="product_images[]" id="product_images" class="fileupload ignore-validate product_merchant_image" data-rule-required="false" accept="image/*" data-rel="product_images" multiple="true" required/>
+                            </span -->
+                            <input type="file" name="product_images[]" class="product_images" accept="image/*"  multiple required/>
+                            <span class="fileupload-process"></span>
+                            <span id="file-error-container"></span>
+                            <span class="help-block">{{ trans('cruds.product.fields.product_images_helper') }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- div class="row">
+                <div class="col-md-8">
+                    <div class="form-group">
+                        <div class="col-md-12 col-xs-offset-3">
+                            <div class="files-table table-container">
+                                <table role="presentation" class="table table-striped table-bordered clearfix table-border-separate" id="image-preview-table">
+                                    <thead>
+                                        <tr>
+                                            <th width="1%">#</th>
+                                            <th>{{ trans('cruds.product.fields.preview') }}</th>
+                                            <th>{{ trans('cruds.product.fields.file_name') }}</th>
+                                            <th>{{ trans('cruds.product.fields.image_description') }}</th>
+                                            <th>{{ trans('cruds.product.fields.display_order') }}</th>
+                                            <th>{{ trans('cruds.product.fields.remove') }}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="files" id="dvPreview">
+                                        <tr class="row-for-blank" id="blank-row">
+                                            <td colspan="6" class="text-center">No image selected.</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div -->
+
             <div class="form-group">
                 <button class="btn btn-danger" type="submit">
                     {{ trans('global.save') }}
                 </button>
+                <!-- input type="hidden" name="images[]" id="images"/ -->
             </div>
         </form>
     </div>

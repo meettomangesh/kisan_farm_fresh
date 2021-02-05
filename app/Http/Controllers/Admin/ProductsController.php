@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Product;
+// use App\Product;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\MassDestroyProductRequest;
 use App\Http\Requests\StoreProductRequest;
@@ -10,6 +10,8 @@ use App\Http\Requests\UpdateProductRequest;
 use Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
+use App\Models\Product;
+use App\Models\ProductImages;
 
 class ProductsController extends Controller
 {
@@ -28,19 +30,37 @@ class ProductsController extends Controller
 
     public function store(StoreProductRequest $request)
     {
-        $product = Product::create($request->all());
+        // print_r($request->all()); exit;
+        if ($request->hasFile('product_images')) {
+            $product = Product::create($request->all());
+            if($product->id > 0) {
+                Product::storeProductImages($request, $product->id, 1);
+                Product::storeProductInventory($request, $product->id);
+            }
+        }
         return redirect()->route('admin.products.index');
     }
 
     public function edit(Product $product)
     {
         abort_if(Gate::denies('product_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-        return view('admin.products.edit', compact('product'));
+        $productImages = Product::getProductImages($product->id);
+        $srNo = 0;
+        return view('admin.products.edit', compact('product','productImages','srNo'));
     }
 
     public function update(UpdateProductRequest $request, Product $product)
     {
-        $product->update($request->all());
+        // print_r($request->all());exit;
+        $requestAll = $request->all();
+        $product->update($requestAll);
+        if ($request->hasFile('product_images') && $product->id > 0) {
+            Product::storeProductImages($request, $product->id, 2);
+        }
+        if($requestAll['removed_images'] != '' && $product->id > 0) {
+            Product::removeProductImages($requestAll['removed_images']);
+        }
+
         return redirect()->route('admin.products.index');
     }
 

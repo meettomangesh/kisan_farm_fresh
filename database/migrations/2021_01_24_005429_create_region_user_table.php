@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateRegionDeliveryBoyTable extends Migration
+class CreateRegionUserTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,10 +13,10 @@ class CreateRegionDeliveryBoyTable extends Migration
      */
     public function up()
     {
-        Schema::create('region_delivery_boy', function (Blueprint $table) {
+        Schema::create('region_user', function (Blueprint $table) {
             $table->id();
             $table->integer('region_id')->unsigned()->index();
-            $table->integer('delivery_boy_id')->unsigned()->index();
+            $table->integer('user_id')->unsigned()->index();
             $table->tinyInteger('status')->default(1)->unsigned()->index()->comment = "1: Active, 0: Inactive";
             $table->timestamps();
             $table->softDeletes();
@@ -30,6 +30,6 @@ class CreateRegionDeliveryBoyTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('region_delivery_boy');
+        Schema::dropIfExists('region_user');
     }
 }

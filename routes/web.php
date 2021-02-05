@@ -63,6 +63,12 @@ Route::group([
     //Route::get('cities/getStates/{cid?}', 'RegionsController@getStates')->name('regions.getStates');
     Route::resource('regions', 'RegionsController');
 
+    // Delivery boys
+
+    Route::delete('deliveryboys/destroy', 'DeliveryBoysController@massDestroy')->name('deliveryboys.massDestroy');
+    //Route::get('cities/getStates/{cid?}', 'RegionsController@getStates')->name('regions.getStates');
+    Route::resource('deliveryboys', 'DeliveryBoysController');
+
     // Trips
     Route::delete('trips/destroy', 'TripsController@massDestroy')->name('trips.massDestroy');
     Route::resource('trips', 'TripsController');

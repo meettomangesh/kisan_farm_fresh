@@ -12,7 +12,7 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Passport\HasApiTokens;
 use \DateTimeInterface;
 
-class User extends Authenticatable
+class DeliveryBoy extends Authenticatable
 {
     use SoftDeletes, Notifiable, HasApiTokens;
 
@@ -79,7 +79,6 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Role::class);
     }
-
     public function regions()
     {
         return $this->belongsToMany(Region::class);

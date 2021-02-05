@@ -49,6 +49,24 @@
                         </a>
                     </li>
                     @endcan
+                    @can('deliveryboy_access')
+                    <li class="nav-item">
+                        <a href="{{ route("admin.deliveryboys.index") }}" class="nav-link {{ request()->is('admin/deliveryboys') || request()->is('admin/deliveryboys/*') ? 'active' : '' }}">
+                            <i class="fa-fw fas fa-cogs nav-icon">
+
+                            </i>
+                            {{ trans('cruds.deliveryboy.title') }}
+                        </a>
+                    </li>
+                    @endcan
+                    @can('customers_access')
+                    <li class="nav-item">
+                        <a href="{{ route("admin.customers.index") }}" class="nav-link {{ request()->is('admin/customers') || request()->is('admin/customers/*') ? 'active' : '' }}">
+                            <i class="fa-fw fas fa-cogs nav-icon"></i>
+                            {{ trans('cruds.customers.title') }}
+                        </a>
+                    </li>
+                    @endcan
                 </ul>
             </li>
             @endcan
@@ -116,16 +134,7 @@
             <li>
             @endcan
             
-            <!-- @can('trip_access')
-            <li class="nav-item">
-                <a href="{{ route("admin.trips.index") }}" class="nav-link {{ request()->is('admin/trips') || request()->is('admin/trips/*') ? 'active' : '' }}">
-                    <i class="fa-fw fas fa-cogs nav-icon">
 
-                    </i>
-                    {{ trans('cruds.trip.title') }}
-                </a>
-            </li>
-            @endcan -->
             @can('product_access')
             <li class="nav-item">
                 <a href="{{ route("admin.products.index") }}" class="nav-link {{ request()->is('admin/products') || request()->is('admin/products/*') ? 'active' : '' }}">
@@ -142,14 +151,7 @@
                 </a>
             </li>
             @endcan
-            @can('customers_access')
-            <li class="nav-item">
-                <a href="{{ route("admin.customers.index") }}" class="nav-link {{ request()->is('admin/customers') || request()->is('admin/customers/*') ? 'active' : '' }}">
-                    <i class="fa-fw fas fa-cogs nav-icon"></i>
-                    {{ trans('cruds.customers.title') }}
-                </a>
-            </li>
-            @endcan
+  
             @if(file_exists(app_path('Http/Controllers/Auth/ChangePasswordController.php')))
             @can('profile_password_edit')
             <li class="nav-item">

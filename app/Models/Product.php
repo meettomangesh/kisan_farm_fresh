@@ -43,21 +43,12 @@ class Product extends Model
             $userId = $inputs['updated_by'];
         }
         if ($params->hasFile('product_images')) {
-            /* if($flag == 2) {
-                $displayOrder = ProductImages::select('display_order')->where('products_id', $productId, 'status', 1)->get();
-            } */
             $path = '/images/products/';
-            $i = 1;
             foreach ($images as $item) {
                 $var = date_create();
                 $time = date_format($var, 'YmdHis');
                 $imageName = $time . '-' . $item->getClientOriginalName();
                 $item->move(base_path().'/public' . $path, $imageName);
-                if($i == 1 && $flag == 1) {
-                    $product = Product::find($productId);
-                    $product->images = $path.$imageName;
-                    $product->save();
-                }
                 ProductImages::create(array(
                     'products_id' => $productId,
                     'image_name' => $path.$imageName,

@@ -32,7 +32,7 @@
                         <tr data-entry-id="{{ $product->id }}">
                             <td></td>
                             <td>{{ $product->id ?? '' }}</td>
-                            <td><img src="{{ asset($product->images) }}" alt="" width="60" height="60"></td>
+                            <td><img src="{{ asset(App\Models\ProductImages::getFirstImage($product->id))  }}" alt="" width="60" height="60"></td>
                             <td>{{ $product->product_name ?? '' }}</td>
                             <td>{{ $product->sku ?? '' }}</td>
                             <td>

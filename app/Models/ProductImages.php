@@ -24,4 +24,9 @@ class ProductImages extends Model
     {
         return $date->format('Y-m-d H:i:s');
     }
+
+    protected function getFirstImage($productId) {
+        $firstProductImage = ProductImages::select('image_name')->where('products_id', $productId)->where('status', 1)->first();
+        return $firstProductImage->image_name;
+    }
 }

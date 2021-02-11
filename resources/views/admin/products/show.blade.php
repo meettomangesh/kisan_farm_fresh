@@ -21,7 +21,7 @@
                     </tr>
                     <tr>
                         <th>{{ trans('cruds.product.fields.product_image') }}</th>
-                        <td><img src="{{ asset($product->images) }}" alt="" width="50" height="50"></td>
+                        <td><img src="{{ asset(App\Models\ProductImages::getFirstImage($product->id)) }}" alt="" width="50" height="50"></td>
                     </tr>
                     <tr>
                         <th>{{ trans('cruds.product.fields.product_name') }}</th>

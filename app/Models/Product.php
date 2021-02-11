@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use \DateTimeInterface;
 use App\Models\ProductImages;
 use App\Models\ProductInventory;
+use App\Models\Category;
 
 class Product extends Model
 {
@@ -20,11 +21,16 @@ class Product extends Model
         'deleted_at',
     ];
 
-    protected $fillable = ['brand_id', 'product_name', 'short_description', 'sku', 'images', 'expiry_date', 'selling_price', 'special_price', 'special_price_start_date', 'special_price_end_date', 'current_quantity', 'min_quantity', 'max_quantity', 'max_quantity_perday_percust', 'max_quantity_perday_allcust', 'notify_for_qty_below', 'stock_availability', 'status', 'view_count','created_by','updated_by'];
+    protected $fillable = ['brand_id', 'category_id', 'product_name', 'short_description', 'sku', 'images', 'expiry_date', 'selling_price', 'special_price', 'special_price_start_date', 'special_price_end_date', 'current_quantity', 'min_quantity', 'max_quantity', 'max_quantity_perday_percust', 'max_quantity_perday_allcust', 'notify_for_qty_below', 'stock_availability', 'status', 'view_count','created_by','updated_by'];
 
     protected function serializeDate(DateTimeInterface $date)
     {
         return $date->format('Y-m-d H:i:s');
+    }
+
+    public function category()
+    {
+        return $this->belongsTo(Category::class, 'category_id');
     }
 
     protected function storeProductImages ($params, $productId, $flag) {

@@ -86,6 +86,27 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-group">
+                        <label class="control-label col-md-4 required" for="category_id">{{ trans('cruds.product.fields.category') }}</label>
+                        <div class="col-md-8 float-right">
+                            <select class="form-control select2 {{ $errors->has('category') ? 'is-invalid' : '' }}" name="category_id" id="category_id" required>
+                                @foreach($categories as $id => $category)
+                                    <option value="{{ $id }}" {{ old('category_id') == $id ? 'selected' : '' }}>{{ $category }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        @if($errors->has('category'))
+                        <div class="invalid-feedback">
+                            {{ $errors->first('category') }}
+                        </div>
+                        @endif
+                        <span class="help-block">{{ trans('cruds.product.fields.category_helper') }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
                         <label class="control-label col-md-4" for="expiry_date">{{ trans('cruds.product.fields.expiry_date') }}</label>
                         <div class="col-md-8 float-right">
                             <!--div data-error-container="#form_expiry_date_error" class="input-group date form_datetime" data-date-start-date="+0d" -->

@@ -151,6 +151,14 @@
                 </a>
             </li>
             @endcan
+            @can('unit_access')
+            <li class="nav-item">
+                <a href="{{ route("admin.units.index") }}" class="nav-link {{ request()->is('admin/units') || request()->is('admin/units/*') ? 'active' : '' }}">
+                    <i class="fa-fw fas fa-cogs nav-icon"></i>
+                    {{ trans('cruds.unit.title') }}
+                </a>
+            </li>
+            @endcan
   
             @if(file_exists(app_path('Http/Controllers/Auth/ChangePasswordController.php')))
             @can('profile_password_edit')

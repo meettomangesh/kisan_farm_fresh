@@ -2,17 +2,17 @@
 
 namespace App\Http\Requests;
 
-use App\Models\Category;
+use App\Models\Unit;
 use Gate;
 use Illuminate\Foundation\Http\FormRequest;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Support\Facades\Auth;
 
-class StoreCategoryRequest extends FormRequest
+class StoreUnitRequest extends FormRequest
 {
     public function authorize()
     {
-        abort_if(Gate::denies('category_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+        abort_if(Gate::denies('unit_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         return true;
     }
 
@@ -20,7 +20,7 @@ class StoreCategoryRequest extends FormRequest
     {
         $this->sanitize();
         return [
-            'cat_name' => ['required','max:50','unique:categories_master'], //alphaSpaces
+            'unit' => ['required','max:20'], //alphaSpaces
             'status' => ['required','numeric']
         ];
     }
@@ -28,8 +28,8 @@ class StoreCategoryRequest extends FormRequest
     public function sanitize()
     {
         $input = $this->all();
-        $input['cat_name'] = filter_var($input['cat_name'], FILTER_SANITIZE_STRING);
-        $input['cat_description'] = filter_var($input['cat_description'], FILTER_SANITIZE_STRING);
+        $input['unit'] = filter_var($input['unit'], FILTER_SANITIZE_STRING);
+        $input['description'] = filter_var($input['description'], FILTER_SANITIZE_STRING);
         $input['created_by'] = Auth::id();
         $this->merge($input);
     }

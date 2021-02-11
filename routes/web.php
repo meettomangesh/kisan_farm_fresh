@@ -81,6 +81,10 @@ Route::group([
     Route::delete('categories/destroy', 'CategoriesController@massDestroy')->name('categories.massDestroy');
     Route::resource('categories', 'CategoriesController');
 
+    // Units
+    Route::delete('units/destroy', 'UnitsController@massDestroy')->name('units.massDestroy');
+    Route::resource('units', 'UnitsController');
+
     // Customers
     Route::delete('customers/destroy', 'CustomersController@massDestroy')->name('customers.massDestroy');
     Route::resource('customers', 'CustomersController');

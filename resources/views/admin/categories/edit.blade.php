@@ -39,8 +39,8 @@
                     <label class="col-md-3 required" for="status">{{ trans('cruds.category.fields.status') }}</label>
                     <div class="col-md-4">
                         <div class="radio-list">
-                            <label class="radio-inline"><input type="radio" name="status" value="{{ old('status', '1') }}" required> {!! trans('cruds.category.fields.active') !!}</label>
-                            <label class="radio-inline"><input type="radio" name="status" value="{{ old('status', '0') }}" required> {!! trans('cruds.category.fields.inactive') !!}</label>
+                            <label class="radio-inline"><input type="radio" name="status" value="{{ old('status', '1') }}" {{ $category->status == '1' ? 'checked' : '' }} required> {!! trans('cruds.category.fields.active') !!}</label>
+                            <label class="radio-inline"><input type="radio" name="status" value="{{ old('status', '0') }}" {{ $category->status == '0' ? 'checked' : '' }} required> {!! trans('cruds.category.fields.inactive') !!}</label>
                         </div>
                     </div>
                 </div>

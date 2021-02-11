@@ -15,11 +15,11 @@ class CreateProductImagesTable extends Migration
     {
         Schema::create('product_images', function(Blueprint $table) {
             $table->increments('id')->unsigned();
-            $table->integer('products_merchant_id')->unsigned()->index();
+            $table->integer('products_id')->unsigned()->index();
             $table->string('image_name', 1000);
             $table->string('image_description', 200)->nullable();
             $table->tinyInteger('display_order')->default(1)->unsigned();
-            $table->tinyInteger('status')->default(1)->unsigned()->index()->comment = "1 : Active  0 : Inactive";           
+            $table->tinyInteger('status')->default(1)->unsigned()->index()->comment = "1: Active, 0: Inactive";
             $table->integer('created_by')->unsigned();
             $table->integer('updated_by')->default(0)->unsigned();
             $table->timestamps();

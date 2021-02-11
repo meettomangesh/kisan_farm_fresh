@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -18,7 +18,7 @@ class Category extends Model
         'deleted_at',
     ];
 
-    protected $fillable = ['cat_name','status','cat_description','created_by','updated_by'];
+    protected $fillable = ['cat_name','status','cat_description','created_by','updated_by','created_at','updated_at','deleted_at'];
 
     protected function serializeDate(DateTimeInterface $date)
     {

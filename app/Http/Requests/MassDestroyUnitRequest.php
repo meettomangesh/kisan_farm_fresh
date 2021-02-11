@@ -2,16 +2,16 @@
 
 namespace App\Http\Requests;
 
-use App\Models\Category;
+use App\Models\Unit;
 use Gate;
 use Illuminate\Foundation\Http\FormRequest;
 use Symfony\Component\HttpFoundation\Response;
 
-class MassDestroyCategoryRequest extends FormRequest
+class MassDestroyUnitRequest extends FormRequest
 {
     public function authorize()
     {
-        abort_if(Gate::denies('category_delete'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+        abort_if(Gate::denies('unit_delete'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         return true;
     }
 
@@ -19,7 +19,7 @@ class MassDestroyCategoryRequest extends FormRequest
     {
         return [
             'ids'   => ['required','array'],
-            'ids.*' => ['exists:categories_master,id'],
+            'ids.*' => ['exists:unit_master,id'],
         ];
     }
 }

@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use App\Models\Product;
 use App\Models\ProductImages;
+use App\Models\Category;
 
 class ProductsController extends Controller
 {
@@ -25,7 +26,8 @@ class ProductsController extends Controller
     public function create()
     {
         abort_if(Gate::denies('product_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-        return view('admin.products.create');
+        $categories = Category::all()->pluck('cat_name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        return view('admin.products.create', compact('categories'));
     }
 
     public function store(StoreProductRequest $request)
@@ -46,7 +48,9 @@ class ProductsController extends Controller
         abort_if(Gate::denies('product_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $productImages = Product::getProductImages($product->id);
         $srNo = 0;
-        return view('admin.products.edit', compact('product','productImages','srNo'));
+        $categories = Category::all()->pluck('cat_name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $product->load('category');
+        return view('admin.products.edit', compact('product','productImages','srNo','categories'));
     }
 
     public function update(UpdateProductRequest $request, Product $product)

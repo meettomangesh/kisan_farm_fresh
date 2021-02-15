@@ -259,6 +259,8 @@ return [
             'opening_quantity_helper'         => '',
             'category'                => 'Category',
             'category_helper'         => '',
+            'units'                => 'Units',
+            'units_helper'         => '',
             'expiry_date'                => 'Expiry Date',
             'expiry_date_helper'         => 'The product will not be visible beyond this date.',
             'voucher_value'                => 'Product Price',

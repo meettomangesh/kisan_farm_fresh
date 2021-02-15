@@ -102,6 +102,27 @@
                         <span class="help-block">{{ trans('cruds.product.fields.category_helper') }}</span>
                     </div>
                 </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="control-label col-md-4 required" for="units">{{ trans('cruds.product.fields.units') }}</label>
+                        <div class="col-md-8 float-right">
+                            <div style="padding-bottom: 4px">
+                                <span class="btn btn-info btn-xs select-all" style="border-radius: 0">{{ trans('global.select_all') }}</span>
+                                <span class="btn btn-info btn-xs deselect-all" style="border-radius: 0">{{ trans('global.deselect_all') }}</span>
+                            </div>
+                            <select class="form-control select2 {{ $errors->has('units') ? 'is-invalid' : '' }}" name="unit_ids[]" id="unit_ids" multiple required>
+                                <option>Please select</option>
+                            </select>
+                            @if($errors->has('units'))
+                                <div class="invalid-feedback">
+                                    {{ $errors->first('units') }}
+                                </div>
+                            @endif
+                            <span class="help-block">{{ trans('cruds.product.fields.units_helper') }}</span>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <div class="row">
@@ -314,6 +335,28 @@
 <script>
     jQuery(document).ready(function () {
         siteObjJs.admin.productMerchantJs.init('create-product');
+
+        $('select[name="category_id"]').on('change', function() {
+            var categoryId = $(this).val();
+            var url = '{{ route("admin.products.getUnits", "") }}';
+            url = url+'/'+categoryId;
+
+            if (categoryId) {
+                $.ajax({
+                    url: url,
+                    type: "GET",
+                    dataType: "json",
+                    success: function(data) {
+                        $("#unit_ids").empty();
+                        $.each(data, function(key, value) {
+                            $("#unit_ids").append('<option value="' + key + '">' + value + '</option>');
+                        });
+                    }
+                });
+            } else {
+                $("#unit_ids").empty();
+            }
+        });
     });
 </script>
 @endsection

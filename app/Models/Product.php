@@ -8,6 +8,7 @@ use \DateTimeInterface;
 use App\Models\ProductImages;
 use App\Models\ProductInventory;
 use App\Models\Category;
+use App\Models\ProductUnits;
 
 class Product extends Model
 {
@@ -44,6 +45,7 @@ class Product extends Model
         }
         if ($params->hasFile('product_images')) {
             $path = '/images/products/';
+            $i = 0;
             foreach ($images as $item) {
                 $var = date_create();
                 $time = date_format($var, 'YmdHis');
@@ -85,5 +87,37 @@ class Product extends Model
             ProductImages::destroy($val);
         }
         return true;
+    }
+
+    protected function storeProductUnits ($params, $productId, $flag) {
+        $inputs = $params->all();
+        $productUnits = $inputs['unit_ids'];
+        $userId = 0;
+        if($flag == 1) {
+            $userId = $inputs['created_by'];
+        } elseif($flag == 2) {
+            $userId = $inputs['updated_by'];
+        }
+        foreach ($productUnits as $item) {
+            ProductUnits::create(array(
+                'products_id' => $productId,
+                'unit_id' => $item,
+                'created_by' => $userId
+            ));
+        }
+        return true;
+    }
+
+    protected function removeProductUnits($productId) {
+        ProductUnits::where('products_id',$productId)->delete();
+        return true;
+    }
+
+    protected function getProductUnits($productId) {
+        return ProductUnits::join('unit_master', 'unit_master.id', '=', 'product_units.unit_id')
+            ->where('product_units.status', 1)
+            ->where('product_units.products_id', $productId)
+            ->get(['unit_master.id','unit_master.unit']);
+            // ->toArray();
     }
 }

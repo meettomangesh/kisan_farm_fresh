@@ -22,7 +22,9 @@ class CreateCustomerOtpTable extends Migration
             $table->tinyInteger('otp_used')->default(0)->index()->comment = "1 : Yes, 0 : No";
             $table->tinyInteger('platform_generated_on')->default(0)->comment = "1 : Android, 2 : iOS, 3 : WebPOS, 4 : Website";
             $table->integer('otp_generated_for')->default(1)->comment = "201 : Login, 202 : Registration";
-            $table->timestamps();
+            // $table->timestamps();
+            $table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP'));
+            $table->timestamp('updated_at')->default(DB::raw('null ON UPDATE CURRENT_TIMESTAMP'))->nullable();
         });
     }
 

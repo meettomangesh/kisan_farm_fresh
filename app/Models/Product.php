@@ -8,6 +8,7 @@ use \DateTimeInterface;
 use App\Models\ProductImages;
 use App\Models\ProductInventory;
 use App\Models\Category;
+use App\Models\Product
 
 class Product extends Model
 {
@@ -85,5 +86,16 @@ class Product extends Model
             ProductImages::destroy($val);
         }
         return true;
+    }
+
+    public function getProductList($params) {
+        $queryResult = DB::select('call getProductList(?)', [$params]);
+        // $result = collect($queryResult);
+        if(sizeof($queryResult) > 0) {
+            foreach($queryResult as $key => $val) {
+                // ProductUnit::select('id','product_name','short_description','expiry_date','selling_price','special_price','special_price_start_date','special_price_end_date','min_quantity','max_quantity')->where('status', 1)->where('stock_availability', 1)->get()->toArray();
+            }
+        }
+        return $queryResult;
     }
 }

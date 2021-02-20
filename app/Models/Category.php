@@ -24,4 +24,8 @@ class Category extends Model
     {
         return $date->format('Y-m-d H:i:s');
     }
+
+    public function getCategoryList() {
+        return Category::select('id','cat_name')->get()->toArray();
+    }
 }

@@ -20,7 +20,8 @@ class ProductsController extends BaseController
             'no_of_records' => 'required',
             'page_number' => 'required',
             // 'search' => 'required',
-            // 'sort' => 'required',
+            // 'sort_type' => 'required',
+            // 'sort_on' => 'required',
         ]);
         if ($validator->fails()) {
             return $this->sendError(parent::VALIDATION_ERROR, $validator->errors());

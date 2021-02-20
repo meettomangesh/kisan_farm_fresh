@@ -26,5 +26,5 @@ Route::post('verifyOtp', 'Api\SmsController@verifyOtp');
 Route::post('categories', 'Api\CategoryController@getCategoryList');
 Route::post('products', 'Api\ProductsController@getProductList');
 Route::middleware('auth:api')->group( function () {
-    Route::resource('products', 'API\ProductController');
+    // Route::resource('products', 'API\ProductsController');
 });

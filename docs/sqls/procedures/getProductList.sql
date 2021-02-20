@@ -29,7 +29,7 @@ getProductList:BEGIN
     FROM products AS p
     WHERE p.deleted_at IS NULL AND p.status = 1 AND p.stock_availability = 1 AND IF(categoryId = 0 OR categoryId IS NULL, 1=1, p.category_id = categoryId)
     -- AND (searchValue IS NULL, 1=1, p.product_name LIKE "%searchValue%")
-    ORDER BY p.id ASC
+    ORDER BY p.selling_price ASC
     LIMIT noOfRecords
     OFFSET pageNumber;
     -- SELECT JSON_OBJECT('status','SUCCESS', 'message','No record found.','data',JSON_OBJECT('statusCode',104),'statusCode',104) AS response;

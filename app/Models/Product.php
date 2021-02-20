@@ -9,6 +9,7 @@ use App\Models\ProductImages;
 use App\Models\ProductInventory;
 use App\Models\Category;
 use App\Models\ProductUnits;
+use DB;
 
 class Product extends Model
 {
@@ -74,7 +75,7 @@ class Product extends Model
     }
 
     protected function getProductImages($productId) {
-        return ProductImages::select('id','image_name','display_order')->where('products_id', $productId)->get();
+        return ProductImages::select('id','image_name')->where('products_id', $productId)->get();
     }
 
     protected function removeProductImages($ids) {
@@ -126,7 +127,13 @@ class Product extends Model
         // $result = collect($queryResult);
         if(sizeof($queryResult) > 0) {
             foreach($queryResult as $key => $val) {
-                // ProductUnit::select('id','product_name','short_description','expiry_date','selling_price','special_price','special_price_start_date','special_price_end_date','min_quantity','max_quantity')->where('status', 1)->where('stock_availability', 1)->get()->toArray();
+                $productUnits = ProductUnits::join('unit_master', 'unit_master.id', '=', 'product_units.unit_id')
+                    ->where('product_units.status', 1)
+                    ->where('product_units.products_id', $val->id)
+                    ->get(['unit_master.id','unit_master.unit'])
+                    ->toArray();
+                $queryResult[$key]->product_units = $productUnits;
+                $queryResult[$key]->product_images = ProductImages::select('image_name')->where('products_id', $val->id)->where('status', 1)->get()->toArray();
             }
         }
         return $queryResult;

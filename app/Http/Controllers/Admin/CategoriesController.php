@@ -23,7 +23,6 @@ class CategoriesController extends Controller
     public function create()
     {
         abort_if(Gate::denies('category_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-        $category = Category::getCategories();
         return view('admin.categories.create');
     }
 

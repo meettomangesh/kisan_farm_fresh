@@ -27,7 +27,8 @@ class CreateCustomerOrdersTable extends Migration
             $table->tinyInteger('order_status')->default(1)->unsigned()->index()->comment = "1: Pending, 2: Ordered, 3: In Process, 4: Completed";
             $table->integer('created_by')->unsigned();
             $table->integer('updated_by')->default(0)->unsigned();
-            $table->timestamps();
+            $table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP'));
+            $table->timestamp('updated_at')->default(DB::raw('null ON UPDATE CURRENT_TIMESTAMP'))->nullable();
             $table->softDeletes();
           });
     }

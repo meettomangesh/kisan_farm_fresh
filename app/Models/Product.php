@@ -74,6 +74,16 @@ class Product extends Model
         return true;
     }
 
+    protected function storeProductLocationInventory ($params, $productId) {
+        $inputs = $params->all();
+        ProductLocationInventory::create(array(
+            'products_id' => $productId,
+            'current_quantity' => $inputs['current_quantity'],
+            'created_by' => $inputs['created_by']
+        ));
+        return true;
+    }
+
     protected function getProductImages($productId) {
         return ProductImages::select('id','image_name')->where('products_id', $productId)->get();
     }

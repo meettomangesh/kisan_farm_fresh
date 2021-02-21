@@ -40,6 +40,10 @@
                         <td>{{ $product->current_quantity }}</td>
                     </tr>
                     <tr>
+                        <th>{{ trans('cruds.product.fields.current_quantity') }}</th>
+                        <td>{{ App\Models\ProductLocationInventory::getProductCurrentQuantity($product->id) }}</td>
+                    </tr>
+                    <tr>
                         <th>{{ trans('cruds.product.fields.expiry_date') }}</th>
                         <td>{{ $product->expiry_date }}</td>
                     </tr>

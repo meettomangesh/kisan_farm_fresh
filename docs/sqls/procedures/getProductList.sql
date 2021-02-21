@@ -25,8 +25,9 @@ getProductList:BEGIN
         SET pageNumber = pageNumber * noOfRecords;
     END IF;
 
-    SELECT p.id,p.product_name,p.short_description,p.expiry_date,p.selling_price,p.special_price,p.special_price_start_date,p.special_price_end_date,p.min_quantity,p.max_quantity
+    SELECT p.id,p.product_name,p.short_description,p.expiry_date,TRUNCATE(p.selling_price, 2) AS selling_price,TRUNCATE(p.special_price, 2) AS special_price,p.special_price_start_date,p.special_price_end_date,p.min_quantity,p.max_quantity,pli.current_quantity
     FROM products AS p
+    JOIN product_location_inventory AS pli ON p.id = pli.products_id
     WHERE p.deleted_at IS NULL AND p.status = 1 AND p.stock_availability = 1 AND IF(categoryId = 0 OR categoryId IS NULL, 1=1, p.category_id = categoryId)
     -- AND (searchValue IS NULL, 1=1, p.product_name LIKE "%searchValue%")
     ORDER BY p.selling_price ASC

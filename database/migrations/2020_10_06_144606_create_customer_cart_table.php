@@ -19,7 +19,8 @@ class CreateCustomerCartTable extends Migration
             $table->text('cart_details')->nullable();
             $table->tinyInteger('platform')->default(1)->unsigned()->index();
             $table->integer('created_by')->unsigned();
-            $table->timestamps();
+            $table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP'));
+            $table->timestamp('updated_at')->default(DB::raw('null ON UPDATE CURRENT_TIMESTAMP'))->nullable();
             $table->softDeletes();
         });
     }

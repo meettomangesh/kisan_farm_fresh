@@ -40,6 +40,7 @@ class ProductsController extends Controller
             if($product->id > 0) {
                 Product::storeProductImages($request, $product->id, 1);
                 Product::storeProductInventory($request, $product->id);
+                Product::storeProductLocationInventory($request, $product->id);
                 Product::storeProductUnits($request, $product->id, 1);
             }
         }

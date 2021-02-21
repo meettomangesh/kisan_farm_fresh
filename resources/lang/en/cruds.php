@@ -257,6 +257,8 @@ return [
             'short_description_helper'         => '',
             'opening_quantity'                => 'Opening Quantity',
             'opening_quantity_helper'         => '',
+            'current_quantity'                => 'Current Quantity',
+            'current_quantity_helper'         => '',
             'category'                => 'Category',
             'category_helper'         => '',
             'units'                => 'Units',

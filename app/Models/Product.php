@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use \DateTimeInterface;
 use App\Models\ProductImages;
 use App\Models\ProductInventory;
+use App\Models\ProductLocationInventory;
 use App\Models\Category;
 use App\Models\ProductUnits;
 use DB;

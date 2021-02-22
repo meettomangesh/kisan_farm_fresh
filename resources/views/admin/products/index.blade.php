@@ -55,6 +55,12 @@
                                         <input type="submit" class="btn btn-xs btn-danger" value="{{ trans('global.delete') }}">
                                     </form>
                                 @endcan
+
+                                @can('product_add_or_remove_inventory')
+                                    <a class="btn btn-xs btn-primary" href="{{ route('admin.products.addOrRemoveInventory', $product->id) }}">
+                                        {{ trans('cruds.product.fields.add_or_remove_inventory') }}
+                                    </a>
+                                @endcan
                             </td>
                         </tr>
                     @endforeach

@@ -241,6 +241,10 @@ return [
             'deleted_at_helper' => '',
         ],
     ],
+    'productManagement' => [
+        'title'          => 'Product Management',
+        'title_singular' => 'Product Management',
+    ],
     'product'        => [
         'title'          => 'Products',
         'title_singular' => 'Product',
@@ -305,6 +309,15 @@ return [
             'deleted_at_helper' => '',
             'actions'        => 'Actions',
             'actions_helper' => '',
+            'add_or_remove_inventory'                => 'Add/Remove Inventory',
+            'add_or_remove_inventory_helper'         => '',
+            'add_or_remove_product_inventory'        => 'Add/Remove Product Inventory',
+            'inventory_type'                => 'Inventory Type',
+            'inventory_type_helper'         => '',
+            'add'                => 'Add',
+            'remove'                => 'Remove',
+            'quantity'                => 'Quantity',
+            'quantity_helper'         => '',
         ],
     ],
     'category'        => [

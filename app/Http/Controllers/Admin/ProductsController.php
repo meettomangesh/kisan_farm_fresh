@@ -98,4 +98,17 @@ class ProductsController extends Controller
         $units = DB::table("unit_master")->where("cat_id", $id)->pluck("unit", "id");
         return json_encode($units);
     }
+
+    public function addOrRemoveInventory($productId)
+    {
+        abort_if(Gate::denies('product_add_or_remove_inventory'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+        $product = Product::getProductById($productId);
+        return view('admin.products.add_or_remove_inventory', compact('product'));
+    }
+
+    public function storeInventory()
+    {
+        Product::storeInventory($_POST);
+        return redirect()->route('admin.products.index');
+    }
 }

@@ -134,30 +134,41 @@
             <li>
             @endcan
             
+            @can('product_management_access')
+            <li class="nav-item nav-dropdown">
+                <a class="nav-link  nav-dropdown-toggle" href="#">
+                    <i class="fa-fw fas fa-users nav-icon">
 
-            @can('product_access')
-            <li class="nav-item">
-                <a href="{{ route("admin.products.index") }}" class="nav-link {{ request()->is('admin/products') || request()->is('admin/products/*') ? 'active' : '' }}">
-                    <i class="fa-fw fas fa-cogs nav-icon"></i>
-                    {{ trans('cruds.product.title') }}
+                    </i>
+                    {{ trans('cruds.productManagement.title') }}
                 </a>
-            </li>
-            @endcan
-            @can('category_access')
-            <li class="nav-item">
-                <a href="{{ route("admin.categories.index") }}" class="nav-link {{ request()->is('admin/categories') || request()->is('admin/categories/*') ? 'active' : '' }}">
-                    <i class="fa-fw fas fa-cogs nav-icon"></i>
-                    {{ trans('cruds.category.title') }}
-                </a>
-            </li>
-            @endcan
-            @can('unit_access')
-            <li class="nav-item">
-                <a href="{{ route("admin.units.index") }}" class="nav-link {{ request()->is('admin/units') || request()->is('admin/units/*') ? 'active' : '' }}">
-                    <i class="fa-fw fas fa-cogs nav-icon"></i>
-                    {{ trans('cruds.unit.title') }}
-                </a>
-            </li>
+                <ul class="nav-dropdown-items">
+                    @can('category_access')
+                    <li class="nav-item">
+                        <a href="{{ route("admin.categories.index") }}" class="nav-link {{ request()->is('admin/categories') || request()->is('admin/categories/*') ? 'active' : '' }}">
+                            <i class="fa-fw fas fa-cogs nav-icon"></i>
+                            {{ trans('cruds.category.title') }}
+                        </a>
+                    </li>
+                    @endcan
+                    @can('unit_access')
+                    <li class="nav-item">
+                        <a href="{{ route("admin.units.index") }}" class="nav-link {{ request()->is('admin/units') || request()->is('admin/units/*') ? 'active' : '' }}">
+                            <i class="fa-fw fas fa-cogs nav-icon"></i>
+                            {{ trans('cruds.unit.title') }}
+                        </a>
+                    </li>
+                    @endcan
+                    @can('product_access')
+                    <li class="nav-item">
+                        <a href="{{ route("admin.products.index") }}" class="nav-link {{ request()->is('admin/products') || request()->is('admin/products/*') ? 'active' : '' }}">
+                            <i class="fa-fw fas fa-cogs nav-icon"></i>
+                            {{ trans('cruds.product.title') }}
+                        </a>
+                    </li>
+                    @endcan
+                </ul>
+            <li>
             @endcan
   
             @if(file_exists(app_path('Http/Controllers/Auth/ChangePasswordController.php')))

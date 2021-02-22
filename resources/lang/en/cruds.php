@@ -241,6 +241,10 @@ return [
             'deleted_at_helper' => '',
         ],
     ],
+    'productManagement' => [
+        'title'          => 'Product Management',
+        'title_singular' => 'Product Management',
+    ],
     'product'        => [
         'title'          => 'Products',
         'title_singular' => 'Product',

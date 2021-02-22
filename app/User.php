@@ -11,6 +11,8 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Passport\HasApiTokens;
 use \DateTimeInterface;
+use DB;
+use PDO;
 
 class User extends Authenticatable
 {
@@ -83,5 +85,31 @@ class User extends Authenticatable
     public function regions()
     {
         return $this->belongsToMany(Region::class);
+    }
+
+
+    /**
+     * Get pin code details
+     * @param array $params
+     * @throws Exception  
+     * @return array of data
+     */
+    public function getPinCodeDetails($params = [])
+    {
+        try {
+
+            $stmt = DB::connection()->getPdo()->prepare("CALL searchPincode(?)");
+            $stmt->execute(array($params['pin_code']));
+            $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+           // print_r($result); exit;
+            if ($result) {
+                return $result;
+            } else {
+                return [];
+            }
+        } catch (Exception $e) {
+            //  throw new Exception($e->getMessage());
+            return $this->sendError('Error.', $$e->getMessage());
+        }
     }
 }

@@ -125,6 +125,11 @@ class Product extends Model
         return true;
     }
 
+    protected function getProductById($productId) {
+        $product = Product::select('id','product_name')->where('id', $productId)->get()->toArray();
+        return $product[0];
+    }
+
     protected function getProductUnits($productId) {
         return ProductUnits::join('unit_master', 'unit_master.id', '=', 'product_units.unit_id')
             ->where('product_units.status', 1)
@@ -148,5 +153,25 @@ class Product extends Model
             }
         }
         return $queryResult;
+    }
+
+    protected function storeInventory ($params) {
+        $qty = ProductLocationInventory::select('id','current_quantity')->where('products_id', $params['product_id'])->get()->toArray();
+        $currentQuantity = $qty[0]['current_quantity'];
+        if($params['inventory_type'] == 1) {
+            $currentQuantity = $currentQuantity + $params['quantity'];
+        } else {
+            $currentQuantity = $currentQuantity - $params['quantity'];
+        }
+        $inventory = ProductLocationInventory::find($qty[0]['id']);
+        $inventory->current_quantity = $currentQuantity;
+        $inventory->save();
+
+        ProductInventory::create(array(
+            'products_id' => $params['product_id'],
+            'quantity' => ($params['inventory_type'] == 1) ? $params['quantity'] : '-'.$params['quantity'],
+            'created_by' => 1
+        ));
+        return true;
     }
 }

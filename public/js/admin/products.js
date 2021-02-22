@@ -1091,7 +1091,7 @@ siteObjJs.admin.productMerchantJs = function () {
         return this.optional(element) || (parseFloat(value) > 0);
     }, 'Number must be greater than zero.');
 
-    $.validator.addMethod('priseRangeValid', function (value, element) {
+    $.validator.addMethod('priceRangeValid', function (value, element) {
         var formElement = $(element).closest("form");
         var formId = formElement.attr("id");
         var minVal = $('#' + formId).find('#selling_price').val();

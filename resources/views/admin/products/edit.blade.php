@@ -132,7 +132,7 @@
                         <label class="control-label col-md-4" for="expiry_date">{{ trans('cruds.product.fields.expiry_date') }}</label>
                         <div class="col-md-8 float-right">
                             <!--div data-error-container="#form_expiry_date_error" class="input-group date form_datetime" data-date-start-date="+0d" -->
-                                <input class="form-control {{ $errors->has('expiry_date') ? 'is-invalid' : '' }}" type="date" name="expiry_date" id="expiry_date" value="{{ old('expiry_date', $product->expiry_date) }}">
+                                <input class="form-control {{ $errors->has('expiry_date') ? 'is-invalid' : '' }}" type="date" name="expiry_date" id="expiry_date" min="{{ date('Y-m-d') }}" value="{{ old('expiry_date', $product->expiry_date) }}">
                                 <!-- span class="input-group-btn">
                                     <button class="btn default date-set" type="button" id="date-picker-btn"><i class="fa fa-calendar"></i></button>
                                 </span>
@@ -195,7 +195,7 @@
                         <label class="control-label col-md-4" for="special_price_start_date">{{ trans('cruds.product.fields.special_price_start_date') }}</label>
                         <div class="col-md-8 float-right">
                             <!-- div data-error-container="#form_special_price_start_date_error" class="input-group date form_datetime" data-date-start-date="+0d" -->
-                                <input class="form-control {{ $errors->has('special_price_start_date') ? 'is-invalid' : '' }}" type="date" name="special_price_start_date" id="special_price_start_date" value="{{ old('special_price_start_date', $product->special_price_start_date) }}" startDateValid="true">
+                                <input class="form-control {{ $errors->has('special_price_start_date') ? 'is-invalid' : '' }}" type="date" name="special_price_start_date" id="special_price_start_date" min="{{ ($product->special_price_start_date) ? $product->special_price_start_date : date('Y-m-d') }}" value="{{ old('special_price_start_date', $product->special_price_start_date) }}" startDateValid="true">
                                 <!-- span class="input-group-btn">
                                     <button class="btn default date-set" type="button" id="date-picker-btn"><i class="fa fa-calendar"></i></button>
                                 </span>
@@ -211,7 +211,7 @@
                         <label class="control-label col-md-4" for="special_price_end_date">{{ trans('cruds.product.fields.special_price_end_date') }}</label>
                         <div class="col-md-8 float-right">
                             <!-- div data-error-container="#form_special_price_end_date_error" class="input-group date form_datetime" data-date-start-date="+0d" -->
-                                <input class="form-control {{ $errors->has('special_price_end_date') ? 'is-invalid' : '' }}" type="date" name="special_price_end_date" id="special_price_end_date" value="{{ old('special_price_end_date', $product->special_price_end_date) }}" endDateValid="true">
+                                <input class="form-control {{ $errors->has('special_price_end_date') ? 'is-invalid' : '' }}" type="date" name="special_price_end_date" id="special_price_end_date" min="{{ ($product->special_price_end_date) ? $product->special_price_end_date : date('Y-m-d') }}" value="{{ old('special_price_end_date', $product->special_price_end_date) }}" endDateValid="true">
                                 <!-- span class="input-group-btn">
                                     <button class="btn default date-set" type="button" id="date-picker-btn"><i class="fa fa-calendar"></i></button>
                                 </span>

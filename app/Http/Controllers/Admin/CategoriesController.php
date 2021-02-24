@@ -28,7 +28,11 @@ class CategoriesController extends Controller
 
     public function store(StoreCategoryRequest $request)
     {
-        $category = Category::create($request->all());
+        // print_r($request->all()); exit;
+        if ($request->hasFile('cat_image_name')) {
+            // $category = Category::create($request->all());
+            Category::storeCategory($request);
+        }
         return redirect()->route('admin.categories.index');
     }
 
@@ -40,7 +44,8 @@ class CategoriesController extends Controller
 
     public function update(UpdateCategoryRequest $request, Category $category)
     {
-        $category->update($request->all());
+        // $category->update($request->all());
+        Category::updateCategory($request, $category);
         return redirect()->route('admin.categories.index');
     }
 

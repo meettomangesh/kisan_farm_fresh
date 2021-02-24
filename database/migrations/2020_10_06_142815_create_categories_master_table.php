@@ -16,6 +16,7 @@ class CreateCategoriesMasterTable extends Migration
         Schema::create('categories_master', function (Blueprint $table) {
             $table->increments('id')->unsigned();
             $table->string('cat_name', 50)->unique()->index();
+            $table->string('cat_image_name', 1000)->nullable();
             $table->text('cat_description')->nullable();
             $table->tinyInteger('status')->default(1)->unsigned()->index()->comment = "1: Active, 0: Inactive";
             $table->integer('created_by')->unsigned();

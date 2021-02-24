@@ -330,6 +330,8 @@ return [
             'cat_name_helper'       => '',
             'cat_description'        => 'Category Description',
             'cat_description_helper' => '',
+            'cat_image'          => 'Category Image',
+            'cat_image_helper'       => '',
             'status'                => 'Status',
             'status_helper'         => '',
             'active'                => 'Active',
@@ -340,6 +342,8 @@ return [
             'updated_at_helper' => '',
             'deleted_at'        => 'Deleted at',
             'deleted_at_helper' => '',
+            'preview' => 'Preview',
+            'actions'        => 'Actions',
         ],
     ],
     'unit'        => [

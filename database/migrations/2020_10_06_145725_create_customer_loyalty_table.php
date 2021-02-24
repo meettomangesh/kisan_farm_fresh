@@ -19,7 +19,7 @@ class CreateCustomerLoyaltyTable extends Migration
             $table->string('last_name', 100)->default(null)->nullable();
             $table->string('mobile_number', 20)->unique()->index();
             $table->tinyInteger('mobile_verified')->default(0)->unsigned()->index()->comment = "1: Yes, 0: No";
-            $table->string('email_address', 100)->index();
+            $table->string('email_address', 100)->default(null)->nullable();
             $table->tinyInteger('email_verified')->default(0)->unsigned()->index()->comment = "1: Yes, 0: No";
             $table->string('email_verify_key', 100)->unique()->index();
             $table->text('address_1')->nullable();

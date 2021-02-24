@@ -7,7 +7,7 @@
     </div>
 
     <div class="card-body">
-        <form method="POST" id="create-category" action="{{ route("admin.categories.store") }}" enctype="multipart/form-data" onSubmit="return validate();">
+        <form method="POST" id="create-category" action="{{ route("admin.categories.store") }}" enctype="multipart/form-data">
             @csrf
             <div class="row">
                 <div class="col-md-6">

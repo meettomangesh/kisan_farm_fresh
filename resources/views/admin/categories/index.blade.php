@@ -21,6 +21,7 @@
                     <tr>
                         <th width="10"></th>
                         <th>{{ trans('cruds.category.fields.id') }}</th>
+                        <th>{{ trans('cruds.product.fields.cat_image') }}</th>
                         <th>{{ trans('cruds.category.fields.cat_name') }}</th>
                         <th>{{ trans('cruds.category.fields.cat_description') }}</th>
                         <th>&nbsp;</th>
@@ -31,6 +32,7 @@
                         <tr data-entry-id="{{ $category->id }}">
                             <td></td>
                             <td>{{ $category->id ?? '' }}</td>
+                            <td><img src="{{ asset($category->cat_image_name)  }}" alt="" width="60" height="60"></td>
                             <td>{{ $category->cat_name ?? '' }}</td>
                             <td>{{ $category->cat_description ?? '' }}</td>
                             <td>
@@ -104,7 +106,7 @@
   $.extend(true, $.fn.dataTable.defaults, {
     orderCellsTop: true,
     order: [[ 1, 'desc' ]],
-    pageLength: 100,
+    pageLength: 10,
   });
   let table = $('.datatable-Category:not(.ajaxTable)').DataTable({ buttons: dtButtons })
   $('a[data-toggle="tab"]').on('shown.bs.tab', function(e){

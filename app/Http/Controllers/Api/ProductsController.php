@@ -16,10 +16,10 @@ class ProductsController extends BaseController
     {
         $validator = Validator::make($request->all(), [
             'platform' => 'required',
-            // 'category_id' => 'required',
+            'category_id' => 'required',
             'no_of_records' => 'required',
             'page_number' => 'required',
-            // 'search' => 'required',
+            // 'search_value' => 'required',
             // 'sort_type' => 'required',
             // 'sort_on' => 'required',
         ]);

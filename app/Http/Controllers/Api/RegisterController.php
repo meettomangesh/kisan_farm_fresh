@@ -65,6 +65,10 @@ class RegisterController extends BaseController
             $user = Auth::guard('api')->user();
             $success['token'] =  $user->createToken(getenv('APP_NAME'))->accessToken;
             $success['name'] =  $user->first_name . " " . $user->last_name;
+            $success['dob'] =  $user->date_of_birth;
+            $success['marital_status'] =  $user->marital_status;
+            $success['gender'] =  $user->gender;
+            $success['email'] =  $user->email_address;
 
             return $this->sendResponse($success, 'User login successfully.');
         } else {

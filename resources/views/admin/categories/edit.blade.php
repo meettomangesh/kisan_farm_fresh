@@ -15,7 +15,7 @@
                     <div class="form-group">
                         <label class="control-label col-md-4 required" for="cat_name">{{ trans('cruds.category.fields.cat_name') }}</label>
                         <div class="col-md-8 float-right">
-                            <input class="form-control {{ $errors->has('cat_name') ? 'is-invalid' : '' }}" type="text" name="cat_name" id="cat_name" value="{{ old('cat_name', $category->cat_name) }}" required>
+                            <input class="form-control {{ $errors->has('cat_name') ? 'is-invalid' : '' }}" type="text" name="cat_name" id="cat_name" maxlength="50" value="{{ old('cat_name', $category->cat_name) }}" required>
                             @if($errors->has('cat_name'))
                                 <div class="invalid-feedback">
                                     {{ $errors->first('cat_name') }}

@@ -37,6 +37,7 @@ class Category extends Model
             'cat_name' => $inputs['cat_name'],
             'cat_image_name' => $path.$imageName,
             'cat_description' => $inputs['cat_description'],
+            'status' => $inputs['status'],
             'created_by' => $inputs['created_by']
         ));
     }
@@ -60,6 +61,7 @@ class Category extends Model
         $category->cat_name = $inputs['cat_name'];
         $category->cat_image_name = $imageName;
         $category->cat_description = $inputs['cat_description'];
+        $category->status = $inputs['status'];
         $category->updated_by = $inputs['updated_by'];
         $category->save();
         return true;

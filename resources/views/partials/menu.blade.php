@@ -170,6 +170,15 @@
                 </ul>
             <li>
             @endcan
+
+            @can('banner_access')
+            <li class="nav-item">
+                <a href="{{ route("admin.banners.index") }}" class="nav-link {{ request()->is('admin/banners') || request()->is('admin/banners/*') ? 'active' : '' }}">
+                    <i class="fa-fw fas fa-cogs nav-icon"></i>
+                    {{ trans('cruds.banner.title') }}
+                </a>
+            </li>
+            @endcan
   
             @if(file_exists(app_path('Http/Controllers/Auth/ChangePasswordController.php')))
             @can('profile_password_edit')

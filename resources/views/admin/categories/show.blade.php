@@ -20,6 +20,10 @@
                         <td>{{ $category->id }}</td>
                     </tr>
                     <tr>
+                        <th>{{ trans('cruds.category.fields.cat_image') }}</th>
+                        <td><img src="{{ asset($category->cat_image_name) }}" alt="" width="50" height="50"></td>
+                    </tr>
+                    <tr>
                         <th>{{ trans('cruds.category.fields.cat_name') }}</th>
                         <td>{{ $category->cat_name }}</td>
                     </tr>

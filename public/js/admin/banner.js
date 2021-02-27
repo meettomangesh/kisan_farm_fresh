@@ -1,9 +1,9 @@
-siteObjJs.admin.categoryJs = function () {
+siteObjJs.admin.bannerJs = function () {
     var maxImageSize = 2097152;
     // Initialize all the page-specific event listeners here.
     
     var initializeListener = function () {        
-        $("body").on('change', '.cat_image_name', function () {
+        $("body").on('change', '.image_name', function () {
             var billSelectError = '';
             var form = $(this).closest("form");
             var formId = form.attr("id");
@@ -38,8 +38,8 @@ siteObjJs.admin.categoryJs = function () {
                 var rowId = $(this).attr('data-image-id');
                 $("#blank-row-"+rowId).remove();
                 if($("#dvPreview").children().length == 0) {
-                    $(".category-image-div").remove();
-                    $("#cat_image_name").removeAttr('disabled');
+                    $(".banner-image-div").remove();
+                    $("#image_name").removeAttr('disabled');
                 }
             }
         });

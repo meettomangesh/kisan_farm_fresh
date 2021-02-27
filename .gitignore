@@ -4,6 +4,7 @@
 /storage/*.key
 /public/images/products
 /public/images/categories
+/public/images/banners
 /vendor
 .env
 .env.backup

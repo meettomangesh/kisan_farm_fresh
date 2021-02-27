@@ -96,6 +96,10 @@ Route::group([
     Route::delete('states/destroy', 'StatesController@massDestroy')->name('states.massDestroy');
     Route::resource('states', 'StatesController');
 
+    // Banners
+    Route::delete('banners/destroy', 'BannersController@massDestroy')->name('banners.massDestroy');
+    Route::resource('banners', 'BannersController');
+
 });
 Route::group(['prefix' => 'profile', 'as' => 'profile.', 'namespace' => 'Auth', 'middleware' => ['auth']], function () {
 // Change password

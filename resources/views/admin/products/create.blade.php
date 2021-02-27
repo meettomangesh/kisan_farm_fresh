@@ -39,7 +39,7 @@
                     <div class="form-group">
                         <label class="control-label col-md-4 required" for="sku">{{ trans('cruds.product.fields.sku') }}</label>
                         <div class="col-md-8 float-right">
-                            <input class="form-control {{ $errors->has('sku') ? 'is-invalid' : '' }}" type="text" name="sku" id="sku" value="{{ old('sku', '') }}" required>
+                            <input class="form-control {{ $errors->has('sku') ? 'is-invalid' : '' }}" type="text" name="sku" id="sku" value="{{ old('sku', '') }}" maxlength="50" required>
                             @if($errors->has('sku'))
                                 <div class="invalid-feedback">
                                     {{ $errors->first('sku') }}

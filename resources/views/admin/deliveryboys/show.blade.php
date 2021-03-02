@@ -25,10 +25,18 @@
                     </tr>
                     <tr>
                         <th>
-                            {{ trans('cruds.deliveryboy.fields.name') }}
+                            {{ trans('cruds.deliveryboy.fields.first_name') }}
                         </th>
                         <td>
-                            {{ $deliveryboy->name }}
+                            {{ $deliveryboy->first_name }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>
+                            {{ trans('cruds.deliveryboy.fields.last_name') }}
+                        </th>
+                        <td>
+                            {{ $deliveryboy->last_name }}
                         </td>
                     </tr>
                     <tr>

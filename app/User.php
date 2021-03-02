@@ -13,6 +13,7 @@ use Laravel\Passport\HasApiTokens;
 use \DateTimeInterface;
 use DB;
 use PDO;
+use App\Helper\DataHelper;
 
 class User extends Authenticatable
 {
@@ -33,8 +34,10 @@ class User extends Authenticatable
     ];
 
     protected $fillable = [
-        'name',
+        'first_name',
+        'last_name',
         'email',
+        'email_verify_key',
         'email_verified_at',
         'mobile_number',
         'mobile_number_verified_at',
@@ -63,6 +66,16 @@ class User extends Authenticatable
     public function setEmailVerifiedAtAttribute($value)
     {
         $this->attributes['email_verified_at'] = $value ? Carbon::createFromFormat(config('panel.date_format') . ' ' . config('panel.time_format'), $value)->format('Y-m-d H:i:s') : null;
+    }
+
+    public function setEmailVerifyKeyAtAttribute($value)
+    {
+        $this->attributes['email_verify_key'] = DataHelper::emailVerifyKey();
+    }
+
+    public function getEmailVerifyKeyAtAttribute($value)
+    {
+        return $value ? $value : DataHelper::emailVerifyKey();
     }
 
     public function setPasswordAttribute($input)
@@ -101,7 +114,7 @@ class User extends Authenticatable
             $stmt = DB::connection()->getPdo()->prepare("CALL searchPincode(?)");
             $stmt->execute(array($params['pin_code']));
             $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
-           // print_r($result); exit;
+            // print_r($result); exit;
             if ($result) {
                 return $result;
             } else {

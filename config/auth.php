@@ -72,7 +72,8 @@ return [
         ],
         'api' => [
             'driver' => 'eloquent',
-            'model' => App\Models\CustomerLoyalty::class,
+            //'model' => App\Models\CustomerLoyalty::class,
+            'model'  => App\User::class,
         ],
 
         // 'users' => [

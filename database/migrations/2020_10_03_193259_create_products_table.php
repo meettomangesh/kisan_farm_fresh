@@ -21,10 +21,10 @@ class CreateProductsTable extends Migration
             $table->text('description')->nullable();
             $table->string('short_description', 255)->index();
             $table->string('sku', 50)->unique()->index();
-            $table->text('images')->nullable();
             $table->date('expiry_date')->default(null)->nullable();
             $table->text('custom_text')->nullable();
             $table->tinyInteger('display_custom_text_or_date')->default(0)->unsigned()->index()->comment = "1: Custom Text, 0: Date";
+            /* $table->text('images')->nullable();
             $table->decimal('voucher_value', 14, 4)->nullable();
             $table->decimal('selling_price', 14, 4);
             $table->decimal('special_price', 14, 4)->nullable()->comment = "This is the discounted price";
@@ -35,7 +35,7 @@ class CreateProductsTable extends Migration
             $table->integer('max_quantity')->default(0)->unsigned()->index();
             $table->integer('max_quantity_perday_percust')->default(0)->unsigned()->index();
             $table->integer('max_quantity_perday_allcust')->default(0)->unsigned()->index();
-            $table->tinyInteger('notify_for_qty_below')->default(0)->unsigned()->index();
+            $table->tinyInteger('notify_for_qty_below')->default(0)->unsigned()->index(); */
             $table->tinyInteger('stock_availability')->default(1)->unsigned()->index()->comment = "1: In Stock, 0: Out of Stock";
             $table->tinyInteger('show_in_search_results')->default(1)->unsigned()->index()->comment = "1: Yes, 0: No";
             $table->tinyInteger('pay_for_product_in')->default(1)->unsigned()->index()->comment = "1: COD, 0: Online";

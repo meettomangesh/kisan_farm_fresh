@@ -39,9 +39,9 @@ class ProductsController extends Controller
             $product = Product::create($request->all());
             if($product->id > 0) {
                 Product::storeProductImages($request, $product->id, 1);
-                Product::storeProductInventory($request, $product->id);
-                Product::storeProductLocationInventory($request, $product->id);
-                Product::storeProductUnits($request, $product->id, 1);
+                // Product::storeProductInventory($request, $product->id);
+                // Product::storeProductLocationInventory($request, $product->id);
+                // Product::storeProductUnits($request, $product->id, 1);
             }
         }
         return redirect()->route('admin.products.index');
@@ -54,8 +54,8 @@ class ProductsController extends Controller
         $srNo = 0;
         $categories = Category::all()->pluck('cat_name', 'id')->prepend(trans('global.pleaseSelect'), '');
         $product->load('category');
-        $productUnits = Product::getProductUnits($product->id);
-        return view('admin.products.edit', compact('product','productImages','srNo','categories','productUnits'));
+        // $productUnits = Product::getProductUnits($product->id);
+        return view('admin.products.edit', compact('product','productImages','srNo','categories'));
     }
 
     public function update(UpdateProductRequest $request, Product $product)
@@ -69,8 +69,8 @@ class ProductsController extends Controller
         if($requestAll['removed_images'] != '' && $product->id > 0) {
             Product::removeProductImages($requestAll['removed_images']);
         }
-        Product::removeProductUnits($product->id);
-        Product::storeProductUnits($request, $product->id, 2);
+        // Product::removeProductUnits($product->id);
+        // Product::storeProductUnits($request, $product->id, 2);
         return redirect()->route('admin.products.index');
     }
 

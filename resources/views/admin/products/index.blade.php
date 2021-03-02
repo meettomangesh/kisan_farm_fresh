@@ -57,9 +57,9 @@
                                 @endcan
 
                                 @can('product_add_or_remove_inventory')
-                                    <a class="btn btn-xs btn-primary" href="{{ route('admin.products.addOrRemoveInventory', $product->id) }}">
+                                    <!-- a class="btn btn-xs btn-primary" href="{{ route('admin.products.addOrRemoveInventory', $product->id) }}">
                                         {{ trans('cruds.product.fields.add_or_remove_inventory') }}
-                                    </a>
+                                    </a -->
                                 @endcan
                             </td>
                         </tr>

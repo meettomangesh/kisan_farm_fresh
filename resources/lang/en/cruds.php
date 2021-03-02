@@ -247,6 +247,7 @@ return [
     ],
     'product'        => [
         'title'          => 'Products',
+        'title_master'          => 'Product Master',
         'title_singular' => 'Product',
         'fields'         => [
             'id'                => 'ID',

@@ -17,6 +17,16 @@ class CreateProductUnitsTable extends Migration
             $table->increments('id')->unsigned();
             $table->integer('products_id')->unsigned()->index();
             $table->integer('unit_id')->default(0)->unsigned()->index();
+            $table->decimal('selling_price', 14, 4);
+            $table->decimal('special_price', 14, 4)->nullable()->comment = "This is the discounted price";
+            $table->date('special_price_start_date')->nullable()->index();
+            $table->date('special_price_end_date')->nullable()->index();
+            $table->integer('opening_quantity')->default(0)->unsigned()->index();
+            $table->integer('min_quantity')->default(0)->unsigned()->index();
+            $table->integer('max_quantity')->default(0)->unsigned()->index();
+            $table->integer('max_quantity_perday_percust')->default(0)->unsigned()->index();
+            $table->integer('max_quantity_perday_allcust')->default(0)->unsigned()->index();
+            $table->tinyInteger('notify_for_qty_below')->default(0)->unsigned()->index();
             $table->tinyInteger('status')->default(1)->unsigned()->index()->comment = "1: Active, 0: Inactive";
             $table->integer('created_by')->unsigned();
             $table->integer('updated_by')->default(0)->unsigned();

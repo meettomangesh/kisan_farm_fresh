@@ -15,7 +15,8 @@ class CreateProductInventoryTable extends Migration
     {
         Schema::create('product_inventory', function (Blueprint $table) {
             $table->increments('id')->unsigned();
-            $table->integer('products_id')->unsigned()->index();
+            $table->integer('product_units_id')->unsigned()->index();
+            $table->integer('location_id')->default(0)->unsigned()->index();
             $table->integer('quantity')->default(0);
             $table->integer('created_by')->unsigned();
             $table->integer('updated_by')->default(0)->unsigned();

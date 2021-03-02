@@ -32,8 +32,8 @@
                         <tr data-entry-id="{{ $unit->id }}">
                             <td></td>
                             <td>{{ $unit->id ?? '' }}</td>
-                            <td>{{ $unit->category->cat_name ?? '' }}</td>
-                            <td>{{ $unit->unit ?? '' }}</td>
+                            <td><b>{{ $unit->category->cat_name ?? '' }}</b></td>
+                            <td><b>{{ $unit->unit ?? '' }}</b></td>
                             <td>{{ $unit->description ?? '' }}</td>
                             <td>
                                 @can('unit_show')

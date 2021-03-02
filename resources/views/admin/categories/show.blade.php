@@ -25,11 +25,21 @@
                     </tr>
                     <tr>
                         <th>{{ trans('cruds.category.fields.cat_name') }}</th>
-                        <td>{{ $category->cat_name }}</td>
+                        <td><b>{{ $category->cat_name }}</b></td>
                     </tr>
                     <tr>
                         <th>{{ trans('cruds.category.fields.cat_description') }}</th>
                         <td>{{ $category->cat_description }}</td>
+                    </tr>
+                    <tr>
+                        <th>{{ trans('cruds.category.fields.status') }}</th>
+                        <td><b>
+                            @if($category->status == 1)
+                                {{ trans('cruds.category.fields.active') }}
+                            @else
+                                {{ trans('cruds.category.fields.inactive') }}
+                            @endif</b>
+                        </td>
                     </tr>
                 </tbody>
             </table>

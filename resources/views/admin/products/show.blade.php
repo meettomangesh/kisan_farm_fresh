@@ -25,15 +25,15 @@
                     </tr>
                     <tr>
                         <th>{{ trans('cruds.product.fields.category') }}</th>
-                        <td>{{ App\Models\Category::getCategoryName($product->category_id) }}</td>
+                        <td><b>{{ App\Models\Category::getCategoryName($product->category_id) }}</b></td>
                     </tr>
                     <tr>
                         <th>{{ trans('cruds.product.fields.product_name') }}</th>
-                        <td>{{ $product->product_name }}</td>
+                        <td><b>{{ $product->product_name }}</b></td>
                     </tr>
                     <tr>
                         <th>{{ trans('cruds.product.fields.sku') }}</th>
-                        <td>{{ $product->sku }}</td>
+                        <td><b>{{ $product->sku }}</b></td>
                     </tr>
                     <tr>
                         <th>{{ trans('cruds.product.fields.short_description') }}</th>
@@ -45,22 +45,22 @@
                     </tr>
                     <tr>
                         <th>{{ trans('cruds.product.fields.stock_availability') }}</th>
-                        <td>
+                        <td><b>
                             @if($product->status == 1)
                                 {{ trans('cruds.product.fields.in_stock') }}
                             @else
                                 {{ trans('cruds.product.fields.out_of_stock') }}
-                            @endif
+                            @endif</b>
                         </td>
                     </tr>
                     <tr>
                         <th>{{ trans('cruds.product.fields.status') }}</th>
-                        <td>
+                        <td><b>
                             @if($product->status == 1)
                                 {{ trans('cruds.product.fields.active') }}
                             @else
                                 {{ trans('cruds.product.fields.inactive') }}
-                            @endif
+                            @endif</b>
                         </td>
                     </tr>
                 </tbody>

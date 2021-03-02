@@ -75,9 +75,6 @@ Route::group([
 
     // Products
     Route::delete('products/destroy', 'ProductsController@massDestroy')->name('products.massDestroy');
-    Route::get('products/getUnits/{cid?}', 'ProductsController@getUnits')->name('products.getUnits');
-    Route::get('products/addOrRemoveInventory/{pid?}', 'ProductsController@addOrRemoveInventory')->name('products.addOrRemoveInventory');
-    Route::post('products/storeInventory', 'ProductsController@storeInventory')->name('products.storeInventory');
     Route::resource('products', 'ProductsController');
 
     // Categories
@@ -99,6 +96,13 @@ Route::group([
     // Banners
     Route::delete('banners/destroy', 'BannersController@massDestroy')->name('banners.massDestroy');
     Route::resource('banners', 'BannersController');
+
+    // Product Units
+    Route::delete('product_units/destroy', 'ProductUnitsController@massDestroy')->name('product_units.massDestroy');
+    Route::get('product_units/getUnits/{cid?}', 'ProductUnitsController@getUnits')->name('product_units.getUnits');
+    Route::get('product_units/addOrRemoveInventory/{pid?}', 'ProductUnitsController@addOrRemoveInventory')->name('product_units.addOrRemoveInventory');
+    Route::post('product_units/storeInventory', 'ProductUnitsController@storeInventory')->name('product_units.storeInventory');
+    Route::resource('product_units', 'ProductUnitsController');
 
 });
 Route::group(['prefix' => 'profile', 'as' => 'profile.', 'namespace' => 'Auth', 'middleware' => ['auth']], function () {

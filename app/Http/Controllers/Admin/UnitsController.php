@@ -24,7 +24,7 @@ class UnitsController extends Controller
     public function create()
     {
         abort_if(Gate::denies('unit_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-        $categories = Category::all()->pluck('cat_name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $categories = Category::all()->where('status', 1)->pluck('cat_name', 'id')->prepend(trans('global.pleaseSelect'), '');
         return view('admin.units.create', compact('categories'));
     }
 
@@ -37,7 +37,7 @@ class UnitsController extends Controller
     public function edit(Unit $unit)
     {
         abort_if(Gate::denies('unit_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-        $categories = Category::all()->pluck('cat_name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $categories = Category::all()->where('status', 1)->pluck('cat_name', 'id')->prepend(trans('global.pleaseSelect'), '');
         $unit->load('category');
         return view('admin.units.edit', compact('unit','categories'));
     }

@@ -163,7 +163,7 @@
                     <li class="nav-item">
                         <a href="{{ route("admin.products.index") }}" class="nav-link {{ request()->is('admin/products') || request()->is('admin/products/*') ? 'active' : '' }}">
                             <i class="fa-fw fas fa-cogs nav-icon"></i>
-                            {{ trans('cruds.product.title') }}
+                            {{ trans('cruds.product.title_master') }}
                         </a>
                     </li>
                     @endcan

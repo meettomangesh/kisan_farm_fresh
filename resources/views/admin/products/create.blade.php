@@ -69,23 +69,6 @@
 
                 <div class="col-md-6">
                     <div class="form-group">
-                        <label class="control-label col-md-4 required" for="current_quantity">{{ trans('cruds.product.fields.opening_quantity') }}</label>
-                        <div class="col-md-8 float-right">
-                            <input class="form-control {{ $errors->has('current_quantity') ? 'is-invalid' : '' }}" name="current_quantity" id="current_quantity" value="{{ old('current_quantity', '') }}" greaterThanZero = "true" numberOnly="true" required>
-                            @if($errors->has('current_quantity'))
-                                <div class="invalid-feedback">
-                                    {{ $errors->first('current_quantity') }}
-                                </div>
-                            @endif
-                            <span class="help-block">{{ trans('cruds.product.fields.opening_quantity_helper') }}</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="form-group">
                         <label class="control-label col-md-4 required" for="category_id">{{ trans('cruds.product.fields.category') }}</label>
                         <div class="col-md-8 float-right">
                             <select class="form-control select2 {{ $errors->has('category') ? 'is-invalid' : '' }}" name="category_id" id="category_id" required>
@@ -103,7 +86,24 @@
                     </div>
                 </div>
 
-                <div class="col-md-6">
+                <!-- div class="col-md-6">
+                    <div class="form-group">
+                        <label class="control-label col-md-4 required" for="current_quantity">{{ trans('cruds.product.fields.opening_quantity') }}</label>
+                        <div class="col-md-8 float-right">
+                            <input class="form-control {{ $errors->has('current_quantity') ? 'is-invalid' : '' }}" name="current_quantity" id="current_quantity" value="{{ old('current_quantity', '') }}" greaterThanZero = "true" numberOnly="true" required>
+                            @if($errors->has('current_quantity'))
+                                <div class="invalid-feedback">
+                                    {{ $errors->first('current_quantity') }}
+                                </div>
+                            @endif
+                            <span class="help-block">{{ trans('cruds.product.fields.opening_quantity_helper') }}</span>
+                        </div>
+                    </div>
+                </div -->
+            </div>
+
+            <div class="row">
+                <!-- div class="col-md-6">
                     <div class="form-group">
                         <label class="control-label col-md-4 required" for="units">{{ trans('cruds.product.fields.units') }}</label>
                         <div class="col-md-8 float-right">
@@ -122,7 +122,7 @@
                             <span class="help-block">{{ trans('cruds.product.fields.units_helper') }}</span>
                         </div>
                     </div>
-                </div>
+                </div -->
             </div>
 
             <div class="row">
@@ -138,6 +138,18 @@
                             </div -->
                             <span class="help-block">{{ trans('cruds.product.fields.expiry_date_helper') }}</span>
                             <div id="form_expiry_date_error"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="control-label col-md-4 required" for="status">{{ trans('cruds.product.fields.status') }}</label>
+                        <div class="col-md-8 float-right">
+                            <div class="radio-list">
+                                <label class="radio-inline"><input type="radio" name="status" value="{{ old('status', '1') }}" checked required> {!! trans('cruds.product.fields.active') !!}</label>
+                                <label class="radio-inline"><input type="radio" name="status" value="{{ old('status', '0') }}" required> {!! trans('cruds.product.fields.inactive') !!}</label>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -157,10 +169,10 @@
                 </div> -->
             </div>
 
-            <div class="row">
+            <!-- div class="row">
                 <div class="col-md-6">
                     <div class="form-group">
-                        <label class="control-label col-md-4 required" for="voucher_value">{{ trans('cruds.product.fields.selling_price') }}</label>
+                        <label class="control-label col-md-4 required" for="selling_price">{{ trans('cruds.product.fields.selling_price') }}</label>
                         <div class="col-md-8 float-right">
                             <div class="input-group">
                                 <span class="input-group-addon">
@@ -194,12 +206,12 @@
                         <label class="control-label col-md-4" for="special_price_start_date">{{ trans('cruds.product.fields.special_price_start_date') }}</label>
                         <div class="col-md-8 float-right">
                             <!-- div data-error-container="#form_special_price_start_date_error" class="input-group date form_datetime" data-date-start-date="+0d" -->
-                                <input class="form-control {{ $errors->has('special_price_start_date') ? 'is-invalid' : '' }}" type="date" name="special_price_start_date" id="special_price_start_date" min="{{ date('Y-m-d') }}" value="{{ old('special_price_start_date', '') }}" startDateValid="true">
+                                <!-- input class="form-control {{ $errors->has('special_price_start_date') ? 'is-invalid' : '' }}" type="date" name="special_price_start_date" id="special_price_start_date" min="{{ date('Y-m-d') }}" value="{{ old('special_price_start_date', '') }}" startDateValid="true" -->
                                 <!-- span class="input-group-btn">
                                     <button class="btn default date-set" type="button" id="date-picker-btn"><i class="fa fa-calendar"></i></button>
                                 </span>
                             </div -->
-                            <span class="help-block">{{ trans('cruds.product.fields.special_price_start_date_helper') }}</span>
+                            <!-- span class="help-block">{{ trans('cruds.product.fields.special_price_start_date_helper') }}</span>
                             <div id="form_special_price_start_date_error"></div>
                         </div>
                     </div>
@@ -210,12 +222,12 @@
                         <label class="control-label col-md-4" for="special_price_end_date">{{ trans('cruds.product.fields.special_price_end_date') }}</label>
                         <div class="col-md-8 float-right">
                             <!-- div data-error-container="#form_special_price_end_date_error" class="input-group date form_datetime" data-date-start-date="+0d" -->
-                                <input class="form-control {{ $errors->has('special_price_end_date') ? 'is-invalid' : '' }}" type="date" name="special_price_end_date" id="special_price_end_date" min="{{ date('Y-m-d') }}" value="{{ old('special_price_end_date', '') }}" endDateValid="true">
+                                <!-- input class="form-control {{ $errors->has('special_price_end_date') ? 'is-invalid' : '' }}" type="date" name="special_price_end_date" id="special_price_end_date" min="{{ date('Y-m-d') }}" value="{{ old('special_price_end_date', '') }}" endDateValid="true" -->
                                 <!-- span class="input-group-btn">
                                     <button class="btn default date-set" type="button" id="date-picker-btn"><i class="fa fa-calendar"></i></button>
                                 </span>
                             </div -->
-                            <span class="help-block">{{ trans('cruds.product.fields.special_price_end_date_helper') }}</span>
+                            <!-- span class="help-block">{{ trans('cruds.product.fields.special_price_end_date_helper') }}</span>
                             <div id="form_special_price_end_date_error"></div>
                         </div>
                     </div>
@@ -241,21 +253,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
-
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label class="control-label col-md-4 required" for="status">{{ trans('cruds.product.fields.status') }}</label>
-                        <div class="col-md-8 float-right">
-                            <div class="radio-list">
-                                <label class="radio-inline"><input type="radio" name="status" value="{{ old('status', '1') }}" checked required> {!! trans('cruds.product.fields.active') !!}</label>
-                                <label class="radio-inline"><input type="radio" name="status" value="{{ old('status', '0') }}" required> {!! trans('cruds.product.fields.inactive') !!}</label>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            </div -->
 
             <div class="row">
                 <div class="col-md-6">
@@ -336,7 +334,7 @@
     jQuery(document).ready(function () {
         siteObjJs.admin.productMerchantJs.init('create-product');
 
-        $('select[name="category_id"]').on('change', function() {
+        /* $('select[name="category_id"]').on('change', function() {
             var categoryId = $(this).val();
             var url = '{{ route("admin.products.getUnits", "") }}';
             url = url+'/'+categoryId;
@@ -356,7 +354,7 @@
             } else {
                 $("#unit_ids").empty();
             }
-        });
+        }); */
     });
 </script>
 @endsection

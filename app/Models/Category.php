@@ -70,4 +70,9 @@ class Category extends Model
     public function getCategoryList() {
         return Category::select('id','cat_name','cat_image_name')->where('status', 1)->get()->toArray();
     }
+
+    protected function getCategoryName($id) {
+        $categoryName = Category::select('cat_name')->where('id', $id)->where('status', 1)->get()->toArray();
+        return $categoryName[0]['cat_name'];
+    }
 }

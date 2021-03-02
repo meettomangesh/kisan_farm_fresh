@@ -19,12 +19,12 @@ class StoreProductRequest extends FormRequest
     public function rules()
     {
         $this->sanitize();
-        $startDate = strtotime('-1 days', strtotime($this->all()['special_price_start_date']));
+        /* $startDate = strtotime('-1 days', strtotime($this->all()['special_price_start_date']));
         $startDateNew = date('d F Y', $startDate);
         if (!$this->request->get('special_price')) {
             $this->request->set('special_price_start_date', null);
             $this->request->set('special_price_end_date', null);
-        }
+        } */
         $this->request->set('created_by', Auth::id());
 
         $validationRules = [

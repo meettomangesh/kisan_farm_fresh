@@ -73,6 +73,9 @@ class Category extends Model
 
     protected function getCategoryName($id) {
         $categoryName = Category::select('cat_name')->where('id', $id)->where('status', 1)->get()->toArray();
-        return $categoryName[0]['cat_name'];
+        if(!empty($categoryName[0])) {
+            return $categoryName[0]['cat_name'];
+        }
+        return '';
     }
 }

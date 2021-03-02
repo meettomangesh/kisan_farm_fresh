@@ -107,12 +107,18 @@ class Product extends Model
 
     protected function getProductById($productId) {
         $product = Product::select('id','product_name','category_id')->where('id', $productId)->get()->toArray();
-        return $product[0];
+        if(!empty($product[0])) {
+            return $product[0];
+        }
+        return [];
     }
 
     protected function getProductName($productId) {
         $productName = Product::select('product_name')->where('id', $productId)->where('status', 1)->get()->toArray();
-        return $productName[0]['product_name'];
+        if(!empty($productName[0])) {
+            return $productName[0]['product_name'];
+        }
+        return '';
     }
 
     protected function getProductUnits($productId) {

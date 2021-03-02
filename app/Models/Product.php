@@ -24,7 +24,7 @@ class Product extends Model
         'deleted_at',
     ];
 
-    protected $fillable = ['brand_id', 'category_id', 'product_name', 'short_description', 'sku', 'images', 'expiry_date', 'selling_price', 'special_price', 'special_price_start_date', 'special_price_end_date', 'current_quantity', 'min_quantity', 'max_quantity', 'max_quantity_perday_percust', 'max_quantity_perday_allcust', 'notify_for_qty_below', 'stock_availability', 'status', 'view_count','created_by','updated_by'];
+    protected $fillable = ['brand_id', 'category_id', 'product_name', 'short_description', 'sku', 'expiry_date', 'stock_availability', 'status', 'view_count','created_by','updated_by'];
 
     protected function serializeDate(DateTimeInterface $date)
     {
@@ -62,26 +62,6 @@ class Product extends Model
                 $i++;
             }
         }
-        return true;
-    }
-
-    protected function storeProductInventory ($params, $productId) {
-        $inputs = $params->all();
-        ProductInventory::create(array(
-            'products_id' => $productId,
-            'quantity' => $inputs['current_quantity'],
-            'created_by' => $inputs['created_by']
-        ));
-        return true;
-    }
-
-    protected function storeProductLocationInventory ($params, $productId) {
-        $inputs = $params->all();
-        ProductLocationInventory::create(array(
-            'products_id' => $productId,
-            'current_quantity' => $inputs['current_quantity'],
-            'created_by' => $inputs['created_by']
-        ));
         return true;
     }
 
@@ -126,8 +106,13 @@ class Product extends Model
     }
 
     protected function getProductById($productId) {
-        $product = Product::select('id','product_name')->where('id', $productId)->get()->toArray();
+        $product = Product::select('id','product_name','category_id')->where('id', $productId)->get()->toArray();
         return $product[0];
+    }
+
+    protected function getProductName($productId) {
+        $productName = Product::select('product_name')->where('id', $productId)->where('status', 1)->get()->toArray();
+        return $productName[0]['product_name'];
     }
 
     protected function getProductUnits($productId) {
@@ -147,6 +132,7 @@ class Product extends Model
                     ->join('product_location_inventory', 'product_location_inventory.product_units_id', '=', 'product_units.id')
                     ->where('product_units.status', 1)
                     ->where('product_units.products_id', $val->id)
+                    ->where('product_units.selling_price', '>', 0)
                     ->where('product_location_inventory.current_quantity', '>', 0)
                     // ->get(['product_units.id','unit_master.unit','TRUNCATE(product_units.selling_price, 2) AS selling_price','product_units.special_price','product_units.min_quantity','product_units.max_quantity','product_location_inventory.current_quantity'])
                     ->select(DB::raw('product_units.id, unit_master.unit, TRUNCATE(product_units.selling_price, 2) AS selling_price, IF(product_units.special_price > 0 AND product_units.special_price_start_date <= CURDATE() AND product_units.special_price_end_date >= CURDATE(), TRUNCATE(product_units.special_price, 2), 0.00)  AS special_price, product_units.special_price_start_date, product_units.special_price_end_date, product_units.min_quantity, product_units.max_quantity, product_location_inventory.current_quantity'))
@@ -161,25 +147,5 @@ class Product extends Model
             }
         }
         return $queryResult;
-    }
-
-    protected function storeInventory ($params) {
-        $qty = ProductLocationInventory::select('id','current_quantity')->where('products_id', $params['product_id'])->get()->toArray();
-        $currentQuantity = $qty[0]['current_quantity'];
-        if($params['inventory_type'] == 1) {
-            $currentQuantity = $currentQuantity + $params['quantity'];
-        } else {
-            $currentQuantity = $currentQuantity - $params['quantity'];
-        }
-        $inventory = ProductLocationInventory::find($qty[0]['id']);
-        $inventory->current_quantity = $currentQuantity;
-        $inventory->save();
-
-        ProductInventory::create(array(
-            'products_id' => $params['product_id'],
-            'quantity' => ($params['inventory_type'] == 1) ? $params['quantity'] : '-'.$params['quantity'],
-            'created_by' => 1
-        ));
-        return true;
     }
 }

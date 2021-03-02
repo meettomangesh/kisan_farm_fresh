@@ -28,20 +28,16 @@ class ProductsController extends Controller
     public function create()
     {
         abort_if(Gate::denies('product_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-        $categories = Category::all()->pluck('cat_name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $categories = Category::all()->where('status', 1)->pluck('cat_name', 'id')->prepend(trans('global.pleaseSelect'), '');
         return view('admin.products.create', compact('categories'));
     }
 
     public function store(StoreProductRequest $request)
     {
-        // print_r($request->all()); exit;
         if ($request->hasFile('product_images')) {
             $product = Product::create($request->all());
             if($product->id > 0) {
                 Product::storeProductImages($request, $product->id, 1);
-                // Product::storeProductInventory($request, $product->id);
-                // Product::storeProductLocationInventory($request, $product->id);
-                // Product::storeProductUnits($request, $product->id, 1);
             }
         }
         return redirect()->route('admin.products.index');
@@ -52,15 +48,13 @@ class ProductsController extends Controller
         abort_if(Gate::denies('product_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $productImages = Product::getProductImages($product->id);
         $srNo = 0;
-        $categories = Category::all()->pluck('cat_name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $categories = Category::all()->where('status', 1)->pluck('cat_name', 'id')->prepend(trans('global.pleaseSelect'), '');
         $product->load('category');
-        // $productUnits = Product::getProductUnits($product->id);
         return view('admin.products.edit', compact('product','productImages','srNo','categories'));
     }
 
     public function update(UpdateProductRequest $request, Product $product)
     {
-        // print_r($request->all());exit;
         $requestAll = $request->all();
         $product->update($requestAll);
         if ($request->hasFile('product_images') && $product->id > 0) {
@@ -69,8 +63,6 @@ class ProductsController extends Controller
         if($requestAll['removed_images'] != '' && $product->id > 0) {
             Product::removeProductImages($requestAll['removed_images']);
         }
-        // Product::removeProductUnits($product->id);
-        // Product::storeProductUnits($request, $product->id, 2);
         return redirect()->route('admin.products.index');
     }
 
@@ -93,22 +85,4 @@ class ProductsController extends Controller
         return response(null, Response::HTTP_NO_CONTENT);
     }
 
-    public function getUnits($id)
-    {
-        $units = DB::table("unit_master")->where("cat_id", $id)->pluck("unit", "id");
-        return json_encode($units);
-    }
-
-    public function addOrRemoveInventory($productId)
-    {
-        abort_if(Gate::denies('product_add_or_remove_inventory'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-        $product = Product::getProductById($productId);
-        return view('admin.products.add_or_remove_inventory', compact('product'));
-    }
-
-    public function storeInventory()
-    {
-        Product::storeInventory($_POST);
-        return redirect()->route('admin.products.index');
-    }
 }

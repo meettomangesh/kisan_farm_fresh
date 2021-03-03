@@ -100,6 +100,20 @@
                 <span class="help-block">{{ trans('cruds.deliveryboy.fields.regions_helper') }}</span>
             </div>
             <div class="form-group">
+                <label class="required" for="status">{{ trans('cruds.deliveryboy.fields.status') }}</label>
+                <div class="radio-list">
+                         <label class="radio-inline"><input type="radio" name="status" value="{{ old('status', '1') }}" {{ $deliveryboy->status == '1' ? 'checked' : '' }} required> {!! trans('cruds.deliveryboy.fields.active') !!}</label>
+                        <label class="radio-inline"><input type="radio" name="status" value="{{ old('status', '0') }}" {{ $deliveryboy->status == '0' ? 'checked' : '' }} required> {!! trans('cruds.deliveryboy.fields.inactive') !!}</label>
+                </div>
+
+                @if($errors->has('status'))
+                    <div class="invalid-feedback">
+                        {{ $errors->first('status') }}
+                    </div>
+                @endif
+                <span class="help-block">{{ trans('cruds.customers.fields.status_helper') }}</span>
+            </div>
+            <div class="form-group">
                 <button class="btn btn-danger" type="submit">
                     {{ trans('global.save') }}
                 </button>

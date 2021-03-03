@@ -35,7 +35,7 @@ class CreateUsersTable extends Migration
             $table->string('email', 100)->default(null)->nullable();
             $table->tinyInteger('email_verified')->default(0)->unsigned()->index()->comment = "1: Yes, 0: No";
             $table->datetime('email_verified_at')->nullable();
-            $table->string('email_verify_key', 100)->unique()->index();
+            $table->string('email_verify_key', 100)->default(null)->nullable();
             $table->text('address_1')->nullable();
             $table->text('address_2')->nullable();
             $table->text('address_3')->nullable();
@@ -47,7 +47,7 @@ class CreateUsersTable extends Migration
             $table->integer('city_id')->default(0)->unsigned()->index();
             $table->string('pin_code', 15)->index()->nullable();
             $table->tinyInteger('registered_from')->default(1)->unsigned()->index();
-            $table->string('referral_code', 20)->unique();
+            $table->string('referral_code', 20)->default(null)->nullable();
             $table->integer('referred_by_customer_id')->default(0)->unsigned()->index();
             $table->tinyInteger('is_app_installed')->default(0)->unsigned()->index()->comment = "1: Yes, 0: No";
             $table->date('app_installed_date')->default(null)->nullable();
@@ -55,7 +55,7 @@ class CreateUsersTable extends Migration
             $table->tinyInteger('status')->default(1)->unsigned()->index()->comment = "1: Active, 0: Inactive";
             $table->string('password');
             $table->string('remember_token')->nullable();
-            $table->integer('created_by')->unsigned();
+            $table->integer('created_by')->default(0)->unsigned();
             $table->integer('updated_by')->default(0)->unsigned();
             $table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP'));
             $table->timestamp('updated_at')->default(DB::raw('null ON UPDATE CURRENT_TIMESTAMP'))->nullable();

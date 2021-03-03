@@ -41,6 +41,7 @@ class User extends Authenticatable
         'email_verified_at',
         'mobile_number',
         'mobile_number_verified_at',
+        'status',
         'password',
         'remember_token',
         'created_at',

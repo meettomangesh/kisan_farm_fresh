@@ -3,48 +3,99 @@
 
 <div class="card">
     <div class="card-header">
-        {{ trans('global.edit') }} {{ trans('cruds.category.title_singular') }}
+        {{ trans('global.edit') }} {{ trans('cruds.customers.title_singular') }}
     </div>
 
     <div class="card-body">
-        <form method="POST" action="{{ route("admin.categories.update", [$category->id]) }}" enctype="multipart/form-data">
+        <form method="POST" action="{{ route("admin.customers.update", [$customer->id]) }}" enctype="multipart/form-data">
             @method('PUT')
             @csrf
-            <div class="form-body">
-                <div class="form-group">
-                    <label class="col-md-3 required" for="cat_name">{{ trans('cruds.category.fields.cat_name') }}</label>
-                    <div class="col-md-4">
-                        <input class="form-control {{ $errors->has('cat_name') ? 'is-invalid' : '' }}" type="text" name="cat_name" id="cat_name" value="{{ old('cat_name', $category->cat_name) }}" required>
-                        @if($errors->has('cat_name'))
-                            <div class="invalid-feedback">
-                                {{ $errors->first('cat_name') }}
-                            </div>
-                        @endif
-                        <span class="help-block">{{ trans('cruds.category.fields.cat_name_helper') }}</span>
+            <div class="form-group">
+                <label class="required" for="first_name">{{ trans('cruds.customers.fields.first_name') }}</label>
+                <input class="form-control {{ $errors->has('first_name') ? 'is-invalid' : '' }}" type="text" name="first_name" id="first_name" value="{{ old('first_name', $customer->first_name) }}" required>
+                @if($errors->has('first_name'))
+                    <div class="invalid-feedback">
+                        {{ $errors->first('first_name') }}
                     </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-3" for="cat_description">{{ trans('cruds.category.fields.cat_description') }}</label>
-                    <div class="col-md-4">
-                        <textarea class="form-control {{ $errors->has('cat_description') ? 'is-invalid' : '' }}" rows="2" name="cat_description" id="cat_description">{{ old('cat_description', $category->cat_description) }}</textarea>
-                        @if($errors->has('cat_description'))
-                            <div class="invalid-feedback">
-                                {{ $errors->first('cat_description') }}
-                            </div>
-                        @endif
-                        <span class="help-block">{{ trans('cruds.category.fields.cat_description_helper') }}</span>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-3 required" for="status">{{ trans('cruds.category.fields.status') }}</label>
-                    <div class="col-md-4">
-                        <div class="radio-list">
-                            <label class="radio-inline"><input type="radio" name="status" value="{{ old('status', '1') }}" required> {!! trans('cruds.category.fields.active') !!}</label>
-                            <label class="radio-inline"><input type="radio" name="status" value="{{ old('status', '0') }}" required> {!! trans('cruds.category.fields.inactive') !!}</label>
-                        </div>
-                    </div>
-                </div>
+                @endif
+                <span class="help-block">{{ trans('cruds.customers.fields.first_name_helper') }}</span>
             </div>
+            <div class="form-group">
+                <label class="required" for="last_name">{{ trans('cruds.customers.fields.last_name') }}</label>
+                <input class="form-control {{ $errors->has('last_name') ? 'is-invalid' : '' }}" type="text" name="last_name" id="last_name" value="{{ old('last_name', $customer->last_name) }}" required>
+                @if($errors->has('last_name'))
+                    <div class="invalid-feedback">
+                        {{ $errors->first('last_name') }}
+                    </div>
+                @endif
+                <span class="help-block">{{ trans('cruds.customers.fields.last_name_helper') }}</span>
+            </div>
+
+            <div class="form-group">
+                <label class="required" for="mobile_number">{{ trans('cruds.customers.fields.mobile_number') }}</label>
+                <input class="form-control {{ $errors->has('mobile_number') ? 'is-invalid' : '' }}" type="mobile_number" name="mobile_number" id="mobile_number" value="{{ old('mobile_number', $customer->mobile_number) }}" required>
+                @if($errors->has('mobile_number'))
+                    <div class="invalid-feedback">
+                        {{ $errors->first('mobile_number') }}
+                    </div>
+                @endif
+                <span class="help-block">{{ trans('cruds.customers.fields.mobile_number_helper') }}</span>
+            </div>
+
+            <div class="form-group">
+                <label class="required" for="email">{{ trans('cruds.customers.fields.email') }}</label>
+                <input class="form-control {{ $errors->has('email') ? 'is-invalid' : '' }}" type="email" name="email" id="mobile_number" value="{{ old('email', $customer->email) }}" required>
+                @if($errors->has('email'))
+                    <div class="invalid-feedback">
+                        {{ $errors->first('email') }}
+                    </div>
+                @endif
+                <span class="help-block">{{ trans('cruds.customers.fields.email_helper') }}</span>
+            </div>
+
+            <!-- <div class="form-group">
+                <label class="required" for="password">{{ trans('cruds.customers.fields.password') }}</label>
+                <input class="form-control {{ $errors->has('password') ? 'is-invalid' : '' }}" type="password" name="password" id="password">
+                @if($errors->has('password'))
+                    <div class="invalid-feedback">
+                        {{ $errors->first('password') }}
+                    </div>
+                @endif
+                <span class="help-block">{{ trans('cruds.customers.fields.password_helper') }}</span>
+            </div> -->
+            <div class="form-group">
+                <label class="required" for="roles">{{ trans('cruds.customers.fields.roles') }}</label>
+                <div style="padding-bottom: 4px">
+                    <span class="btn btn-info btn-xs select-all" style="border-radius: 0">{{ trans('global.select_all') }}</span>
+                    <span class="btn btn-info btn-xs deselect-all" style="border-radius: 0">{{ trans('global.deselect_all') }}</span>
+                </div>
+                <select class="form-control select2 {{ $errors->has('roles') ? 'is-invalid' : '' }}" name="roles[]" id="roles" multiple required>
+                    @foreach($roles as $id => $roles)
+                        <option value="{{ $id }}" {{ (in_array($id, old('roles', [])) || $customer->roles->contains($id)) ? 'selected' : '' }}>{{ $roles }}</option>
+                    @endforeach
+                </select>
+                @if($errors->has('roles'))
+                    <div class="invalid-feedback">
+                        {{ $errors->first('roles') }}
+                    </div>
+                @endif
+                <span class="help-block">{{ trans('cruds.customers.fields.roles_helper') }}</span>
+            </div>
+            <div class="form-group">
+                <label class="required" for="status">{{ trans('cruds.customers.fields.status') }}</label>
+                <div class="radio-list">
+                         <label class="radio-inline"><input type="radio" name="status" value="{{ old('status', '1') }}" {{ $customer->status == '1' ? 'checked' : '' }} required> {!! trans('cruds.customers.fields.active') !!}</label>
+                        <label class="radio-inline"><input type="radio" name="status" value="{{ old('status', '0') }}" {{ $customer->status == '0' ? 'checked' : '' }} required> {!! trans('cruds.customers.fields.inactive') !!}</label>
+                </div>
+
+                @if($errors->has('status'))
+                    <div class="invalid-feedback">
+                        {{ $errors->first('status') }}
+                    </div>
+                @endif
+                <span class="help-block">{{ trans('cruds.customers.fields.status_helper') }}</span>
+            </div>
+
             <div class="form-group">
                 <button class="btn btn-danger" type="submit">
                     {{ trans('global.save') }}
@@ -54,21 +105,6 @@
     </div>
 </div>
 
-@endsection
 
-@section('template-level-scripts')
-<script src="{{ asset('js/admin/category.js') }}"></script>
-@endsection
 
-@section('page-level-scripts')
-<script src="{{ asset('global/plugins/jquery-inputmask/jquery.inputmask.bundle.min.js') }}"></script>
-<script src="{{ asset('global/plugins/bootstrap-maxlength/bootstrap-maxlength.min.js') }}"></script>
-@endsection
-
-@section('scripts')
-<script>
-    jQuery(document).ready(function () {
-        siteObjJs.admin.categoryJs.init();
-    });
-</script>
 @endsection

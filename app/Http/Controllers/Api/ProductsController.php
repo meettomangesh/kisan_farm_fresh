@@ -66,6 +66,8 @@ class ProductsController extends BaseController
             'delivery_details.address.id' => 'required',
             'payment_details' => 'required',
             'payment_details.type' => 'in:cod,online',
+            'payment_details.amount' => 'required|integer|gt:0',
+            'payment_details.discounted_amount' => 'required',
             'payment_details.order_id'=>'required_if:payment_details.type,online',
             'payment_details.transaction_id'=>'required_if:payment_details.type,online',
             'payment_details.method'=>'required_if:payment_details.type,online',
@@ -83,27 +85,19 @@ class ProductsController extends BaseController
         if ($validator->fails()) {
             return $this->sendError(parent::VALIDATION_ERROR, $validator->errors());
         }
-        exit;
+
         try {
-            $params = [
-                'platform' => $request->platform,
-                'category_id' => $request->category_id,
-                'no_of_records' => $request->no_of_records,
-                'page_number' => $request->page_number,
-                'search_value' => $request->search_value,
-                'sort_type' => $request->sort_type,
-                'sort_on' => $request->sort_on,
-            ];
-            $params = json_encode($params);
+            $params = $request->all();
             //Create product object to call functions
             $product = new Product();
             // Function call to get product list
-            $responseDetails = $product->getProductList($params);
-            $message = 'Product list.';
-            if(sizeof($responseDetails) == 0) {
-                $message = 'No record found.';
+            $responseDetails = $product->placeOrder($params);
+            if($responseDetails) {
+                $message = 'Order placed successully!.';
+            } else {
+                return $this->sendError('Failed to place order.', [], 422);
             }
-            $response = $this->sendResponse($responseDetails, $message);
+            $response = $this->sendResponse([], $message);
         } catch (Exception $e) {
             $response = $this->sendResponse(array(), $e->getMessage());
         }

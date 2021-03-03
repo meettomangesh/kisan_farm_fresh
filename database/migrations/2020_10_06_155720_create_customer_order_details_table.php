@@ -15,9 +15,10 @@ class CreateCustomerOrderDetailsTable extends Migration
     {
         Schema::create('customer_order_details', function (Blueprint $table) {
             $table->increments('id')->unsigned();
-            $table->integer('customer_id')->default(0)->unsigned()->index();
+            $table->integer('customer_loyalty_id')->default(0)->unsigned()->index();
             $table->integer('order_id')->default(0)->unsigned()->index();
             $table->integer('products_id')->unsigned()->index();
+            $table->integer('product_units_id')->unsigned()->index();
             $table->integer('item_quantity')->unsigned();
             $table->date('expiry_date')->nullable()->index()->comment = "The product will not be visible beyond this date.";
             $table->decimal('selling_price', 14, 4);

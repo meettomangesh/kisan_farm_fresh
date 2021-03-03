@@ -10,6 +10,8 @@ use App\Models\ProductInventory;
 use App\Models\ProductLocationInventory;
 use App\Models\Category;
 use App\Models\ProductUnits;
+use App\Models\CustomerLoyalty;
+use App\Models\CustomerOrders;
 use DB;
 
 class Product extends Model
@@ -153,5 +155,54 @@ class Product extends Model
             }
         }
         return $queryResult;
+    }
+
+    public function placeOrder($params) {
+        // validate customer
+        $customerLoyaltyData = CustomerLoyalty::select('id')->where('id', $params['user_id'])->where('status', 1)->get()->toArray();
+        if(sizeof($customerLoyaltyData) == 0 || sizeof($params['products']) == 0) {
+            return false;
+        }
+
+        $orderAmount = $totalItemQty = 0;
+        // validate product
+        foreach($params['products'] as $key => $value) {
+            $orderAmount = $orderAmount + ((($value['special_price'] > 0) ? $value['special_price'] : $value['selling_price']) * $value['quantity']);
+            $totalItemQty = $totalItemQty + $value['quantity'];
+            $inputData = json_encode($value);
+            $result = DB::select('call validateProduct(?)', [$inputData]);
+            $reponse = json_decode($result[0]->response);
+            if($reponse->status == "FAILURE" && $reponse->statusCode != 200) {
+                return false;
+            }
+        }
+
+        if($orderAmount != $params['payment_details']['amount']) {
+            return false;
+        }
+
+        $customerOrdersResponse = CustomerOrders::create(array(
+            'customer_loyalty_id' => $params['user_id'],
+            'amount' => $params['payment_details']['amount'],
+            'discounted_amount' => $params['payment_details']['discounted_amount'],
+            'total_items' => sizeof($params['products']),
+            'total_items_quantity' => $totalItemQty,
+            'shipping_address_id' => $params['delivery_details']['address']['id'],
+            'billing_address_id' => $params['delivery_details']['address']['id'],
+            'delivery_date' => $params['delivery_details']['date'],
+            'created_by' => 1
+        ));
+        $orderId = $customerOrdersResponse->id;
+        foreach($params['products'] as $key => $value) {
+            $value['order_id'] = $orderId;
+            $value['customer_loyalty_id'] = $params['user_id'];
+            $inputData = json_encode($value);
+            $result = DB::select('call placeOrderDetails(?)', [$inputData]);
+            $reponse = json_decode($result[0]->response);
+            if($reponse->status == "FAILURE" && $reponse->statusCode != 200) {
+                return false;
+            }
+        }
+        return true;
     }
 }

@@ -33,6 +33,9 @@ class Unit extends Model
 
     protected function getUnitName($id) {
         $unitName = Unit::select('unit')->where('id', $id)->where('status', 1)->get()->toArray();
-        return $unitName[0]['unit'];
+        if(!empty($unitName[0])) {
+            return $unitName[0]['unit'];
+        }
+        return '';
     }
 }

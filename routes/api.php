@@ -27,6 +27,7 @@ Route::post('categories', 'Api\CategoryController@getCategoryList');
 Route::post('products', 'Api\ProductsController@getProductList');
 Route::post('banners', 'Api\BannersController@getBannerList');
 Route::post('pinCodes', 'Api\RegisterController@getPinCodeList');
+Route::post('placeOrder', 'Api\ProductsController@placeOrder');
 Route::middleware('auth:api')->group( function () {
     // Route::resource('products', 'API\ProductsController');
 });

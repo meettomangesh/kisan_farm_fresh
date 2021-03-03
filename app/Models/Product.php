@@ -200,6 +200,9 @@ class Product extends Model
             $result = DB::select('call placeOrderDetails(?)', [$inputData]);
             $reponse = json_decode($result[0]->response);
             if($reponse->status == "FAILURE" && $reponse->statusCode != 200) {
+                $cancelData = array('order_id' => $orderId, 'type' => 1);
+                $cancelData = json_encode($cancelData);
+                DB::select('call cancelOrder(?)', [$cancelData]);
                 return false;
             }
         }

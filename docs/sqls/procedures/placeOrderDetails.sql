@@ -43,8 +43,6 @@ placeOrderDetails:BEGIN
             UPDATE product_units SET status = 0, updated_by = 1 WHERE id = productUnitId;
         END IF;
     ELSE
-        -- DELETE FROM customer_order_details WHERE order_id = orderId;
-        -- DELETE FROM customer_orders WHERE id = orderId;
         SELECT JSON_OBJECT('status', 'FAILURE', 'message', 'Failed to add.','data',JSON_OBJECT(),'statusCode',101) AS response;
         LEAVE placeOrderDetails;
     END IF;

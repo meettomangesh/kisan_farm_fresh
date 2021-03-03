@@ -53,4 +53,55 @@ class ProductsController extends BaseController
         return $response;
         // $this->response->setContent(json_encode($response)); // send response in json format
     }
+
+    public function placeOrder(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'platform' => 'required',
+            // 'user_id' => 'exists:users.id',
+            'user_id' => 'required|integer',
+            'delivery_details' => 'required',
+            'delivery_details.date' => 'required',
+            'delivery_details.address' => 'required',
+            'delivery_details.address.id' => 'required',
+            'payment_details' => 'required',
+            'payment_details.type' => 'in:cod,online',
+            'payment_details.amount' => 'required|integer|gt:0',
+            'payment_details.discounted_amount' => 'required',
+            'payment_details.order_id'=>'required_if:payment_details.type,online',
+            'payment_details.transaction_id'=>'required_if:payment_details.type,online',
+            'payment_details.method'=>'required_if:payment_details.type,online',
+            'payment_details.bank'=>'required_if:payment_details.type,online',
+            'products' => 'required',
+            'products.*.id' => 'required|integer|gt:0',
+            'products.*.product_unit_id' => 'required|integer|gt:0',
+            'products.*.quantity' => 'required|numeric|gt:0',
+            'products.*.selling_price' => 'required|gt:0',
+            'products.*.special_price' => 'required',
+            'products.*.special_price_start_date' => 'required_if:products.special_price,gt:0',
+            'products.*.special_price_end_date' => 'required_if:products.special_price,gt:0',
+            // 'products.*.expiry_date' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return $this->sendError(parent::VALIDATION_ERROR, $validator->errors());
+        }
+
+        try {
+            $params = $request->all();
+            //Create product object to call functions
+            $product = new Product();
+            // Function call to get product list
+            $responseDetails = $product->placeOrder($params);
+            if($responseDetails) {
+                $message = 'Order placed successully!.';
+            } else {
+                return $this->sendError('Failed to place order.', [], 422);
+            }
+            $response = $this->sendResponse([], $message);
+        } catch (Exception $e) {
+            $response = $this->sendResponse(array(), $e->getMessage());
+        }
+        return $response;
+        // $this->response->setContent(json_encode($response)); // send response in json format
+    }
 }

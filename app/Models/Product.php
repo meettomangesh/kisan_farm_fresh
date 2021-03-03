@@ -10,7 +10,7 @@ use App\Models\ProductInventory;
 use App\Models\ProductLocationInventory;
 use App\Models\Category;
 use App\Models\ProductUnits;
-use App\Models\CustomerLoyalty;
+use App\Models\CustomerOrders;
 use App\User;
 use DB;
 

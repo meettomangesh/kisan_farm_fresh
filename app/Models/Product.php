@@ -11,7 +11,7 @@ use App\Models\ProductLocationInventory;
 use App\Models\Category;
 use App\Models\ProductUnits;
 use App\Models\CustomerLoyalty;
-use App\Models\CustomerOrders;
+use App\User;
 use DB;
 
 class Product extends Model
@@ -159,8 +159,8 @@ class Product extends Model
 
     public function placeOrder($params) {
         // validate customer
-        $customerLoyaltyData = CustomerLoyalty::select('id')->where('id', $params['user_id'])->where('status', 1)->get()->toArray();
-        if(sizeof($customerLoyaltyData) == 0 || sizeof($params['products']) == 0) {
+        $usersData = User::select('id')->where('id', $params['user_id'])->where('status', 1)->get()->toArray();
+        if(sizeof($usersData) == 0 || sizeof($params['products']) == 0) {
             return false;
         }
 
@@ -182,7 +182,7 @@ class Product extends Model
         }
 
         $customerOrdersResponse = CustomerOrders::create(array(
-            'customer_loyalty_id' => $params['user_id'],
+            'customer_id' => $params['user_id'],
             'amount' => $params['payment_details']['amount'],
             'discounted_amount' => $params['payment_details']['discounted_amount'],
             'total_items' => sizeof($params['products']),
@@ -195,7 +195,7 @@ class Product extends Model
         $orderId = $customerOrdersResponse->id;
         foreach($params['products'] as $key => $value) {
             $value['order_id'] = $orderId;
-            $value['customer_loyalty_id'] = $params['user_id'];
+            $value['customer_id'] = $params['user_id'];
             $inputData = json_encode($value);
             $result = DB::select('call placeOrderDetails(?)', [$inputData]);
             $reponse = json_decode($result[0]->response);

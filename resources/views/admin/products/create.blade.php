@@ -69,23 +69,6 @@
 
                 <div class="col-md-6">
                     <div class="form-group">
-                        <label class="control-label col-md-4 required" for="current_quantity">{{ trans('cruds.product.fields.opening_quantity') }}</label>
-                        <div class="col-md-8 float-right">
-                            <input class="form-control {{ $errors->has('current_quantity') ? 'is-invalid' : '' }}" name="current_quantity" id="current_quantity" value="{{ old('current_quantity', '') }}" greaterThanZero = "true" numberOnly="true" required>
-                            @if($errors->has('current_quantity'))
-                                <div class="invalid-feedback">
-                                    {{ $errors->first('current_quantity') }}
-                                </div>
-                            @endif
-                            <span class="help-block">{{ trans('cruds.product.fields.opening_quantity_helper') }}</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="form-group">
                         <label class="control-label col-md-4 required" for="category_id">{{ trans('cruds.product.fields.category') }}</label>
                         <div class="col-md-8 float-right">
                             <select class="form-control select2 {{ $errors->has('category') ? 'is-invalid' : '' }}" name="category_id" id="category_id" required>
@@ -100,27 +83,6 @@
                         </div>
                         @endif
                         <span class="help-block">{{ trans('cruds.product.fields.category_helper') }}</span>
-                    </div>
-                </div>
-
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label class="control-label col-md-4 required" for="units">{{ trans('cruds.product.fields.units') }}</label>
-                        <div class="col-md-8 float-right">
-                            <div style="padding-bottom: 4px">
-                                <span class="btn btn-info btn-xs select-all" style="border-radius: 0">{{ trans('global.select_all') }}</span>
-                                <span class="btn btn-info btn-xs deselect-all" style="border-radius: 0">{{ trans('global.deselect_all') }}</span>
-                            </div>
-                            <select class="form-control select2 {{ $errors->has('units') ? 'is-invalid' : '' }}" name="unit_ids[]" id="unit_ids" multiple required>
-                                <option>Please select</option>
-                            </select>
-                            @if($errors->has('units'))
-                                <div class="invalid-feedback">
-                                    {{ $errors->first('units') }}
-                                </div>
-                            @endif
-                            <span class="help-block">{{ trans('cruds.product.fields.units_helper') }}</span>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -141,109 +103,7 @@
                         </div>
                     </div>
                 </div>
-                <!-- <div class="col-md-6">
-                    <div class="form-group">
-                        <label class="control-label col-md-4 required" for="voucher_value">{{ trans('cruds.product.fields.voucher_value') }}</label>
-                        <div class="col-md-8 float-right">
-                            <div class="input-group">
-                                <span class="input-group-addon">
-                                    <i class="fa fa-inr"></i>
-                                </span>
-                                <input class="form-control {{ $errors->has('voucher_value') ? 'is-invalid' : '' }}" name="voucher_value" id="voucher_value" value="{{ old('voucher_value', '') }}" greaterThanZero = "true" numberOnly="true" maxlength="10" autocomplete="off" required>
-                            </div>
-                            <span class="help-block">{{ trans('cruds.product.fields.voucher_value_helper') }}</span>
-                        </div>
-                    </div>
-                </div> -->
-            </div>
 
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label class="control-label col-md-4 required" for="voucher_value">{{ trans('cruds.product.fields.selling_price') }}</label>
-                        <div class="col-md-8 float-right">
-                            <div class="input-group">
-                                <span class="input-group-addon">
-                                    <i class="fa fa-inr"></i>
-                                </span>
-                                <input class="form-control {{ $errors->has('selling_price') ? 'is-invalid' : '' }}" name="selling_price" id="selling_price" value="{{ old('selling_price', '') }}" greaterThanZero = "true" numberOnly="true" maxlength="10" autocomplete="off" required>
-                            </div>
-                            <span class="help-block">{{ trans('cruds.product.fields.selling_price_helper') }}</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label class="control-label col-md-4" for="special_price">{{ trans('cruds.product.fields.special_price') }}</label>
-                        <div class="col-md-8 float-right">
-                            <div class="input-group">
-                                <span class="input-group-addon">
-                                    <i class="fa fa-inr"></i>
-                                </span>
-                                <input class="form-control {{ $errors->has('special_price') ? 'is-invalid' : '' }}" name="special_price" id="special_price" value="{{ old('special_price', '') }}" greaterThanZero = "true" numberOnly="true" priceRangeValid="true" maxlength="10" autocomplete="off">
-                            </div>
-                            <span class="help-block">{{ trans('cruds.product.fields.special_price_helper') }}</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label class="control-label col-md-4" for="special_price_start_date">{{ trans('cruds.product.fields.special_price_start_date') }}</label>
-                        <div class="col-md-8 float-right">
-                            <!-- div data-error-container="#form_special_price_start_date_error" class="input-group date form_datetime" data-date-start-date="+0d" -->
-                                <input class="form-control {{ $errors->has('special_price_start_date') ? 'is-invalid' : '' }}" type="date" name="special_price_start_date" id="special_price_start_date" min="{{ date('Y-m-d') }}" value="{{ old('special_price_start_date', '') }}" startDateValid="true">
-                                <!-- span class="input-group-btn">
-                                    <button class="btn default date-set" type="button" id="date-picker-btn"><i class="fa fa-calendar"></i></button>
-                                </span>
-                            </div -->
-                            <span class="help-block">{{ trans('cruds.product.fields.special_price_start_date_helper') }}</span>
-                            <div id="form_special_price_start_date_error"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label class="control-label col-md-4" for="special_price_end_date">{{ trans('cruds.product.fields.special_price_end_date') }}</label>
-                        <div class="col-md-8 float-right">
-                            <!-- div data-error-container="#form_special_price_end_date_error" class="input-group date form_datetime" data-date-start-date="+0d" -->
-                                <input class="form-control {{ $errors->has('special_price_end_date') ? 'is-invalid' : '' }}" type="date" name="special_price_end_date" id="special_price_end_date" min="{{ date('Y-m-d') }}" value="{{ old('special_price_end_date', '') }}" endDateValid="true">
-                                <!-- span class="input-group-btn">
-                                    <button class="btn default date-set" type="button" id="date-picker-btn"><i class="fa fa-calendar"></i></button>
-                                </span>
-                            </div -->
-                            <span class="help-block">{{ trans('cruds.product.fields.special_price_end_date_helper') }}</span>
-                            <div id="form_special_price_end_date_error"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label class="control-label col-md-4 required" for="min_quantity">{{ trans('cruds.product.fields.min_quantity') }}</label>
-                        <div class="col-md-8 float-right">
-                            <input class="form-control {{ $errors->has('min_quantity') ? 'is-invalid' : '' }}" name="min_quantity" id="min_quantity" value="{{ old('min_quantity', '1') }}" greaterThanZero = "true" numberOnly="true" maxlength="10" autocomplete="off" required>
-                            <span class="help-block">{{ trans('cruds.product.fields.min_quantity_helper') }}</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label class="control-label col-md-4 required" for="max_quantity">{{ trans('cruds.product.fields.max_quantity') }}</label>
-                        <div class="col-md-8 float-right">
-                            <input class="form-control {{ $errors->has('max_quantity') ? 'is-invalid' : '' }}" name="max_quantity" id="max_quantity" value="{{ old('max_quantity', '') }}" greaterThanZero = "true" numberOnly="true" quantityValid="true" maxlength="10" autocomplete="off" required>
-                            <span class="help-block">{{ trans('cruds.product.fields.max_quantity_helper') }}</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="row">
                 <div class="col-md-6">
                     <div class="form-group">
                         <label class="control-label col-md-4 required" for="status">{{ trans('cruds.product.fields.status') }}</label>
@@ -335,28 +195,6 @@
 <script>
     jQuery(document).ready(function () {
         siteObjJs.admin.productMerchantJs.init('create-product');
-
-        $('select[name="category_id"]').on('change', function() {
-            var categoryId = $(this).val();
-            var url = '{{ route("admin.products.getUnits", "") }}';
-            url = url+'/'+categoryId;
-
-            if (categoryId) {
-                $.ajax({
-                    url: url,
-                    type: "GET",
-                    dataType: "json",
-                    success: function(data) {
-                        $("#unit_ids").empty();
-                        $.each(data, function(key, value) {
-                            $("#unit_ids").append('<option value="' + key + '">' + value + '</option>');
-                        });
-                    }
-                });
-            } else {
-                $("#unit_ids").empty();
-            }
-        });
     });
 </script>
 @endsection

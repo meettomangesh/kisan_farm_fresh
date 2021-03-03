@@ -30,4 +30,9 @@ class Unit extends Model
     {
         return $this->belongsTo(Category::class, 'cat_id');
     }
+
+    protected function getUnitName($id) {
+        $unitName = Unit::select('unit')->where('id', $id)->where('status', 1)->get()->toArray();
+        return $unitName[0]['unit'];
+    }
 }

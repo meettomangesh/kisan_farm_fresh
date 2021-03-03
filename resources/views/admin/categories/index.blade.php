@@ -33,7 +33,7 @@
                             <td></td>
                             <td>{{ $category->id ?? '' }}</td>
                             <td><img src="{{ asset($category->cat_image_name)  }}" alt="" width="60" height="60"></td>
-                            <td>{{ $category->cat_name ?? '' }}</td>
+                            <td><b>{{ $category->cat_name ?? '' }}</b></td>
                             <td>{{ $category->cat_description ?? '' }}</td>
                             <td>
                                 @can('category_show')

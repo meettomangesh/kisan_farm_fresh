@@ -163,7 +163,15 @@
                     <li class="nav-item">
                         <a href="{{ route("admin.products.index") }}" class="nav-link {{ request()->is('admin/products') || request()->is('admin/products/*') ? 'active' : '' }}">
                             <i class="fa-fw fas fa-cogs nav-icon"></i>
-                            {{ trans('cruds.product.title') }}
+                            {{ trans('cruds.product.title_master') }}
+                        </a>
+                    </li>
+                    @endcan
+                    @can('product_unit_access')
+                    <li class="nav-item">
+                        <a href="{{ route("admin.product_units.index") }}" class="nav-link {{ request()->is('admin/product_units') || request()->is('admin/product_units/*') ? 'active' : '' }}">
+                            <i class="fa-fw fas fa-cogs nav-icon"></i>
+                            {{ trans('cruds.product_unit.title') }}
                         </a>
                     </li>
                     @endcan

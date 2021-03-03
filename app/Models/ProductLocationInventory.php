@@ -18,15 +18,25 @@ class ProductLocationInventory extends Model
         'deleted_at',
     ];
 
-    protected $fillable = ['products_id','current_quantity','created_by','updated_by'];
+    protected $fillable = ['product_units_id','current_quantity','created_by','updated_by'];
 
     protected function serializeDate(DateTimeInterface $date)
     {
         return $date->format('Y-m-d H:i:s');
     }
 
-    protected function getProductCurrentQuantity($productId) {
-        $productCurQty = ProductLocationInventory::select('current_quantity')->where('products_id', $productId)->get()->toArray();
-        return $productCurQty[0]['current_quantity'];
+    protected function getProductUnitCurrentQuantity($productUnitsId) {
+        $productUnitCurQty = ProductLocationInventory::select('current_quantity')->where('product_units_id', $productUnitsId)->get()->toArray();
+        return $productUnitCurQty[0]['current_quantity'];
+    }
+
+    protected function storeProductLocationInventory ($params, $productUnitId) {
+        $inputs = $params->all();
+        ProductLocationInventory::create(array(
+            'product_units_id' => $productUnitId,
+            'current_quantity' => $inputs['opening_quantity'],
+            'created_by' => $inputs['created_by']
+        ));
+        return true;
     }
 }

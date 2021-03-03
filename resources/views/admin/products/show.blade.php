@@ -24,75 +24,43 @@
                         <td><img src="{{ asset(App\Models\ProductImages::getFirstImage($product->id)) }}" alt="" width="50" height="50"></td>
                     </tr>
                     <tr>
+                        <th>{{ trans('cruds.product.fields.category') }}</th>
+                        <td><b>{{ App\Models\Category::getCategoryName($product->category_id) }}</b></td>
+                    </tr>
+                    <tr>
                         <th>{{ trans('cruds.product.fields.product_name') }}</th>
-                        <td>{{ $product->product_name }}</td>
+                        <td><b>{{ $product->product_name }}</b></td>
                     </tr>
                     <tr>
                         <th>{{ trans('cruds.product.fields.sku') }}</th>
-                        <td>{{ $product->sku }}</td>
+                        <td><b>{{ $product->sku }}</b></td>
                     </tr>
                     <tr>
                         <th>{{ trans('cruds.product.fields.short_description') }}</th>
                         <td>{{ $product->short_description }}</td>
                     </tr>
                     <tr>
-                        <th>{{ trans('cruds.product.fields.opening_quantity') }}</th>
-                        <td>{{ $product->current_quantity }}</td>
-                    </tr>
-                    <tr>
-                        <th>{{ trans('cruds.product.fields.current_quantity') }}</th>
-                        <td>{{ App\Models\ProductLocationInventory::getProductCurrentQuantity($product->id) }}</td>
-                    </tr>
-                    <tr>
                         <th>{{ trans('cruds.product.fields.expiry_date') }}</th>
                         <td>{{ $product->expiry_date }}</td>
                     </tr>
-                    <!-- <tr>
-                        <th>{{ trans('cruds.product.fields.voucher_value') }}</th>
-                        <td>{{ $product->voucher_value }}</td>
-                    </tr> -->
-                    <tr>
-                        <th>{{ trans('cruds.product.fields.selling_price') }}</th>
-                        <td>{{ number_format((float)$product->selling_price, 2, '.', '') }}</td>
-                    </tr>
-                    <tr>
-                        <th>{{ trans('cruds.product.fields.special_price') }}</th>
-                        <td>{{ number_format((float)$product->special_price, 2, '.', '') }}</td>
-                    </tr>
-                    <tr>
-                        <th>{{ trans('cruds.product.fields.special_price_start_date') }}</th>
-                        <td>{{ $product->special_price_start_date }}</td>
-                    </tr>
-                    <tr>
-                        <th>{{ trans('cruds.product.fields.special_price_end_date') }}</th>
-                        <td>{{ $product->special_price_end_date }}</td>
-                    </tr>
-                    <tr>
-                        <th>{{ trans('cruds.product.fields.min_quantity') }}</th>
-                        <td>{{ $product->min_quantity }}</td>
-                    </tr>
-                    <tr>
-                        <th>{{ trans('cruds.product.fields.max_quantity') }}</th>
-                        <td>{{ $product->max_quantity }}</td>
-                    </tr>
                     <tr>
                         <th>{{ trans('cruds.product.fields.stock_availability') }}</th>
-                        <td>
+                        <td><b>
                             @if($product->status == 1)
                                 {{ trans('cruds.product.fields.in_stock') }}
                             @else
                                 {{ trans('cruds.product.fields.out_of_stock') }}
-                            @endif
+                            @endif</b>
                         </td>
                     </tr>
                     <tr>
                         <th>{{ trans('cruds.product.fields.status') }}</th>
-                        <td>
+                        <td><b>
                             @if($product->status == 1)
                                 {{ trans('cruds.product.fields.active') }}
                             @else
                                 {{ trans('cruds.product.fields.inactive') }}
-                            @endif
+                            @endif</b>
                         </td>
                     </tr>
                 </tbody>

@@ -7,11 +7,11 @@ use Gate;
 use Illuminate\Foundation\Http\FormRequest;
 use Symfony\Component\HttpFoundation\Response;
 
-class StoreUserRequest extends FormRequest
+class UpdateCustomerRequest extends FormRequest
 {
     public function authorize()
     {
-        abort_if(Gate::denies('user_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+        abort_if(Gate::denies('customers_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         return true;
     }
@@ -19,30 +19,32 @@ class StoreUserRequest extends FormRequest
     public function rules()
     {
         return [
-            'first_name'     => [
+            'first_name'    => [
                 'required',
             ],
-            'last_name'     => [
+            'last_name'    => [
                 'required',
             ],
-            'email'    => [
+            'email'   => [
                 'required',
-                'unique:users',
+                'unique:users,email,' . request()->route('customer')->id,
             ],
-            'mobile_number' => [
+            'mobile_number'   => [
                 'required',
-                'unique:users',
+                'unique:users,mobile_number,' . request()->route('customer')->id,
             ],
-            'password' => [
-                'required',
-            ],
-            'roles.*'  => [
+            'roles.*' => [
                 'integer',
             ],
-            'roles'    => [
+            'roles'   => [
                 'required',
                 'array',
             ],
+            'status' => [
+                'integer',
+            ],
+
         ];
+
     }
 }

@@ -28,8 +28,8 @@
                         <td>{{ $customer->mobile_number ?? '' }}</td>
                     </tr>
                     <tr>
-                        <th>{{ trans('cruds.customers.fields.email_address') }}</th>
-                        <td>{{ $customer->email_address ?? '' }}</td>
+                        <th>{{ trans('cruds.customers.fields.email') }}</th>
+                        <td>{{ $customer->email ?? '' }}</td>
                     </tr>
                     <tr>
                         <th>{{ trans('cruds.customers.fields.status') }}</th>

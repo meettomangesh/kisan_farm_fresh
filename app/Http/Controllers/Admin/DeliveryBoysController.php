@@ -72,7 +72,7 @@ class DeliveryBoysController extends Controller
         return redirect()->route('admin.deliveryboys.index');
     }
 
-    public function show(DeliveryBoy $deliveryboy)
+    public function show(User $deliveryboy)
     {
         abort_if(Gate::denies('deliveryboy_show'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
@@ -82,7 +82,7 @@ class DeliveryBoysController extends Controller
         return view('admin.deliveryboys.show', compact('deliveryboy'));
     }
 
-    public function destroy(DeliveryBoy $deliveryboy)
+    public function destroy(User $deliveryboy)
     {
         abort_if(Gate::denies('deliveryboy_delete'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 

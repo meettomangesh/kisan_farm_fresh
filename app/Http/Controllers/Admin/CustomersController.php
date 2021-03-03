@@ -3,15 +3,16 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\MassDestroyUserRequest;
-use App\Http\Requests\StoreUserRequest;
-use App\Http\Requests\UpdateUserRequest;
+use App\Http\Requests\MassDestroyCustomerRequest;
+use App\Http\Requests\StoreCustomerRequest;
+use App\Http\Requests\UpdateCustomerRequest;
 use App\Role;
 use App\User;
 use Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use App\Models\CustomerLoyalty;
+use App\Region;
 
 class CustomersController extends Controller
 {
@@ -19,66 +20,88 @@ class CustomersController extends Controller
     {
         abort_if(Gate::denies('customers_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $customers = CustomerLoyalty::all();
+        // $customers = CustomerLoyalty::all();
 
-        return view('admin.customers.index', compact('customers'));
+        // return view('admin.customers.index', compact('customers'));
+
+        $customers = User::whereHas(
+            'roles', function($q){
+                $q->where('title', 'Customer');
+            }
+        )->get();
+        $regions = Region::all()->where('status', 1)->pluck('region_name', 'id');
+
+        return view('admin.customers.index', compact('customers','regions'));
+
     }
 
     public function create()
     {
+
+
         abort_if(Gate::denies('customers_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $roles = Role::all()->pluck('title', 'id');
-
+        $roles = Role::all()->where('title', 'Customer')->pluck('title', 'id');
+       // $regions = Region::all()->where('status', 1)->pluck('region_name', 'id');
+         
         return view('admin.customers.create', compact('roles'));
     }
 
-    public function store(StoreUserRequest $request)
+    public function store(StoreCustomerRequest $request)
     {
         $user = User::create($request->all());
         $user->roles()->sync($request->input('roles', []));
+        //$user->regions()->sync($request->input('regions', []));
+
 
         return redirect()->route('admin.customers.index');
     }
 
-    public function edit(User $user)
+    public function edit(User $customer)
     {
+
+        
         abort_if(Gate::denies('customers_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $roles = Role::all()->pluck('title', 'id');
+        $roles = Role::all()->where('title', 'Customer')->pluck('title', 'id');
+       // $regions = Region::all()->where('status', 1)->pluck('region_name', 'id');
 
-        $user->load('roles');
+        $customer->load('roles');
+        $customer->load('regions');
 
-        return view('admin.customers.edit', compact('roles', 'user'));
+        return view('admin.customers.edit', compact('roles', 'customer'));
+
     }
 
-    public function update(UpdateUserRequest $request, User $user)
+    public function update(UpdateCustomerRequest $request, User $customer)
     {
-        $user->update($request->all());
-        $user->roles()->sync($request->input('roles', []));
-
+        $customer->update($request->all());
+        $customer->roles()->sync($request->input('roles', []));
+ 
         return redirect()->route('admin.customers.index');
     }
 
-    public function show(CustomerLoyalty $customer)
+    public function show(User $customer)
     {
+
         abort_if(Gate::denies('customers_show'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-       // $user->load('roles');
+        $customer->load('roles');
+
 
         return view('admin.customers.show', compact('customer'));
     }
 
-    public function destroy(User $user)
+    public function destroy(User $cutomer)
     {
         abort_if(Gate::denies('customers_delete'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $user->delete();
+        $cutomer->delete();
 
         return back();
     }
 
-    public function massDestroy(MassDestroyUserRequest $request)
+    public function massDestroy(MassDestroyCustomerRequest $request)
     {
         User::whereIn('id', request('ids'))->delete();
 

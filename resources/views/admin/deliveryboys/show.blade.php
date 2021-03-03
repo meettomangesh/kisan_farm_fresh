@@ -25,10 +25,18 @@
                     </tr>
                     <tr>
                         <th>
-                            {{ trans('cruds.deliveryboy.fields.name') }}
+                            {{ trans('cruds.deliveryboy.fields.first_name') }}
                         </th>
                         <td>
-                            {{ $deliveryboy->name }}
+                            {{ $deliveryboy->first_name }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>
+                            {{ trans('cruds.deliveryboy.fields.last_name') }}
+                        </th>
+                        <td>
+                            {{ $deliveryboy->last_name }}
                         </td>
                     </tr>
                     <tr>
@@ -39,14 +47,7 @@
                             {{ $deliveryboy->email }}
                         </td>
                     </tr>
-                    <tr>
-                        <th>
-                            {{ trans('cruds.deliveryboy.fields.email_verified_at') }}
-                        </th>
-                        <td>
-                            {{ $deliveryboy->email_verified_at }}
-                        </td>
-                    </tr>
+                   
                     <tr>
                         <th>
                             {{ trans('cruds.deliveryboy.fields.roles') }}
@@ -67,6 +68,12 @@
                             @endforeach
                         </td>
                     </tr>
+
+                    <tr>
+                        <th>{{ trans('cruds.deliveryboy.fields.status') }}</th>
+                        <td><span class="{{ $deliveryboy->status == 1 ? 'btn btn-success':'btn btn-danger' }}"> {{ ($deliveryboy->status == 1 ?trans('cruds.deliveryboy.fields.active'):trans('cruds.deliveryboy.fields.inactive')) ?? '' }}</span></td>
+                    </tr>
+
                 </tbody>
             </table>
             <div class="form-group">

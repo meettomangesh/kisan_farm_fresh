@@ -15,7 +15,8 @@ class CreateCustomerOrdersTable extends Migration
     {
         Schema::create('customer_orders', function (Blueprint $table) {
             $table->increments('id')->unsigned();
-            $table->integer('customer_loyalty_id')->default(0)->unsigned()->index();
+            $table->integer('customer_id')->default(0)->unsigned()->index();
+            $table->integer('delivery_boy_id')->default(0)->unsigned()->index();
             $table->integer('shipping_address_id')->default(0)->unsigned()->index();
             $table->integer('billing_address_id')->default(0)->unsigned()->index();
             $table->date('delivery_date')->nullable()->index();

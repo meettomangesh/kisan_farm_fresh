@@ -18,7 +18,7 @@ class CustomerOrderDetails extends Model
         'deleted_at',
     ];
 
-    protected $fillable = ['customer_loyalty_id','order_id','products_id','product_units_id','item_quantity','expiry_date','selling_price','special_price','special_price_start_date','special_price_end_date','reject_cancel_reason','order_status','created_by','updated_by','created_at','updated_at'];
+    protected $fillable = ['customer_id','order_id','products_id','product_units_id','item_quantity','expiry_date','selling_price','special_price','special_price_start_date','special_price_end_date','reject_cancel_reason','order_status','created_by','updated_by','created_at','updated_at'];
 
     protected function serializeDate(DateTimeInterface $date)
     {

@@ -2,7 +2,7 @@ DELIMITER $$
 DROP PROCEDURE IF EXISTS placeOrderDetails$$
 CREATE PROCEDURE placeOrderDetails(IN inputData JSON)
 placeOrderDetails:BEGIN
-    DECLARE productsId,productUnitId,quantity,orderId,lastInsertId,customerLoyaltyId INTEGER(10) DEFAULT 0;
+    DECLARE productsId,productUnitId,quantity,orderId,lastInsertId,customerId INTEGER(10) DEFAULT 0;
     DECLARE sellingPrice,specialPrice DECIMAL(14,4) DEFAULT 0.00;
     DECLARE specialPriceStartDate,specialPriceEndDate,expiryDate DATE DEFAULT NULL;
 
@@ -16,7 +16,7 @@ placeOrderDetails:BEGIN
     SET sellingPrice = JSON_UNQUOTE(JSON_EXTRACT(inputData,'$.selling_price'));
     SET specialPrice = JSON_UNQUOTE(JSON_EXTRACT(inputData,'$.special_price'));
     SET orderId = JSON_UNQUOTE(JSON_EXTRACT(inputData,'$.order_id'));
-    SET customerLoyaltyId = JSON_UNQUOTE(JSON_EXTRACT(inputData,'$.customer_loyalty_id'));
+    SET customerId = JSON_UNQUOTE(JSON_EXTRACT(inputData,'$.customer_id'));
 
     IF JSON_UNQUOTE(JSON_EXTRACT(inputData,'$.special_price_start_date')) != "" AND JSON_UNQUOTE(JSON_EXTRACT(inputData,'$.special_price_start_date')) != "null" THEN
         SET specialPriceStartDate = JSON_UNQUOTE(JSON_EXTRACT(inputData,'$.special_price_start_date'));
@@ -29,8 +29,8 @@ placeOrderDetails:BEGIN
     END IF;
     
     
-    INSERT INTO customer_order_details (customer_loyalty_id,order_id,products_id,product_units_id,item_quantity,expiry_date,selling_price,special_price,special_price_start_date,special_price_end_date,created_by)
-    VALUES (customerLoyaltyId,orderId,productsId,productUnitId,quantity,expiryDate,sellingPrice,specialPrice,specialPriceStartDate,specialPriceEndDate,1);
+    INSERT INTO customer_order_details (customer_id,order_id,products_id,product_units_id,item_quantity,expiry_date,selling_price,special_price,special_price_start_date,special_price_end_date,created_by)
+    VALUES (customerId,orderId,productsId,productUnitId,quantity,expiryDate,sellingPrice,specialPrice,specialPriceStartDate,specialPriceEndDate,1);
 
     IF LAST_INSERT_ID() > 0 THEN
         SET lastInsertId = LAST_INSERT_ID();

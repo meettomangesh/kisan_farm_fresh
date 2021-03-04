@@ -9,6 +9,7 @@ use App\Models\CustomerLoyalty;
 use Illuminate\Support\Facades\Auth;
 use Validator;
 use App\Helper\DataHelper;
+use App\Role;
 
 class RegisterController extends BaseController
 {
@@ -39,7 +40,10 @@ class RegisterController extends BaseController
         $input['referral_code'] = DataHelper::generateBarcodeString(9);
         $input['email_verify_key'] = DataHelper::emailVerifyKey();
         $input['created_by'] = 1;
+        $input['roles'] = [4];
+        
         $user = User::create($input);
+        $user->roles()->sync([4]);
         $success['token'] =  $user->createToken(getenv('APP_NAME'))->accessToken;
         $success['name'] =  $user->first_name . " " . $user->last_name;
         $success['id'] = $user->id;

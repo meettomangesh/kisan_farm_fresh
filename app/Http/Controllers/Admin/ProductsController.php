@@ -21,7 +21,7 @@ class ProductsController extends Controller
     public function index()
     {
         abort_if(Gate::denies('product_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-        $products = Product::with('category')->get();
+        $products = Product::all();
         return view('admin.products.index', compact('products'));
     }
 

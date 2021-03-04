@@ -21,8 +21,8 @@ class RegisterController extends BaseController
     {
         $validator = Validator::make($request->all(), [
             'first_name' => 'required',
-            //'email_address' => 'required|email|unique:customer_loyalty,email_address',
-            'mobile_number' => 'required|unique:customer_loyalty,mobile_number',
+            'email_address' => 'email|unique:users,email',
+            'mobile_number' => 'required|unique:users,mobile_number',
             'password' => 'required',
             //  'confirm_password' => 'required|same:password',
             'otp_verified' => 'required',
@@ -34,15 +34,64 @@ class RegisterController extends BaseController
         }
 
         $input = $request->all();
+        $input['email'] = $request->email_address;
         $input['password'] = bcrypt($input['password']);
         $input['referral_code'] = DataHelper::generateBarcodeString(9);
         $input['email_verify_key'] = DataHelper::emailVerifyKey();
         $input['created_by'] = 1;
-        $user = CustomerLoyalty::create($input);
+        $user = User::create($input);
         $success['token'] =  $user->createToken(getenv('APP_NAME'))->accessToken;
         $success['name'] =  $user->first_name . " " . $user->last_name;
+        $success['id'] = $user->id;
+        $success['role'] = $user->load('roles')->roles[0]->id;
+        $success['role_name'] = $user->load('roles')->roles[0]->title;
 
         return $this->sendResponse($success, 'User register successfully.');
+    }
+
+    public function updateCustomer(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'first_name' => 'required',
+            'last_name' => 'required',            
+            'gender' => 'required',           
+            'date_of_birth' => 'required',
+            'marital_status' => 'required',
+            'email_address' => 'email|unique:users,email,'.$request->id,
+            //'mobile_number' => 'required|unique:customer_loyalty,mobile_number',
+            //'password' => 'required',
+            //  'confirm_password' => 'required|same:password',
+            // 'otp_verified' => 'required',
+           // 'pin_code' => 'required',
+            'id' => 'required'
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendError(parent::VALIDATION_ERROR, $validator->errors());
+        }
+        
+        $input = $request->all();
+        $customer = User::where('id',$request->id)->first();
+        $input['email'] = $request->email_address;
+      //  $input['password'] = bcrypt($input['password']);
+        //$input['referral_code'] = DataHelper::generateBarcodeString(9);
+        //$input['email_verify_key'] = DataHelper::emailVerifyKey();
+        
+        if(!$customer){
+            return $this->sendError("Please try with valid details.", []);
+        }
+
+        $input['updated_by'] = 1;
+        $customer->update($input);
+        
+
+        //$customer = User::create($input);
+       // $success['token'] =  $customer->createToken(getenv('APP_NAME'))->accessToken;
+        $success['name'] =  $customer->first_name . " " . $customer->last_name;
+        $success['id'] = $customer->id;
+        $success['role'] = $customer->load('roles')->roles[0]->id;
+        $success['role_name'] = $customer->load('roles')->roles[0]->title;
+        return $this->sendResponse($success, 'User updated successfully.');
     }
 
     /**
@@ -63,14 +112,16 @@ class RegisterController extends BaseController
 
         if (Auth::guard('api')->attempt(['mobile_number' => $request->mobile_number, 'password' => $request->password])) {
             $user = Auth::guard('api')->user();
+            //print_r($user->first_name); exit;
             $success['token'] =  $user->createToken(getenv('APP_NAME'))->accessToken;
             $success['name'] =  $user->first_name . " " . $user->last_name;
-            $success['name'] =  $user->name;
             $success['dob'] =  $user->date_of_birth;
             $success['marital_status'] =  $user->marital_status;
             $success['gender'] =  $user->gender;
-            $success['email'] =  $user->email_address;
-
+            $success['email'] =  $user->email;
+            $success['id'] = $user->id;
+            $success['role'] = $user->load('roles')->roles[0]->id;
+            $success['role_name'] = $user->load('roles')->roles[0]->title;
             return $this->sendResponse($success, 'User login successfully.');
         } else {
             return $this->sendError('Unauthorised.', ['error' => 'Unauthorised']);

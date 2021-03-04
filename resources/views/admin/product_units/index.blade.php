@@ -35,8 +35,8 @@
                         <tr data-entry-id="{{ $productUnit->id }}">
                             <td></td>
                             <td>{{ $productUnit->id ?? '' }}</td>
-                            <td><b>{{ App\Models\Product::getProductName($productUnit->products_id) }}</b></td>
-                            <td><b>{{ App\Models\Unit::getUnitName($productUnit->unit_id) }}</b></td>
+                            <td><b>{{ $productUnit->product->product_name }}</b></td>
+                            <td><b>{{ $productUnit->unit->unit }}</b></td>
                             <td>{{ round($productUnit->selling_price, 2) ?? '' }}</td>
                             <td>{{ round($productUnit->special_price, 2) ?? '' }}</td>
                             <td>{{ $productUnit->opening_quantity ?? '' }}</td>

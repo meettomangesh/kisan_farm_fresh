@@ -104,6 +104,11 @@ Route::group([
     Route::post('product_units/storeInventory', 'ProductUnitsController@storeInventory')->name('product_units.storeInventory');
     Route::resource('product_units', 'ProductUnitsController');
 
+    // Orders
+    // Route::delete('orders/destroy', 'OrdersController@massDestroy')->name('orders.massDestroy');
+    Route::get('orders/cancelOrder/{cid?}', 'OrdersController@cancelOrder')->name('orders.cancelOrder');
+    Route::resource('orders', 'OrdersController');
+
 });
 Route::group(['prefix' => 'profile', 'as' => 'profile.', 'namespace' => 'Auth', 'middleware' => ['auth']], function () {
 // Change password

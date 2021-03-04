@@ -179,6 +179,27 @@
             <li>
             @endcan
 
+            @can('order_management_access')
+            <li class="nav-item nav-dropdown">
+                <a class="nav-link  nav-dropdown-toggle" href="#">
+                    <i class="fa-fw fas fa-users nav-icon">
+
+                    </i>
+                    {{ trans('cruds.orderManagement.title') }}
+                </a>
+                <ul class="nav-dropdown-items">
+                    @can('order_access')
+                    <li class="nav-item">
+                        <a href="{{ route("admin.orders.index") }}" class="nav-link {{ request()->is('admin/orders') || request()->is('admin/orders/*') ? 'active' : '' }}">
+                            <i class="fa-fw fas fa-cogs nav-icon"></i>
+                            {{ trans('cruds.order.title') }}
+                        </a>
+                    </li>
+                    @endcan
+                </ul>
+            <li>
+            @endcan
+
             @can('banner_access')
             <li class="nav-item">
                 <a href="{{ route("admin.banners.index") }}" class="nav-link {{ request()->is('admin/banners') || request()->is('admin/banners/*') ? 'active' : '' }}">

@@ -20,8 +20,10 @@ class CreateCustomerOrdersTable extends Migration
             $table->integer('shipping_address_id')->default(0)->unsigned()->index();
             $table->integer('billing_address_id')->default(0)->unsigned()->index();
             $table->date('delivery_date')->nullable()->index();
-            $table->decimal('amount', 10, 4)->comment = "Total points redeemed against this order.";
+            $table->decimal('net_amount', 10, 4);
+            $table->decimal('gross_amount', 10, 4);
             $table->decimal('discounted_amount', 14, 4)->nullable();
+            $table->string('payment_type', 20)->index()->nullable();
             $table->string('payment_id', 255)->index()->nullable();
             $table->integer('total_items')->default(0)->unsigned()->index();
             $table->integer('total_items_quantity')->default(0)->unsigned()->index();

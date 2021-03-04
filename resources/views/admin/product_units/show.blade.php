@@ -21,11 +21,11 @@
                     </tr>
                     <tr>
                         <th>{{ trans('cruds.product_unit.fields.product_name') }}</th>
-                        <td><b>{{ App\Models\Product::getProductName($productUnit->products_id) }}</b></td>
+                        <td><b>{{ $productUnit->product->product_name }}</b></td>
                     </tr>
                     <tr>
                         <th>{{ trans('cruds.product_unit.fields.unit') }}</th>
-                        <td><b>{{ App\Models\Unit::getUnitName($productUnit->unit_id) }}</b></td>
+                        <td><b>{{ $productUnit->unit->unit }}</b></td>
                     </tr>
                     <tr>
                         <th>{{ trans('cruds.product_unit.fields.selling_price') }}</th>

@@ -22,6 +22,7 @@ class ProductUnitsController extends Controller
     public function index()
     {
         abort_if(Gate::denies('product_unit_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+        // $productUnits = ProductUnits::with('product','unit')->get();
         $productUnits = ProductUnits::all();
         return view('admin.product_units.index', compact('productUnits'));
     }

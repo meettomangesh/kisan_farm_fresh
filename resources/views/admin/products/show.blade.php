@@ -25,7 +25,7 @@
                     </tr>
                     <tr>
                         <th>{{ trans('cruds.product.fields.category') }}</th>
-                        <td><b>{{ App\Models\Category::getCategoryName($product->category_id) }}</b></td>
+                        <td><b>{{ $product->category->cat_name }}</b></td>
                     </tr>
                     <tr>
                         <th>{{ trans('cruds.product.fields.product_name') }}</th>

@@ -177,14 +177,16 @@ class Product extends Model
             }
         }
 
-        if($orderAmount != $params['payment_details']['amount']) {
+        if($orderAmount != $params['payment_details']['net_amount']) {
             return false;
         }
 
         $customerOrdersResponse = CustomerOrders::create(array(
             'customer_id' => $params['user_id'],
-            'amount' => $params['payment_details']['amount'],
+            'net_amount' => $params['payment_details']['net_amount'],
+            'gross_amount' => $params['payment_details']['gross_amount'],
             'discounted_amount' => $params['payment_details']['discounted_amount'],
+            'payment_type' => $params['payment_details']['payment_type'],
             'total_items' => sizeof($params['products']),
             'total_items_quantity' => $totalItemQty,
             'shipping_address_id' => $params['delivery_details']['address']['id'],
@@ -200,9 +202,9 @@ class Product extends Model
             $result = DB::select('call placeOrderDetails(?)', [$inputData]);
             $reponse = json_decode($result[0]->response);
             if($reponse->status == "FAILURE" && $reponse->statusCode != 200) {
-                $cancelData = array('order_id' => $orderId, 'type' => 1);
+                /* $cancelData = array('order_id' => $orderId, 'type' => 1);
                 $cancelData = json_encode($cancelData);
-                DB::select('call cancelOrder(?)', [$cancelData]);
+                DB::select('call cancelOrder(?)', [$cancelData]); */
                 return false;
             }
         }

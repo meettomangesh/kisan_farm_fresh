@@ -5,12 +5,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use \DateTimeInterface;
+use App\User\CustomerOrders;
+use DB;
 
 class CustomerOrderDetails extends Model
 {
     use SoftDeletes;
 
-    public $table = 'customer_orders';
+    public $table = 'customer_order_details';
 
     protected $dates = [
         'created_at',
@@ -23,5 +25,10 @@ class CustomerOrderDetails extends Model
     protected function serializeDate(DateTimeInterface $date)
     {
         return $date->format('Y-m-d H:i:s');
+    }
+
+    public function customerOrders()
+    {
+        return $this->belongsTo(CustomerOrders::class, 'order_id');
     }
 }

@@ -6,8 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use \DateTimeInterface;
 use App\User;
-use App\Models\CustomerOrderDetails;
-use App\Models\CustomerOrderStatusTrack;
 use DB;
 
 class CustomerOrders extends Model
@@ -39,55 +37,13 @@ class CustomerOrders extends Model
         return $this->belongsTo(User::class, 'delivery_boy_id');
     }
 
-    protected function cancelOrder($orderId, $type) {
-        /* $cancelData = array('order_id' => $orderId, 'type' => 2);
+    protected function cancelOrder($orderId) {
+        $cancelData = array('order_id' => $orderId, 'type' => 2);
         $cancelData = json_encode($cancelData);
         $result = DB::select('call cancelOrder(?)', [$cancelData]);
         $reponse = json_decode($result[0]->response);
         if($reponse->status == "FAILURE" && $reponse->statusCode != 200) {
             return false;
-        }
-        return true; */
-        $cancelled = 5;
-        $customerOrderDetails = CustomerOrderDetails::select('id','product_units_id','item_quantity')->where('order_id', $orderId)->get()->toArray();
-        if(sizeof($customerOrderDetails) > 0) {
-            foreach($customerOrderDetails as $key => $value) {
-                if($type == 1) {
-                    CustomerOrderStatusTrack::where('order_details_id',$value['id'])->forceDelete();
-                    $cod = CustomerOrderDetails::find($value['id']);
-                    $cod->forceDelete();
-                } else {
-                    CustomerOrderStatusTrack::create(array(
-                        'order_details_id' => $value['id'],
-                        'order_status' => $cancelled,
-                        'created_by' => 1
-                    ));
-                    $cod = CustomerOrderDetails::find($value['id']);
-                    $cod->order_status = $cancelled;
-                    $cod->save();
-                }
-                $qty = ProductLocationInventory::select('id','current_quantity')->where('product_units_id', $value['product_units_id'])->get()->toArray();
-                $inventory = ProductLocationInventory::find($qty[0]['id']);
-                $inventory->current_quantity = $qty[0]['current_quantity'] + $value['item_quantity'];
-                $inventory->save();
-            }
-            if($type == 1) {
-                $co = CustomerOrders::find($orderId);
-                $co->forceDelete();
-                /* //delete with primary key
-                $post = Post::find(1);
-                $post->delete();
-
-                //delete with key (primary key)
-                Post::destroy(1);
-
-                //delete specific rows
-                $deletedRows = Post::where('comments', 0)->delete(); */
-            } else {
-                $co = CustomerOrders::find($orderId);
-                $co->order_status = $cancelled;
-                $co->save();
-            }
         }
         return true;
     }
@@ -144,7 +100,6 @@ class CustomerOrders extends Model
                 /* $cancelData = array('order_id' => $orderId, 'type' => 1);
                 $cancelData = json_encode($cancelData);
                 DB::select('call cancelOrder(?)', [$cancelData]); */
-                $this->cancelOrder($orderId, 1);
                 return false;
             }
         }

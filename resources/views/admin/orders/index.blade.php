@@ -52,9 +52,9 @@
                                 @endcan
                                 @can('order_cancel')
                                     @if($customerOrder->order_status == 1 || $customerOrder->order_status == 2)
-                                        <button class="btn btn-xs btn-primary cancel_order" data-id="{{ $customerOrder->id }}">
+                                        <!-- a class="btn btn-xs btn-primary" id="cancel_order" href="#" data-id="{{ $customerOrder->id }}">
                                             {{ trans('cruds.order.fields.cancel_order') }}
-                                        </button>
+                                        </a -->
                                     @endif
                                 @endcan
                             </td>
@@ -85,34 +85,30 @@ $(function () {
         $($.fn.dataTable.tables(true)).DataTable()
             .columns.adjust();
     });
-
-    $('.cancel_order').on('click', function () {
-        var r = confirm("Are you sure you want to cancel this order?");
-        if (r == true) {
-            var orderId = $(this).attr("data-id");
-            var url = '{{ route("admin.orders.cancelOrder", "") }}';
-            $(this).text('Cancelling...');
-            $(this).prop('disabled', true);
-            url = url+'/'+orderId;
-            if (orderId) {
-                $.ajax({
-                    url: url,
-                    type: "GET",
-                    dataType: "json",
-                    success: function(data) {
-                        $(this).text('Cancel Order');
-                        $(this).prop('disabled', false);
-                        if(data.status == "Success") {
-                            alert(data.message);
-                            location.reload();
-                        } else {
-                            alert(data.message);
-                        }
+  
+    $('#cancel_order').on('click', function () {
+        var orderId = $(this).attr("data-id");
+        var url = '{{ route("admin.orders.cancelOrder", "") }}';
+        $(this).text('Cancelling...');
+        url = url+'/'+orderId;
+        if (orderId) {
+            $.ajax({
+                url: url,
+                type: "GET",
+                dataType: "json",
+                success: function(data) {
+                    $(this).text('Cancel Order');
+                    if(data.status == "Success") {
+                        alert('Order cancelled successfully.');
+                        location.reload();
+                    } else {
+                        alert('Order not cancelled.');
                     }
-                });
-            }
+                }
+            });
         }
     });
 })
+
 </script>
 @endsection

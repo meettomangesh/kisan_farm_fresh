@@ -27,13 +27,11 @@ class OrdersController extends Controller
 
     public function cancelOrder($orderId)
     {
-        $cancelOrderResponse = CustomerOrders::cancelOrder($orderId, 2);
+        $cancelOrderResponse = CustomerOrders::cancelOrder($orderId);
         if($cancelOrderResponse) {
             $data['status'] = "Success";
-            $data['message'] = "Order cancelled successfully!";
         } else {
             $data['status'] = "Failure";
-            $data['message'] = "Failed to cancel order.";
         }
         $data['status'] = "Success";
         return json_encode($data);

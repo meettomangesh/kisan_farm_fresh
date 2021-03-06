@@ -34,8 +34,8 @@ class UserAddressController extends BaseController
             }
 
             $responseDetails = DB::table('user_address')
-            ->join('states', 'user_address.state_id', '=', 'states.id')
-            ->join('cities', 'user_address.city_id', '=', 'cities.id')
+            ->leftJoin('states', 'user_address.state_id', '=', 'states.id')
+            ->leftJoin('cities', 'user_address.city_id', '=', 'cities.id')
             ->select('user_address.*', 'states.name AS state_name', 'cities.name AS city_name')
             ->where('user_address.user_id', $request->user_id)->orderByDesc('id')->get();
 

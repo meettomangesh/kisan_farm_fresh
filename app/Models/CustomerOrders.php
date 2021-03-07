@@ -155,7 +155,7 @@ class CustomerOrders extends Model
                 $orders["delivery_details"] = array(
                     "date" => $val->delivery_date,
                     "slot" => "",
-                    "order_sattus" => $val->order_status,
+                    "order_status" => $val->order_status,
                     "address" => array(
                         "name" => $val->ua_user_name,
                         "address" => $val->address,

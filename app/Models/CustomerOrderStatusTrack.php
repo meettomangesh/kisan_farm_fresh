@@ -6,11 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use \DateTimeInterface;
 
-class CustomerOrderDetails extends Model
+class CustomerOrderStatusTrack extends Model
 {
     use SoftDeletes;
 
-    public $table = 'customer_order_details';
+    public $table = 'customer_order_status_track';
 
     protected $dates = [
         'created_at',
@@ -18,7 +18,7 @@ class CustomerOrderDetails extends Model
         'deleted_at',
     ];
 
-    protected $fillable = ['customer_id','order_id','products_id','product_units_id','item_quantity','expiry_date','selling_price','special_price','special_price_start_date','special_price_end_date','reject_cancel_reason','order_status','created_by','updated_by','created_at','updated_at'];
+    protected $fillable = ['order_details_id','order_status','created_by','updated_by','created_at','updated_at'];
 
     protected function serializeDate(DateTimeInterface $date)
     {

@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use \DateTimeInterface;
 use App\User;
+use App\Models\CustomerOrderDetails;
 use DB;
 
 class CustomerOrders extends Model
@@ -104,5 +105,51 @@ class CustomerOrders extends Model
             }
         }
         return true;
+    }
+
+    public function getOrderList($params) {
+        $queryResult = DB::select('call getOrderList(?)', [$params]);
+        // $result = collect($queryResult);
+        $orderList = [];
+        if(sizeof($queryResult) > 0) {
+            foreach($queryResult as $key => $val) {
+                $orders["order_id"] = $val->id;
+                $orders["delivery_details"] = array(
+                    "date" => $val->delivery_date,
+                    "slot" => "",
+                    "order_sattus" => $val->order_status,
+                    "address" => array(
+                        "name" => $val->ua_user_name,
+                        "address" => $val->address,
+                        "landmark" => $val->landmark,
+                        "pin_code" => $val->pin_code,
+                        "area" => $val->area,
+                        "city_name" => $val->city_name,
+                        "state_name" => $val->state_name,
+                        "is_primary" => $val->is_primary
+                    ),
+                    "delivery_boy_name" => $val->delivery_boy_name
+                );
+                $orders["payment_details"] = array(
+                    "type" => $val->payment_type,
+                    "net_amount" => round($val->net_amount, 2),
+                    "gross_amount" => round($val->gross_amount, 2),
+                    "discounted_amount" => round($val->discounted_amount, 2),
+                    "order_id" => "",
+                    "bill_no" => "",
+                    "total_items" => $val->total_items,
+                );
+                $orderList[$key] = $orders;
+                $inputData = array('order_id' => $val->id, 'user_id' => $val->customer_id);
+                $inputData = json_encode($inputData);
+                $orderDetails = DB::select('call getOrderDetails(?)', [$inputData]);
+                if(sizeof($orderDetails) > 0) {
+                    $orderList[$key]["products"] = $orderDetails;
+                } else {
+                    unset($orderList[$key]);
+                }
+            }
+        }
+        return $orderList;
     }
 }

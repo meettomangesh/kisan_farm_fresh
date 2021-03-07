@@ -87,7 +87,7 @@ $(function () {
     });
   
     $('.cancel_order').on('click', function () {
-        var r = confirm("Are you sure you want to delete this order?");
+        var r = confirm("Are you sure you want to cancel this order?");
         if (r == true) {
             var orderId = $(this).attr("data-id");
             var url = '{{ route("admin.orders.cancelOrder", "") }}';

@@ -52,9 +52,9 @@
                                 @endcan
                                 @can('order_cancel')
                                     @if($customerOrder->order_status == 1 || $customerOrder->order_status == 2)
-                                        <!-- a class="btn btn-xs btn-primary" id="cancel_order" href="#" data-id="{{ $customerOrder->id }}">
+                                        <a class="btn btn-xs btn-primary" id="cancel_order" href="#" data-id="{{ $customerOrder->id }}">
                                             {{ trans('cruds.order.fields.cancel_order') }}
-                                        </a -->
+                                        </a>
                                     @endif
                                 @endcan
                             </td>

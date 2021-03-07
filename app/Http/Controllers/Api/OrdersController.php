@@ -114,7 +114,6 @@ class OrdersController extends BaseController
                 'platform' => $request->platform,
                 'order_id' => $request->order_id
             ];
-            $params = json_encode($params);
             //Create order object to call functions
             $customerOrders = new CustomerOrders();
             // Function call to cancel order
@@ -123,7 +122,7 @@ class OrdersController extends BaseController
             if($responseDetails) {
                 $message = 'Order cancelled successfully';
             }
-            $response = $this->sendResponse($responseDetails, $message);
+            $response = $this->sendResponse([], $message);
         } catch (Exception $e) {
             $response = $this->sendResponse(array(), $e->getMessage());
         }

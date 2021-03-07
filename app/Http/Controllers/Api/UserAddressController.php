@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use Validator;
 use App\Helper\DataHelper;
 use Exception;
+use DB;
 
 class UserAddressController extends BaseController
 {
@@ -32,9 +33,13 @@ class UserAddressController extends BaseController
                 return $this->sendError('Please provide valid customer details.', []);
             }
 
-            // Function call to get product list
-            $responseDetails = User::find($request->user_id)->address()->where('user_id', $request->user_id)->orderByDesc('id')->get();
-            $message = 'Address list.';
+            $responseDetails = DB::table('user_address')
+            ->leftJoin('states', 'user_address.state_id', '=', 'states.id')
+            ->leftJoin('cities', 'user_address.city_id', '=', 'cities.id')
+            ->select('user_address.*', 'states.name AS state_name', 'cities.name AS city_name')
+            ->where('user_address.user_id', $request->user_id)->orderByDesc('id')->get();
+
+             $message = 'Address list.';
             if (sizeof($responseDetails) == 0) {
                 $message = 'No record found.';
             }

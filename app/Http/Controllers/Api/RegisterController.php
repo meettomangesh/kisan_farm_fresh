@@ -114,10 +114,18 @@ class RegisterController extends BaseController
             return $this->sendError('Validation Error.', $validator->errors());
         }
 
-        if (Auth::guard('api')->attempt(['mobile_number' => $request->mobile_number, 'password' => $request->password])) {
-            $user = Auth::guard('api')->user();
-            //print_r($user->first_name); exit;
+        // if (Auth::guard('api')->attempt(['mobile_number' => $request->mobile_number, 'password' => $request->password])) {
+        if (Auth::attempt(['mobile_number' => $request->mobile_number, 'password' => $request->password])) {
+            // $credentials = request(['email', 'password']);
+            // if(!Auth::attempt($credentials))
+            //     return response()->json([
+            //         'message' => 'Unauthorized'
+            //     ], 401);
+    
+            $user = Auth::user();
+            //print_r($user->createToken(getenv('APP_NAME'))); exit;
             $success['token'] =  $user->createToken(getenv('APP_NAME'))->accessToken;
+            //$success['expires_at'] =  $user->createToken(getenv('APP_NAME'))->accessToken;
             $success['name'] =  $user->first_name . " " . $user->last_name;
             $success['dob'] =  $user->date_of_birth;
             $success['marital_status'] =  $user->marital_status;

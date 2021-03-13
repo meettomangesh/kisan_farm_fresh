@@ -104,6 +104,12 @@ Route::group([
     Route::post('product_units/storeInventory', 'ProductUnitsController@storeInventory')->name('product_units.storeInventory');
     Route::resource('product_units', 'ProductUnitsController');
 
+    // Baskets
+    Route::delete('baskets/destroy', 'BasketsController@massDestroy')->name('baskets.massDestroy');
+    Route::resource('baskets', 'BasketsController');
+
+        
+
     // Orders
     // Route::delete('orders/destroy', 'OrdersController@massDestroy')->name('orders.massDestroy');
     Route::get('orders/cancelOrder/{cid?}', 'OrdersController@cancelOrder')->name('orders.cancelOrder');

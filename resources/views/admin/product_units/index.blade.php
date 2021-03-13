@@ -36,7 +36,7 @@
                             <td></td>
                             <td>{{ $productUnit->id ?? '' }}</td>
                             <td><b>{{ $productUnit->product->product_name }}</b></td>
-                            <td><b>{{ $productUnit->unit->unit }}</b></td>
+                            <td><b>{{ ($productUnit->unit)?$productUnit->unit->unit:"" }}</b></td>
                             <td>{{ round($productUnit->selling_price, 2) ?? '' }}</td>
                             <td>{{ round($productUnit->special_price, 2) ?? '' }}</td>
                             <td>{{ $productUnit->opening_quantity ?? '' }}</td>

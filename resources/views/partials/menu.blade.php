@@ -175,6 +175,14 @@
                         </a>
                     </li>
                     @endcan
+                    @can('basket_access')
+                    <li class="nav-item">
+                        <a href="{{ route("admin.baskets.index") }}" class="nav-link {{ request()->is('admin/baskets') || request()->is('admin/baskets/*') ? 'active' : '' }}">
+                            <i class="fa-fw fas fa-cogs nav-icon"></i>
+                            {{ trans('cruds.basket.title') }}
+                        </a>
+                    </li>
+                    @endcan
                 </ul>
             <li>
             @endcan

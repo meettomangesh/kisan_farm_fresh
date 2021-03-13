@@ -11,6 +11,7 @@
 
 namespace App\Helper;
 
+use Illuminate\Support\Facades\File;
 use App\Models\CustomerLoyalty;
 
 class DataHelper
@@ -133,5 +134,22 @@ class DataHelper
         }
         $promocode .= $promocode_suffix;
         return substr($promocode, 0, $promocode_length);
+    }
+
+    public static function uploadImage($fileObj, $path, $id = 0)
+    {
+        // $path = '/images/categories/';
+        if ($id != 0) {
+            $path .= $id;
+            if (!File::exists(public_path() . $path)) {
+                File::makeDirectory(public_path() . $path, 0775, true);
+            }
+            $path .= '/';
+        }
+        $var = date_create();
+        $time = date_format($var, 'YmdHis');
+        $imageName = $time . '-' . $fileObj->getClientOriginalName();
+        $fileObj->move(base_path() . '/public' . $path, $imageName);
+        return $path . $imageName;
     }
 }

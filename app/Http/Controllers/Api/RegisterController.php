@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use Validator;
 use App\Helper\DataHelper;
 use App\Role;
-
+use Carbon\Carbon;
 class RegisterController extends BaseController
 {
     /**
@@ -44,7 +44,12 @@ class RegisterController extends BaseController
         
         $user = User::create($input);
         $user->roles()->sync([4]);
-        $success['token'] =  $user->createToken(getenv('APP_NAME'))->accessToken;
+        $tokenResult = $user->createToken(getenv('APP_NAME'));
+        $tokenResult->token->expires_at = Carbon::now()->addDays(10);
+        $success['token'] =  $tokenResult->accessToken;
+        $success['expires_at'] =  $tokenResult->token->expires_at;
+
+       // $success['token'] =  $user->createToken(getenv('APP_NAME'))->accessToken;
         $success['name'] =  $user->first_name . " " . $user->last_name;
         $success['id'] = $user->id;
         $success['role'] = $user->load('roles')->roles[0]->id;
@@ -124,8 +129,11 @@ class RegisterController extends BaseController
     
             $user = Auth::user();
             //print_r($user->createToken(getenv('APP_NAME'))); exit;
-            $success['token'] =  $user->createToken(getenv('APP_NAME'))->accessToken;
-            //$success['expires_at'] =  $user->createToken(getenv('APP_NAME'))->accessToken;
+           //$token = $user->createToken(getenv('APP_NAME'));
+            $tokenResult = $user->createToken(getenv('APP_NAME'));
+            $tokenResult->token->expires_at = Carbon::now()->addDays(10);
+            $success['token'] =  $tokenResult->accessToken;
+            $success['expires_at'] =  $tokenResult->token->expires_at;
             $success['name'] =  $user->first_name . " " . $user->last_name;
             $success['dob'] =  $user->date_of_birth;
             $success['marital_status'] =  $user->marital_status;

@@ -34,6 +34,11 @@ class ProductUnits extends Model
     {
         return $this->belongsTo(Unit::class, 'unit_id');
     }
+    
+    public function baskets()
+    {
+        return $this->belongsToMany(Basket::class);
+    }
 
     public function product()
     {

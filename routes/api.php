@@ -29,14 +29,14 @@ Route::post('banners', 'Api\BannersController@getBannerList');
 Route::post('pinCodes', 'Api\RegisterController@getPinCodeList');
 Route::post('placeOrder', 'Api\OrdersController@placeOrder');
 Route::post('updateCustomer', 'API\RegisterController@updateCustomer');
-
+Route::post('getAllAddressByUserId', 'Api\UserAddressController@getAllAddressByUserId');
+Route::post('saveAddressByUserId', 'Api\UserAddressController@saveAddressByUserId');
+Route::post('updateAddressByUserId', 'Api\UserAddressController@updateAddressByUserId');
+Route::post('deleteAddressByUserId', 'Api\UserAddressController@deleteAddressByUserId');
 
 Route::middleware('auth:api')->group( function () {
     // Route::resource('products', 'API\ProductsController');
     // Route::post('updateCustomer', 'API\RegisterController@updateCustomer');
-    Route::post('getAllAddressByUserId', 'Api\UserAddressController@getAllAddressByUserId');
-Route::post('saveAddressByUserId', 'Api\UserAddressController@saveAddressByUserId');
-Route::post('updateAddressByUserId', 'Api\UserAddressController@updateAddressByUserId');
-Route::post('deleteAddressByUserId', 'Api\UserAddressController@deleteAddressByUserId');
+
 
 });

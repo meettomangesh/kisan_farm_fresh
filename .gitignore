@@ -5,6 +5,7 @@
 /public/images/products
 /public/images/categories
 /public/images/banners
+/public/images/baskets
 /vendor
 .env
 .env.backup

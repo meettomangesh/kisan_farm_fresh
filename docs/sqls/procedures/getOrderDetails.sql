@@ -18,7 +18,7 @@ getOrderDetails:BEGIN
 
     SELECT cod.id, cod.customer_id, cod.products_id, cod.product_units_id, cod.item_quantity, cod.expiry_date, TRUNCATE(cod.selling_price, 2) AS selling_price, TRUNCATE(cod.special_price, 2) AS special_price, cod.order_status,
     p.product_name, p.short_description, um.unit,
-    (SELECT image_name FROM product_images WHERE products_id = p.id AND status = 1 AND deleted_at IS NOT NULL ORDER BY id ASC LIMIT 1) AS product_image
+    (SELECT image_name FROM product_images WHERE products_id = p.id AND status = 1 AND deleted_at IS NULL ORDER BY id ASC LIMIT 1) AS product_image
     FROM customer_order_details AS cod
     JOIN products AS p ON p.id = cod.products_id
     JOIN product_units AS pu ON pu.id = cod.product_units_id

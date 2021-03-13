@@ -9,6 +9,7 @@ use App\User;
 use App\Models\CustomerOrderDetails;
 use App\Models\CustomerOrderStatusTrack;
 use App\Models\ProductLocationInventory;
+use App\Models\UserAddress;
 use DB;
 
 class CustomerOrders extends Model
@@ -38,6 +39,16 @@ class CustomerOrders extends Model
     public function userDeliveryBoy()
     {
         return $this->belongsTo(User::class, 'delivery_boy_id');
+    }
+
+    public function customerShippingAddress()
+    {
+        return $this->belongsTo(UserAddress::class, 'shipping_address_id');
+    }
+
+    public function customerBillingAddress()
+    {
+        return $this->belongsTo(UserAddress::class, 'billing_address_id');
     }
 
     protected function cancelOrder($orderId, $type) {
@@ -164,7 +175,8 @@ class CustomerOrders extends Model
                         "area" => $val->area,
                         "city_name" => $val->city_name,
                         "state_name" => $val->state_name,
-                        "is_primary" => $val->is_primary
+                        "is_primary" => $val->is_primary,
+                        "mobile_number" => $val->mobile_number
                     ),
                     "delivery_boy_name" => $val->delivery_boy_name
                 );

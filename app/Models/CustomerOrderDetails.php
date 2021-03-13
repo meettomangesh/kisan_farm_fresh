@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use \DateTimeInterface;
+use App\Models\CustomerOrders;
 
 class CustomerOrderDetails extends Model
 {
@@ -23,5 +24,10 @@ class CustomerOrderDetails extends Model
     protected function serializeDate(DateTimeInterface $date)
     {
         return $date->format('Y-m-d H:i:s');
+    }
+
+    public function customerOrder()
+    {
+        return $this->belongsTo(CustomerOrders::class, 'order_id');
     }
 }

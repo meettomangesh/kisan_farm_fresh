@@ -39,4 +39,5 @@ Route::middleware('auth:api')->group( function () {
     // Route::post('updateCustomer', 'API\RegisterController@updateCustomer');
 
 
+
 });

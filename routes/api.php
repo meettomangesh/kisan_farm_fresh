@@ -29,6 +29,9 @@ Route::post('banners', 'Api\BannersController@getBannerList');
 Route::post('pinCodes', 'Api\RegisterController@getPinCodeList');
 Route::post('placeOrder', 'Api\OrdersController@placeOrder');
 Route::post('updateCustomer', 'API\RegisterController@updateCustomer');
+Route::post('orders', 'Api\OrdersController@getOrderList');
+Route::post('cancelOrder', 'Api\OrdersController@cancelOrder');
+
 Route::post('getAllAddressByUserId', 'Api\UserAddressController@getAllAddressByUserId');
 Route::post('saveAddressByUserId', 'Api\UserAddressController@saveAddressByUserId');
 Route::post('updateAddressByUserId', 'Api\UserAddressController@updateAddressByUserId');

@@ -6,6 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use \DateTimeInterface;
 use App\User;
+use App\Models\CustomerOrderDetails;
+use App\Models\CustomerOrderStatusTrack;
+use App\Models\ProductLocationInventory;
 use DB;
 
 class CustomerOrders extends Model
@@ -37,15 +40,53 @@ class CustomerOrders extends Model
         return $this->belongsTo(User::class, 'delivery_boy_id');
     }
 
-    protected function cancelOrder($orderId) {
-        $cancelData = array('order_id' => $orderId, 'type' => 2);
+    protected function cancelOrder($orderId, $type) {
+        /* $cancelData = array('order_id' => $orderId, 'type' => 2);
         $cancelData = json_encode($cancelData);
         $result = DB::select('call cancelOrder(?)', [$cancelData]);
         $reponse = json_decode($result[0]->response);
         if($reponse->status == "FAILURE" && $reponse->statusCode != 200) {
             return false;
         }
-        return true;
+        return true; */
+        $statusCancelled = 5;
+        $statusIds = explode(',', '1');        
+        $codData = CustomerOrderDetails::select('id','product_units_id','item_quantity')->where('order_id', $orderId)->whereIn('order_status', $statusIds)->get()->toArray();
+        if(sizeof($codData) > 0) {
+            foreach($codData as $key => $value) {
+                if($type == 1) {
+                    CustomerOrderDetails::where('id', $value['id'])->forceDelete();
+                    CustomerOrderStatusTrack::where('order_details_id', $value['id'])->forceDelete();
+                } else {
+                    $cod = CustomerOrderDetails::find($value['id']);
+                    $cod->order_status = $statusCancelled;
+                    $cod->save();
+                    CustomerOrderStatusTrack::create(array(
+                        'order_details_id' => $value['id'],
+                        'order_status' => $statusCancelled,
+                        'created_by' => 1
+                    ));
+                }
+                $qty = ProductLocationInventory::select('id','current_quantity')->where('product_units_id', $value['product_units_id'])->get()->toArray();
+                $inventory = ProductLocationInventory::find($qty[0]['id']);
+                $inventory->current_quantity = $qty[0]['current_quantity'] + $value['item_quantity'];
+                $inventory->save();
+            }
+            if($type == 1) {
+                $co = CustomerOrders::find($orderId);
+                $co->forceDelete();
+            } else {
+                $co = CustomerOrders::find($orderId);
+                $co->order_status = $statusCancelled;
+                $co->save();
+            }
+            return true;
+        }
+        return false;        
+    }
+
+    public function cancelOrderAPI($params) {
+        return $this->cancelOrder($params['order_id'], 2);
     }
 
     public function placeOrder($params) {
@@ -97,12 +138,56 @@ class CustomerOrders extends Model
             $result = DB::select('call placeOrderDetails(?)', [$inputData]);
             $reponse = json_decode($result[0]->response);
             if($reponse->status == "FAILURE" && $reponse->statusCode != 200) {
-                /* $cancelData = array('order_id' => $orderId, 'type' => 1);
-                $cancelData = json_encode($cancelData);
-                DB::select('call cancelOrder(?)', [$cancelData]); */
+                $this->cancelOrder($orderId, 1);
                 return false;
             }
         }
         return true;
+    }
+
+    public function getOrderList($params) {
+        $queryResult = DB::select('call getOrderList(?)', [$params]);
+        // $result = collect($queryResult);
+        $orderList = [];
+        if(sizeof($queryResult) > 0) {
+            foreach($queryResult as $key => $val) {
+                $orders["order_id"] = $val->id;
+                $orders["delivery_details"] = array(
+                    "date" => $val->delivery_date,
+                    "slot" => "",
+                    "order_status" => $val->order_status,
+                    "address" => array(
+                        "name" => $val->ua_user_name,
+                        "address" => $val->address,
+                        "landmark" => $val->landmark,
+                        "pin_code" => $val->pin_code,
+                        "area" => $val->area,
+                        "city_name" => $val->city_name,
+                        "state_name" => $val->state_name,
+                        "is_primary" => $val->is_primary
+                    ),
+                    "delivery_boy_name" => $val->delivery_boy_name
+                );
+                $orders["payment_details"] = array(
+                    "type" => $val->payment_type,
+                    "net_amount" => round($val->net_amount, 2),
+                    "gross_amount" => round($val->gross_amount, 2),
+                    "discounted_amount" => round($val->discounted_amount, 2),
+                    "order_id" => "",
+                    "bill_no" => "",
+                    "total_items" => $val->total_items,
+                );
+                $orderList[$key] = $orders;
+                $inputData = array('order_id' => $val->id, 'user_id' => $val->customer_id);
+                $inputData = json_encode($inputData);
+                $orderDetails = DB::select('call getOrderDetails(?)', [$inputData]);
+                if(sizeof($orderDetails) > 0) {
+                    $orderList[$key]["products"] = $orderDetails;
+                } else {
+                    unset($orderList[$key]);
+                }
+            }
+        }
+        return $orderList;
     }
 }

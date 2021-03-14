@@ -26,6 +26,14 @@
                         <th>{{ trans('cruds.product.fields.sku') }}</th>
                         <th>{{ trans('cruds.product.fields.actions') }}</th>
                     </tr>
+                    <tr>
+                        <th width="10"></th>
+                        <th></th>
+                        <th></th>
+                        <th><input type="text" placeholder="Search" /></th>
+                        <th><input type="text" placeholder="Search" /></th>
+                        <th></th>
+                    </tr>
                 </thead>
                 <tbody>
                     @foreach($products as $key => $product)
@@ -107,6 +115,18 @@
     order: [[ 1, 'desc' ]],
     pageLength: 10,
   });
+  //$('.datatable-Product:not(.ajaxTable) thead tr').clone(true).appendTo( '.datatable-Product:not(.ajaxTable) thead' );
+    $('.datatable-Product:not(.ajaxTable) thead tr:eq(1) th').each( function (i) {
+        $( 'input', this ).on( 'keyup change', function () {
+            if ( table.column(i).search() !== this.value ) {
+                table
+                    .column(i)
+                    .search( this.value )
+                    .draw();
+            }
+        } );
+    } );
+
   let table = $('.datatable-Product:not(.ajaxTable)').DataTable({ buttons: dtButtons })
   $('a[data-toggle="tab"]').on('shown.bs.tab', function(e){
       $($.fn.dataTable.tables(true)).DataTable()

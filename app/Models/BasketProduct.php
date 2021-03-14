@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -12,7 +12,7 @@ class BasketProduct extends Model
 {
     use SoftDeletes;
 
-    public $table = 'basket_product';
+    public $table = 'basket_product_units';
 
     protected $dates = [
         'created_at',

@@ -2,9 +2,10 @@ DELIMITER $$
 DROP PROCEDURE IF EXISTS placeOrderDetails$$
 CREATE PROCEDURE placeOrderDetails(IN inputData JSON)
 placeOrderDetails:BEGIN
-    DECLARE productsId,productUnitId,quantity,orderId,lastInsertId,customerId INTEGER(10) DEFAULT 0;
+    DECLARE productsId,productUnitId,quantity,orderId,lastInsertId,customerId,productUnitsId,notFound,productsIdNew INTEGER(10) DEFAULT 0;
     DECLARE sellingPrice,specialPrice DECIMAL(14,4) DEFAULT 0.00;
     DECLARE specialPriceStartDate,specialPriceEndDate,expiryDate DATE DEFAULT NULL;
+    DECLARE isBasket TINYINT(1) DEFAULT 0;
 
     IF inputData IS NOT NULL AND JSON_VALID(inputData) = 0 THEN
         SELECT JSON_OBJECT('status', 'FAILURE', 'message', 'Please provide valid data.','data',JSON_OBJECT(),'statusCode',520) AS response;
@@ -17,6 +18,7 @@ placeOrderDetails:BEGIN
     SET specialPrice = JSON_UNQUOTE(JSON_EXTRACT(inputData,'$.special_price'));
     SET orderId = JSON_UNQUOTE(JSON_EXTRACT(inputData,'$.order_id'));
     SET customerId = JSON_UNQUOTE(JSON_EXTRACT(inputData,'$.customer_id'));
+    SET isBasket = JSON_UNQUOTE(JSON_EXTRACT(inputData,'$.is_basket'));
 
     IF JSON_UNQUOTE(JSON_EXTRACT(inputData,'$.special_price_start_date')) != "" AND JSON_UNQUOTE(JSON_EXTRACT(inputData,'$.special_price_start_date')) != "null" THEN
         SET specialPriceStartDate = JSON_UNQUOTE(JSON_EXTRACT(inputData,'$.special_price_start_date'));
@@ -28,23 +30,62 @@ placeOrderDetails:BEGIN
         SET expiryDate = JSON_UNQUOTE(JSON_EXTRACT(inputData,'$.expiry_date'));
     END IF;
     
-    
-    INSERT INTO customer_order_details (customer_id,order_id,products_id,product_units_id,item_quantity,expiry_date,selling_price,special_price,special_price_start_date,special_price_end_date,created_by)
-    VALUES (customerId,orderId,productsId,productUnitId,quantity,expiryDate,sellingPrice,specialPrice,specialPriceStartDate,specialPriceEndDate,1);
+    IF isBasket = 0 THEN
+        INSERT INTO customer_order_details (customer_id,order_id,products_id,product_units_id,item_quantity,expiry_date,selling_price,special_price,special_price_start_date,special_price_end_date,created_by)
+        VALUES (customerId,orderId,productsId,productUnitId,quantity,expiryDate,sellingPrice,specialPrice,specialPriceStartDate,specialPriceEndDate,1);
 
-    IF LAST_INSERT_ID() > 0 THEN
-        SET lastInsertId = LAST_INSERT_ID();
-        INSERT INTO customer_order_status_track (order_details_id,created_by)
-        VALUES (lastInsertId,1);
+        IF LAST_INSERT_ID() > 0 THEN
+            SET lastInsertId = LAST_INSERT_ID();
+            INSERT INTO customer_order_status_track (order_details_id,created_by)
+            VALUES (lastInsertId,1);
 
-        UPDATE product_location_inventory SET current_quantity = current_quantity - quantity WHERE product_units_id = productUnitId;
+            UPDATE product_location_inventory SET current_quantity = current_quantity - quantity WHERE product_units_id = productUnitId;
 
-        IF (SELECT current_quantity FROM product_location_inventory WHERE product_units_id = productUnitId) = 0 THEN
-            UPDATE product_units SET status = 0, updated_by = 1 WHERE id = productUnitId;
+            IF (SELECT current_quantity FROM product_location_inventory WHERE product_units_id = productUnitId) = 0 THEN
+                UPDATE product_units SET status = 0, updated_by = 1 WHERE id = productUnitId;
+            END IF;
+        ELSE
+            SELECT JSON_OBJECT('status', 'FAILURE', 'message', 'Failed to add.','data',JSON_OBJECT(),'statusCode',101) AS response;
+            LEAVE placeOrderDetails;
         END IF;
     ELSE
-        SELECT JSON_OBJECT('status', 'FAILURE', 'message', 'Failed to add.','data',JSON_OBJECT(),'statusCode',101) AS response;
-        LEAVE placeOrderDetails;
+        block1:BEGIN
+            DECLARE basketProductUnitsCursor CURSOR FOR
+            -- SELECT product_units_id FROM basket_product_units WHERE basket_id = productsId;
+            SELECT bpu.product_units_id, pu.products_id, pu.selling_price, pu.special_price, pu.special_price_start_date, pu.special_price_end_date
+            FROM basket_product_units AS bpu
+            JOIN product_units AS pu ON bpu.product_units_id = pu.id
+            WHERE bpu.basket_id = productsId;
+
+            DECLARE CONTINUE HANDLER FOR NOT FOUND SET notFound = 1;
+            OPEN basketProductUnitsCursor;
+            basketProductUnitsLoop: LOOP
+                FETCH basketProductUnitsCursor INTO productUnitsId,productsIdNew,sellingPrice,specialPrice,specialPriceStartDate,specialPriceEndDate;
+                IF(notFound = 1) THEN
+                    LEAVE basketProductUnitsLoop;
+                END IF;
+
+                INSERT INTO customer_order_details (customer_id,order_id,products_id,product_units_id,basket_id,item_quantity,expiry_date,selling_price,special_price,special_price_start_date,special_price_end_date,is_basket,created_by)
+                VALUES (customerId,orderId,productsIdNew,productUnitsId,productsId,quantity,expiryDate,sellingPrice,specialPrice,specialPriceStartDate,specialPriceEndDate,isBasket,1);
+
+                IF LAST_INSERT_ID() > 0 THEN
+                    SET lastInsertId = LAST_INSERT_ID();
+                    INSERT INTO customer_order_status_track (order_details_id,created_by)
+                    VALUES (lastInsertId,1);
+
+                    UPDATE product_location_inventory SET current_quantity = current_quantity - quantity WHERE product_units_id = productUnitsId;
+
+                    IF (SELECT current_quantity FROM product_location_inventory WHERE product_units_id = productUnitsId) = 0 THEN
+                        UPDATE product_units SET status = 0, updated_by = 1 WHERE id = productUnitsId;
+                    END IF;
+                ELSE
+                    SELECT JSON_OBJECT('status', 'FAILURE', 'message', 'Failed to add.','data',JSON_OBJECT(),'statusCode',101) AS response;
+                    LEAVE placeOrderDetails;
+                END IF;
+
+            END LOOP basketProductUnitsLoop;
+            CLOSE basketProductUnitsCursor;
+        END block1;
     END IF;
 
     SELECT JSON_OBJECT('status', 'SUCCESS', 'message', 'Order details added successfully.','data',JSON_OBJECT(),'statusCode',200) AS response;

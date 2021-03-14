@@ -60,7 +60,11 @@
                 <tbody>
                     @foreach($customerOrderDetails as $key => $value)
                         <tr data-entry-id="{{ $value->id }}">
-                            <td>{{ $value->product->product_name ?? '' }}<br>{{ $value->productUnit->unit->unit }}</td>
+                            <td>
+                                @if($value->is_basket == 1)
+                                    {{ $value->basket->product_name ?? '' }}<br>
+                                @endif
+                                {{ $value->product->product_name ?? '' }}<br>{{ $value->productUnit->unit->unit }}</td>
                             <td>{{ round($value->selling_price, 2) ?? '' }}</td>
                             <td>@if($value->special_price > 0)
                                     {{ round($value->special_price, 2) }} x {{ $value->item_quantity }}

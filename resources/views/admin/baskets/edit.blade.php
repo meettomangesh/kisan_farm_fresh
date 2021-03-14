@@ -72,7 +72,7 @@
                     </div>
                 </div>
 
-                <div class="col-md-6">
+                <!-- <div class="col-md-6">
                     <div class="form-group">
                         <label class="control-label col-md-4 required" for="opening_quantity">{{ trans('cruds.basket.fields.opening_quantity') }}</label>
                         <div class="col-md-8 float-right">
@@ -85,7 +85,7 @@
                             <span class="help-block">{{ trans('cruds.basket.fields.opening_quantity_helper') }}</span>
                         </div>
                     </div>
-                </div>
+                </div> -->
             </div>
 
 

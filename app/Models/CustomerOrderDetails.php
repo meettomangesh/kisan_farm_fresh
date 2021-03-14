@@ -40,9 +40,4 @@ class CustomerOrderDetails extends Model
     {
         return $this->belongsTo(ProductUnits::class, 'product_units_id');
     }
-
-    public function basket()
-    {
-        return $this->belongsTo(Product::class, 'basket_id');
-    }
 }

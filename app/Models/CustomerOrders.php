@@ -65,7 +65,20 @@ class CustomerOrders extends Model
             return false;
         }
         return true; */
-        $statusCancelled = 5;
+        $cancelData = array('order_id' => $orderId, 'type' => 2);
+        $inputData = json_encode($cancelData);
+        $pdo = DB::connection()->getPdo();
+        $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, true);
+        $stmt = $pdo->prepare("CALL cancelOrder(?)");
+        $stmt->execute([$inputData]);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+        $reponse = json_decode($result['response']);
+        if($reponse->status == "FAILURE" && $reponse->statusCode != 200) {
+            return false;
+        }
+        return true;
+        /* $statusCancelled = 5;
         $statusIds = explode(',', '1');        
         $codData = CustomerOrderDetails::select('id','product_units_id','item_quantity','is_basket')->where('order_id', $orderId)->whereIn('order_status', $statusIds)->get()->toArray();
         if(sizeof($codData) > 0) {
@@ -98,7 +111,7 @@ class CustomerOrders extends Model
             }
             return true;
         }
-        return false;        
+        return false; */
     }
 
     public function cancelOrderAPI($params) {
@@ -133,6 +146,9 @@ class CustomerOrders extends Model
             $reponse = json_decode($result['response']);
             if($reponse->status == "FAILURE" && $reponse->statusCode != 200) {
                 return false;
+            }
+            if($value['is_basket'] == 1) {
+                $isBasketInOrder = 1;
             }
         }
 

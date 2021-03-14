@@ -36,6 +36,8 @@ Route::post('getAllAddressByUserId', 'Api\UserAddressController@getAllAddressByU
 Route::post('saveAddressByUserId', 'Api\UserAddressController@saveAddressByUserId');
 Route::post('updateAddressByUserId', 'Api\UserAddressController@updateAddressByUserId');
 Route::post('deleteAddressByUserId', 'Api\UserAddressController@deleteAddressByUserId');
+Route::post('uploadImage', 'Api\MiscellaneousController@uploadImage');
+
 
 Route::middleware('auth:api')->group( function () {
     // Route::resource('products', 'API\ProductsController');

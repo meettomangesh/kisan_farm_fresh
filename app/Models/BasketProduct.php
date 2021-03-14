@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use \DateTimeInterface;
 
-class RegionUser extends Model
+class BasketProduct extends Model
 {
     use SoftDeletes;
 

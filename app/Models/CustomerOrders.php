@@ -51,6 +51,10 @@ class CustomerOrders extends Model
         return $this->belongsTo(UserAddress::class, 'billing_address_id');
     }
 
+    public function orderDetails() {
+        return $this->hasMany(CustomerOrderDetails::class, 'order_id');
+    }
+
     protected function cancelOrder($orderId, $type) {
         /* $cancelData = array('order_id' => $orderId, 'type' => 2);
         $cancelData = json_encode($cancelData);
@@ -116,11 +120,13 @@ class CustomerOrders extends Model
         foreach($params['products'] as $key => $value) {
             $orderAmount = $orderAmount + ((($value['special_price'] > 0) ? $value['special_price'] : $value['selling_price']) * $value['quantity']);
             $totalItemQty = $totalItemQty + $value['quantity'];
-            $inputData = json_encode($value);
-            $result = DB::select('call validateProduct(?)', [$inputData]);
-            $reponse = json_decode($result[0]->response);
-            if($reponse->status == "FAILURE" && $reponse->statusCode != 200) {
-                return false;
+            if($value['is_basket'] == 0) {
+                $inputData = json_encode($value);
+                $result = DB::select('call validateProduct(?)', [$inputData]);
+                $reponse = json_decode($result[0]->response);
+                if($reponse->status == "FAILURE" && $reponse->statusCode != 200) {
+                    return false;
+                }
             }
         }
 

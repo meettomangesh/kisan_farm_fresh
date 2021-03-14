@@ -5,8 +5,10 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use \DateTimeInterface;
+use App\Models\Product;
+use App\Models\ProductUnits;
 
-class RegionUser extends Model
+class BasketsProduct extends Model
 {
     use SoftDeletes;
 
@@ -32,14 +34,14 @@ class RegionUser extends Model
         return $date->format('Y-m-d H:i:s');
     }
     
-    public function product()
+    public function productUnit()
     {
         return $this->belongsTo(ProductUnits::class, 'product_unit_id');
     }
 
-    public function basket()
+    public function product()
     {
-        return $this->belongsTo(Basket::class, 'basket_id');
+        return $this->belongsTo(Product::class, 'basket_id');
     }
 
     // public function pincode()

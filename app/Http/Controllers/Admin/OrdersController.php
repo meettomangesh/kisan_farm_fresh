@@ -24,6 +24,8 @@ class OrdersController extends Controller
     {
         abort_if(Gate::denies('order_show'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $customerOrder = CustomerOrders::find($orderId);
+        // $customerOrderDetails = $customerOrder->orderDetails();
+        // print_r($customerOrderDetails); exit;
         $customerOrderDetails = CustomerOrderDetails::where('order_id', $orderId)->get();
         return view('admin.orders.show', compact('customerOrder','customerOrderDetails'));
     }

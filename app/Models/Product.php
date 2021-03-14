@@ -10,6 +10,7 @@ use App\Models\ProductInventory;
 use App\Models\ProductLocationInventory;
 use App\Models\Category;
 use App\Models\ProductUnits;
+use App\Models\BasketsProduct;
 use App\User;
 use DB;
 
@@ -35,6 +36,10 @@ class Product extends Model
     public function category()
     {
         return $this->belongsTo(Category::class, 'category_id');
+    }
+
+    public function bProduct() {
+        return $this->hasMany(BasketsProduct::class, 'basket_id');
     }
 
     protected function storeProductImages ($params, $productId, $flag) {
@@ -135,21 +140,27 @@ class Product extends Model
         // $result = collect($queryResult);
         if(sizeof($queryResult) > 0) {
             foreach($queryResult as $key => $val) {
-                $productUnits = ProductUnits::join('unit_master', 'unit_master.id', '=', 'product_units.unit_id')
-                    ->join('product_location_inventory', 'product_location_inventory.product_units_id', '=', 'product_units.id')
-                    ->where('product_units.status', 1)
-                    ->where('product_units.products_id', $val->id)
-                    ->where('product_units.selling_price', '>', 0)
-                    ->where('product_location_inventory.current_quantity', '>', 0)
-                    // ->get(['product_units.id','unit_master.unit','TRUNCATE(product_units.selling_price, 2) AS selling_price','product_units.special_price','product_units.min_quantity','product_units.max_quantity','product_location_inventory.current_quantity'])
-                    ->select(DB::raw('product_units.id, unit_master.unit, TRUNCATE(product_units.selling_price, 2) AS selling_price, IF(product_units.special_price > 0 AND product_units.special_price_start_date <= CURDATE() AND product_units.special_price_end_date >= CURDATE(), TRUNCATE(product_units.special_price, 2), 0.00)  AS special_price, product_units.special_price_start_date, product_units.special_price_end_date, product_units.min_quantity, product_units.max_quantity, product_location_inventory.current_quantity'))
-                    ->get()
-                    ->toArray();
-                if(sizeof($productUnits) > 0) {
-                    $queryResult[$key]->product_units = $productUnits;
-                    $queryResult[$key]->product_images = ProductImages::select('image_name')->where('products_id', $val->id)->where('status', 1)->get()->toArray();
+                if($val->is_basket == 0) {
+                    $productUnits = ProductUnits::join('unit_master', 'unit_master.id', '=', 'product_units.unit_id')
+                        ->join('product_location_inventory', 'product_location_inventory.product_units_id', '=', 'product_units.id')
+                        ->where('product_units.status', 1)
+                        ->where('product_units.products_id', $val->id)
+                        ->where('product_units.selling_price', '>', 0)
+                        ->where('product_location_inventory.current_quantity', '>', 0)
+                        // ->get(['product_units.id','unit_master.unit','TRUNCATE(product_units.selling_price, 2) AS selling_price','product_units.special_price','product_units.min_quantity','product_units.max_quantity','product_location_inventory.current_quantity'])
+                        ->select(DB::raw('product_units.id, unit_master.unit, TRUNCATE(product_units.selling_price, 2) AS selling_price, IF(product_units.special_price > 0 AND product_units.special_price_start_date <= CURDATE() AND product_units.special_price_end_date >= CURDATE(), TRUNCATE(product_units.special_price, 2), 0.00)  AS special_price, product_units.special_price_start_date, product_units.special_price_end_date, product_units.min_quantity, product_units.max_quantity, product_location_inventory.current_quantity'))
+                        ->get()
+                        ->toArray();
+                    if(sizeof($productUnits) > 0) {
+                        $queryResult[$key]->product_units = $productUnits;
+                        $queryResult[$key]->product_images = ProductImages::select('image_name')->where('products_id', $val->id)->where('status', 1)->get()->toArray();
+                    } else {
+                        unset($queryResult[$key]);
+                    }
                 } else {
-                    unset($queryResult[$key]);
+                    // $baskets = BasketsProduct::select('product_unit_id')->where("basket_id", $val->id)->where("status", 1)->get()->toArray();
+                    $queryResult[$key]->product_units = array();
+                    $queryResult[$key]->product_images = ProductImages::select('image_name')->where('products_id', $val->id)->where('status', 1)->get()->toArray();
                 }
             }
         }

@@ -14,7 +14,7 @@ class CreateBasketProductTable extends Migration
     public function up()
     {
         Schema::create('basket_product', function (Blueprint $table) {
-            $table->id();
+            $table->increments('id')->unsigned();
             $table->integer('basket_id')->unsigned()->index();
             $table->integer('product_unit_id')->unsigned()->index()->comment = "Product unit table ID";
             $table->integer('quantity')->default(1)->unsigned()->index();

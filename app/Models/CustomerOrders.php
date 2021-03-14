@@ -57,15 +57,7 @@ class CustomerOrders extends Model
     }
 
     protected function cancelOrder($orderId, $type) {
-        /* $cancelData = array('order_id' => $orderId, 'type' => 2);
-        $cancelData = json_encode($cancelData);
-        $result = DB::select('call cancelOrder(?)', [$cancelData]);
-        $reponse = json_decode($result[0]->response);
-        if($reponse->status == "FAILURE" && $reponse->statusCode != 200) {
-            return false;
-        }
-        return true; */
-        $cancelData = array('order_id' => $orderId, 'type' => 2);
+        $cancelData = array('order_id' => $orderId, 'type' => $type);
         $inputData = json_encode($cancelData);
         $pdo = DB::connection()->getPdo();
         $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, true);

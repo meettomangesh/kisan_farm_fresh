@@ -20,6 +20,17 @@
                         <th>{{ trans('cruds.order.fields.status') }}</th>
                         <th>{{ trans('cruds.order.fields.actions') }}</th>
                     </tr>
+                    <tr>
+                        <th width="10"></th>
+                        <th></th>
+                        <th><input type="text" placeholder="Search" /></th>
+                        <th><input type="text" placeholder="Search" /></th>
+                        <th><input type="text" placeholder="Search" /></th>
+                        <th><input type="text" placeholder="Search" /></th>
+                        <th><input type="text" placeholder="Search" /></th>
+                        <th><input type="text" placeholder="Search" /></th>
+                        <th></th>
+                    </tr>
                 </thead>
                 <tbody>
                     @foreach($customerOrders as $key => $customerOrder)
@@ -80,6 +91,18 @@ $(function () {
         order: [[ 1, 'desc' ]],
         pageLength: 10,
     });
+    $('.datatable-Order:not(.ajaxTable) thead tr:eq(1) th').each( function (i) {
+        $( 'input', this ).on( 'keyup change', function () {
+            if ( table.column(i).search() !== this.value ) {
+                table
+                    .column(i)
+                    .search( this.value )
+                    .draw();
+            }
+        } );
+    } );
+
+
     let table = $('.datatable-Order:not(.ajaxTable)').DataTable({ buttons: dtButtons })
     $('a[data-toggle="tab"]').on('shown.bs.tab', function(e){
         $($.fn.dataTable.tables(true)).DataTable()

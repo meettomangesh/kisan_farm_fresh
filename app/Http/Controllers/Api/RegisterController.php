@@ -5,12 +5,13 @@ namespace App\Http\Controllers\API;
 use Illuminate\Http\Request;
 use App\Http\Controllers\API\BaseController as BaseController;
 use App\User;
-use App\Models\CustomerLoyalty;
+use App\Models\UserDetails;
 use Illuminate\Support\Facades\Auth;
 use Validator;
 use App\Helper\DataHelper;
 use App\Role;
 use Carbon\Carbon;
+
 class RegisterController extends BaseController
 {
     /**
@@ -41,7 +42,7 @@ class RegisterController extends BaseController
         $input['email_verify_key'] = DataHelper::emailVerifyKey();
         $input['created_by'] = 1;
         $input['roles'] = [4];
-        
+
         $user = User::create($input);
         $user->roles()->sync([4]);
         $tokenResult = $user->createToken(getenv('APP_NAME'));
@@ -49,7 +50,7 @@ class RegisterController extends BaseController
         $success['token'] =  $tokenResult->accessToken;
         $success['expires_at'] =  $tokenResult->token->expires_at;
 
-       // $success['token'] =  $user->createToken(getenv('APP_NAME'))->accessToken;
+        // $success['token'] =  $user->createToken(getenv('APP_NAME'))->accessToken;
         $success['name'] =  $user->first_name . " " . $user->last_name;
         $success['id'] = $user->id;
         $success['role'] = $user->load('roles')->roles[0]->id;
@@ -60,47 +61,91 @@ class RegisterController extends BaseController
 
     public function updateCustomer(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'first_name' => 'required',
-            'last_name' => 'required',            
-            'gender' => 'required',           
-            'date_of_birth' => 'required',
-            'marital_status' => 'required',
-            'email_address' => 'email|unique:users,email,'.$request->id,
-            //'mobile_number' => 'required|unique:customer_loyalty,mobile_number',
-            //'password' => 'required',
-            //  'confirm_password' => 'required|same:password',
-            // 'otp_verified' => 'required',
-           // 'pin_code' => 'required',
-            'id' => 'required'
-        ]);
+        if (!isset($request->role_id)) {
+            return $this->sendError("Please provide valid role details.", []);
+        }
+
+        if ($request->role_id == 3) { // For delivery boys only
+            $validator = Validator::make($request->all(), [
+                'first_name' => 'required',
+                'last_name' => 'required',
+                'email_address' => 'email|unique:users,email,' . $request->id,
+                'id' => 'required',
+                'role_id' => 'required',
+                'platform' => 'required',
+                'aadhar_number' => 'required',
+                'pan_number' => 'required',
+                'license_number' => 'required',
+                'vehicle_type' => 'required',
+                'vehicle_number' => 'required',
+                'user_photo' => 'required',
+                'aadhar_card_photo' => 'required',
+                'pan_card_photo' => 'required',
+                'license_card_photo' => 'required',
+                'rc_book_photo' => 'required',
+                'bank_name' => 'required',
+                'account_number' => 'required',
+                'ifsc_code' => 'required',
+            ]);
+        } else {
+            $validator = Validator::make($request->all(), [
+                'first_name' => 'required',
+                'last_name' => 'required',
+                'gender' => 'required',
+                'date_of_birth' => 'required',
+                'marital_status' => 'required',
+                'email_address' => 'email|unique:users,email,' . $request->id,
+                'id' => 'required',
+                'role_id' => 'required',
+                'platform' => 'required'
+            ]);
+        }
+
 
         if ($validator->fails()) {
             return $this->sendError(parent::VALIDATION_ERROR, $validator->errors());
         }
-        
+
         $input = $request->all();
-        $customer = User::where('id',$request->id)->first();
+        $customer = User::where('id', $request->id)->first();
         $input['email'] = $request->email_address;
-      //  $input['password'] = bcrypt($input['password']);
+        //  $input['password'] = bcrypt($input['password']);
         //$input['referral_code'] = DataHelper::generateBarcodeString(9);
         //$input['email_verify_key'] = DataHelper::emailVerifyKey();
-        
-        if(!$customer){
+
+        if (!$customer) {
             return $this->sendError("Please try with valid details.", []);
         }
 
         $input['updated_by'] = 1;
         $customer->update($input);
-        
+
+        if ($request->role_id == 3) {
+            $userDetails =  UserDetails::updateOrCreate(
+                ['user_id' => $request->id, 'role_id' => $request->role_id],
+                $input
+            );
+        }
 
         //$customer = User::create($input);
-       // $success['token'] =  $customer->createToken(getenv('APP_NAME'))->accessToken;
+        // $success['token'] =  $customer->createToken(getenv('APP_NAME'))->accessToken;
         $success['name'] =  $customer->first_name . " " . $customer->last_name;
         $success['id'] = $customer->id;
         $success['role'] = $customer->load('roles')->roles[0]->id;
         $success['role_name'] = $customer->load('roles')->roles[0]->title;
-        return $this->sendResponse($success, 'User updated successfully.');
+        $message = 'User updated successfully.';
+        switch ($request->role_id) {
+            case 3:
+                $message = 'Delivery boy data updated successfully.';
+                break;
+            case 4:
+                $message = 'Customer data updated successfully.';
+                break;
+            default:
+                $message = 'User updated successfully.';
+                break;
+        }
+        return $this->sendResponse($success, $message);
     }
 
     /**
@@ -126,10 +171,10 @@ class RegisterController extends BaseController
             //     return response()->json([
             //         'message' => 'Unauthorized'
             //     ], 401);
-    
+
             $user = Auth::user();
             //print_r($user->createToken(getenv('APP_NAME'))); exit;
-           //$token = $user->createToken(getenv('APP_NAME'));
+            //$token = $user->createToken(getenv('APP_NAME'));
             $tokenResult = $user->createToken(getenv('APP_NAME'));
             $tokenResult->token->expires_at = Carbon::now()->addDays(10);
             $success['token'] =  $tokenResult->accessToken;
@@ -152,7 +197,7 @@ class RegisterController extends BaseController
     {
         $validator = Validator::make($request->all(), [
             'platform' => 'required',
-           // 'pin_code' => 'required',
+            // 'pin_code' => 'required',
 
         ]);
         if ($validator->fails()) {

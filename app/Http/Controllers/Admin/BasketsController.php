@@ -37,9 +37,6 @@ class BasketsController extends Controller
     {
         if ($request->hasFile('images')) {
             $basket = Basket::storeBasket($request);
-            // if($product->id > 0) {
-            //     Product::storeProductImages($request, $product->id, 1);
-            // }
             $basket->productUnits()->sync($request->input('productUnits', []));
         }
         return redirect()->route('admin.baskets.index');
@@ -48,10 +45,6 @@ class BasketsController extends Controller
     public function edit(Basket $basket)
     {
         abort_if(Gate::denies('basket_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-        // $productImages = Product::getProductImages($product->id);
-        // $srNo = 0;
-        // $categories = Category::all()->where('status', 1)->pluck('cat_name', 'id')->prepend(trans('global.pleaseSelect'), '');
-        // $product->load('category');
         $productUnits = ProductUnits::all()->where('status', 1);
         $basket->load('productUnits');
         return view('admin.baskets.edit', compact('basket','productUnits'));

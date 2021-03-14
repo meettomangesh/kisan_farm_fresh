@@ -14,7 +14,7 @@ class CreateRegionUserTable extends Migration
     public function up()
     {
         Schema::create('region_user', function (Blueprint $table) {
-            $table->id();
+            $table->increments('id')->unsigned();
             $table->integer('region_id')->unsigned()->index();
             $table->integer('user_id')->unsigned()->index();
             $table->tinyInteger('status')->default(1)->unsigned()->index()->comment = "1: Active, 0: Inactive";

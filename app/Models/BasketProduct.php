@@ -8,7 +8,7 @@ use \DateTimeInterface;
 use App\Models\Product;
 use App\Models\ProductUnits;
 
-class BasketsProduct extends Model
+class BasketProduct extends Model
 {
     use SoftDeletes;
 

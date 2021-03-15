@@ -35,7 +35,7 @@ siteObjJs.admin.basketMerchantJs = function () {
             storedNewFiles = [];
         });
 
-        $('#product_image').bind('change', function (e) {
+        $('#basket_image').bind('change', function (e) {
             //this.files[0].size gets the size of your file.
             if (this.files[0]) {
                 if (this.files[0].size > 2097152) {
@@ -44,7 +44,7 @@ siteObjJs.admin.basketMerchantJs = function () {
                     return false;
                 }
 
-                var ext = $('#product_image').val().split('.').pop().toLowerCase();
+                var ext = $('#basket_image').val().split('.').pop().toLowerCase();
                 if ($.inArray(ext, ['gif', 'png', 'jpg', 'jpeg']) == -1) {
                     var error = siteObjJs.admin.validateUserJs.mimes;
                     $('#file-error').text(error);
@@ -124,7 +124,7 @@ siteObjJs.admin.basketMerchantJs = function () {
             }
         }); */
 
-        $('#edit-product').on('submit', function() {
+        $('#edit-basket').on('submit', function() {
             if($("#dvPreview").children().length == 0 && $('input[type="file"]').val() == '') {
                 $("#edit-product span#file-error-container").attr("style", "color: red").text("Please select at least one image.").addClass('help-block-error red');
                 setTimeout(function(){
@@ -139,6 +139,8 @@ siteObjJs.admin.basketMerchantJs = function () {
             if (r == true) {
                 var rowId = $(this).attr('data-image-id');
                 $("#blank-row-"+rowId).remove();
+                removedImagesIds.push(rowId);
+                $("#removed_images").val(removedImagesIds);
                 if($("#dvPreview").children().length == 0) {
                     $(".basket-image-div").remove();
                     $("#basket_image_name").removeAttr('disabled');
@@ -148,7 +150,7 @@ siteObjJs.admin.basketMerchantJs = function () {
 
         imageNamesArr = [];
 
-        $("body").on('change', '.product_images', function () {
+        $("body").on('change', '.basket_images', function () {
             var billSelectError = '';
             var form = $(this).closest("form");
             var formId = form.attr("id");
@@ -268,7 +270,7 @@ siteObjJs.admin.basketMerchantJs = function () {
                                  } else {
                                  j = dvPreview.find("tr").length;
                                  }*/
-                                if (formId == 'edit-product-merchant') {
+                                if (formId == 'edit-basket-merchant') {
                                     //var jEdit = j - 1;
                                     if (dvPreview.find("tr:first").hasClass("row-for-blank")) { //all the images removed and starting with blank row
                                         j = dvPreview.find("tr").length - 1;

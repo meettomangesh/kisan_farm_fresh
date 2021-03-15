@@ -1,13 +1,13 @@
 @extends('layouts.admin')
 @section('content')
 @can('deliveryboy_create')
-    <div style="margin-bottom: 10px;" class="row">
-        <div class="col-lg-12">
-            <a class="btn btn-success" href="{{ route('admin.deliveryboys.create') }}">
-                {{ trans('global.add') }} {{ trans('cruds.deliveryboy.title_singular') }}
-            </a>
-        </div>
+<div style="margin-bottom: 10px;" class="row">
+    <div class="col-lg-12">
+        <a class="btn btn-success" href="{{ route('admin.deliveryboys.create') }}">
+            {{ trans('global.add') }} {{ trans('cruds.deliveryboy.title_singular') }}
+        </a>
     </div>
+</div>
 @endcan
 <div class="card">
     <div class="card-header">
@@ -34,7 +34,7 @@
                         <th>
                             {{ trans('cruds.deliveryboy.fields.email') }}
                         </th>
-                       
+
                         <th>
                             {{ trans('cruds.deliveryboy.fields.mobile_number') }}
                         </th>
@@ -42,7 +42,7 @@
                             {{ trans('cruds.deliveryboy.fields.regions') }}
                         </th> -->
                         <th>
-                            {{ trans('cruds.deliveryboy.fields.status') }}
+                            {{ trans('cruds.deliveryboy.fields.kyc_verified') }}
                         </th>
                         <th>
                             &nbsp;
@@ -51,55 +51,80 @@
                 </thead>
                 <tbody>
                     @foreach($deliveryboys as $key => $deliveryboy)
-                        <tr data-entry-id="{{ $deliveryboy->id }}">
-                            <td>
+                    <tr data-entry-id="{{ $deliveryboy->id }}">
+                        <td>
 
-                            </td>
-                            <td>
-                                {{ $deliveryboy->id ?? '' }}
-                            </td>
-                            <td>
-                                {{ $deliveryboy->first_name ?? '' }}
-                            </td>
-                            <td>
-                                {{ $deliveryboy->last_name ?? '' }}
-                            </td>
-                            <td>
-                                {{ $deliveryboy->email ?? '' }}
-                            </td>
-                            <td>
-                                {{ $deliveryboy->mobile_number ?? '' }}
-                            </td>
-                            <!-- <td>
+                        </td>
+                        <td>
+                            {{ $deliveryboy->id ?? '' }}
+                        </td>
+                        <td>
+                            {{ $deliveryboy->first_name ?? '' }}
+                        </td>
+                        <td>
+                            {{ $deliveryboy->last_name ?? '' }}
+                        </td>
+                        <td>
+                            {{ $deliveryboy->email ?? '' }}
+                        </td>
+                        <td>
+                            {{ $deliveryboy->mobile_number ?? '' }}
+                        </td>
+                        <!-- <td>
                                 @foreach($deliveryboy->regions as $key => $item)
                                     <span class="badge badge-info">{{ $item->region_name }}</span>
                                 @endforeach
                             </td> -->
-                            <td><span class="{{ $deliveryboy->status == 1 ? 'btn btn-success':'btn btn-danger' }}"> {{ ($deliveryboy->status == 1 ?trans('cruds.deliveryboy.fields.active'):trans('cruds.deliveryboy.fields.inactive')) ?? '' }}</span></td>
-                            <td>
-                                @can('deliveryboy_show')
-                                    <a class="btn btn-xs btn-primary" href="{{ route('admin.deliveryboys.show', $deliveryboy->id) }}">
-                                        {{ trans('global.view') }}
-                                    </a>
-                                @endcan
+                        <td>
+                            <span>
+                                <?php 
+                                if ($deliveryboy->details) {
+                                    switch ($deliveryboy->details->status) {
+                                        case 1:
+                                            echo trans('cruds.deliveryboy.fields.submitted');
+                                            break;
+                                        case 2:
+                                            echo trans('cruds.deliveryboy.fields.approved');
+                                            break;
+                                        case 3:
+                                            echo trans('cruds.deliveryboy.fields.rejected');
+                                            break;
+                                        default:
+                                            echo 'N/A';
+                                            break;
+                                    }
+                                } else {
+                                    echo 'N/A';
+                                }
+                                ?>
+                            </span>
+                            <!-- <span class="{{ $deliveryboy->status == 1 ? 'btn btn-success':'btn btn-danger' }}"> {{ ($deliveryboy->status == 1 ?trans('cruds.deliveryboy.fields.active'):trans('cruds.deliveryboy.fields.inactive')) ?? '' }}</span> -->
+                        </td>
 
-                                @can('deliveryboy_edit')
-                                    <a class="btn btn-xs btn-info" href="{{ route('admin.deliveryboys.edit', $deliveryboy->id) }}">
-                                        {{ trans('global.edit') }}
-                                    </a>
-                                @endcan
+                        <td>
+                            @can('deliveryboy_show')
+                            <a class="btn btn-xs btn-primary" href="{{ route('admin.deliveryboys.show', $deliveryboy->id) }}">
+                                {{ trans('global.view') }}
+                            </a>
+                            @endcan
 
-                                @can('deliveryboy_delete')
-                                    <form action="{{ route('admin.deliveryboys.destroy', $deliveryboy->id) }}" method="POST" onsubmit="return confirm('{{ trans('global.areYouSure') }}');" style="display: inline-block;">
-                                        <input type="hidden" name="_method" value="DELETE">
-                                        <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                                        <input type="submit" class="btn btn-xs btn-danger" value="{{ trans('global.delete') }}">
-                                    </form>
-                                @endcan
+                            @can('deliveryboy_edit')
+                            <a class="btn btn-xs btn-info" href="{{ route('admin.deliveryboys.edit', $deliveryboy->id) }}">
+                                {{ trans('global.edit') }}
+                            </a>
+                            @endcan
 
-                            </td>
+                            @can('deliveryboy_delete')
+                            <form action="{{ route('admin.deliveryboys.destroy', $deliveryboy->id) }}" method="POST" onsubmit="return confirm('{{ trans('global.areYouSure') }}');" style="display: inline-block;">
+                                <input type="hidden" name="_method" value="DELETE">
+                                <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                                <input type="submit" class="btn btn-xs btn-danger" value="{{ trans('global.delete') }}">
+                            </form>
+                            @endcan
 
-                        </tr>
+                        </td>
+
+                    </tr>
                     @endforeach
                 </tbody>
             </table>
@@ -113,13 +138,13 @@
 @section('scripts')
 @parent
 <script>
-    $(function () {
-  let dtButtons = $.extend(true, [], $.fn.dataTable.defaults.buttons)
-@can('deliveryboy_delete')
+    $(function() {
+        let dtButtons = $.extend(true, [], $.fn.dataTable.defaults.buttons)
+        @can('deliveryboy_delete')
   let deleteButtonTrans = '{{ trans('global.datatables.delete') }}'
   let deleteButton = {
     text: deleteButtonTrans,
-    url: "{{ route('admin.deliveryboys.massDestroy') }}",
+    url: "{{ route('admin.customers.massDestroy') }}",
     className: 'btn-danger',
     action: function (e, dt, node, config) {
       var ids = $.map(dt.rows({ selected: true }).nodes(), function (entry) {
@@ -128,7 +153,6 @@
 
       if (ids.length === 0) {
         alert('{{ trans('global.datatables.zero_selected') }}')
-
         return
       }
 
@@ -145,18 +169,21 @@
   dtButtons.push(deleteButton)
 @endcan
 
-  $.extend(true, $.fn.dataTable.defaults, {
-    orderCellsTop: true,
-    order: [[ 1, 'desc' ]],
-    pageLength: 100,
-  });
-  let table = $('.datatable-Deliveryboy:not(.ajaxTable)').DataTable({ buttons: dtButtons })
-  $('a[data-toggle="tab"]').on('shown.bs.tab', function(e){
-      $($.fn.dataTable.tables(true)).DataTable()
-          .columns.adjust();
-  });
-  
-})
+        $.extend(true, $.fn.dataTable.defaults, {
+            orderCellsTop: true,
+            order: [
+                [1, 'desc']
+            ],
+            pageLength: 100,
+        });
+        let table = $('.datatable-Deliveryboy:not(.ajaxTable)').DataTable({
+            buttons: dtButtons
+        })
+        $('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
+            $($.fn.dataTable.tables(true)).DataTable()
+                .columns.adjust();
+        });
 
+    })
 </script>
 @endsection

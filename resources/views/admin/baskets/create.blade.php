@@ -181,7 +181,7 @@
                                 <span>{{ trans('cruds.basket.fields.select_images') }}</span>
                                 <input type="file" name="basket_images[]" id="basket_images" class="fileupload ignore-validate basket_merchant_image" data-rule-required="false" accept="image/*" data-rel="basket_images" multiple="true" required/>
                             </span -->
-                            <input type="file" name="images" class="basket_images" accept="image/*"  required />
+                            <input type="file" name="basket_images[]" class="basket_images" accept="image/*"  multiple required/>
                             <span class="fileupload-process"></span>
                             <span id="file-error-container"></span>
                             <span class="help-block">{{ trans('cruds.basket.fields.basket_image_helper') }}</span>

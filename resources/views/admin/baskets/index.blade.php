@@ -32,7 +32,8 @@
                         <tr data-entry-id="{{ $basket->id }}">
                             <td></td>
                             <td>{{ $basket->id ?? '' }}</td>
-                            <td><img src="{{ asset($basket->images)  }}" alt="" width="60" height="60"></td>
+                            <!-- <td><img src="{{ asset($basket->images)  }}" alt="" width="60" height="60"></td> -->
+                            <td><img src="{{ asset(App\Models\ProductImages::getFirstImage($basket->id))  }}" alt="" width="60" height="60"></td>
                             <td>{{ $basket->product_name ?? '' }}</td>
                             <td>{{ $basket->sku ?? '' }}</td>
                             <td>

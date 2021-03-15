@@ -186,7 +186,8 @@
                                 <span>{{ trans('cruds.basket.fields.select_images') }}</span>
                                 <input type="file" name="basket_images[]" id="basket_images" class="fileupload ignore-validate basket_merchant_image" data-rule-required="false" accept="image/*" data-rel="basket_images" multiple="true" required/>
                             </span -->
-                            <input type="file" name="images" id="basket_image_name" class="basket_images" accept="image/*" disabled required />
+                            
+                            <input type="file" name="basket_images[]" class="product_images" accept="image/*"  multiple/>
                             <span class="fileupload-process"></span>
                             <span id="file-error-container"></span>
                             <span class="help-block">{{ trans('cruds.basket.fields.basket_image_helper') }}</span>
@@ -207,7 +208,7 @@
                 </div>
             </div>
 
-            <div class="row basket-image-div">
+            <!-- <div class="row basket-image-div">
                 <div class="col-md-8">
                     <div class="form-group">
                         <div class="col-md-12 col-xs-offset-3">
@@ -232,7 +233,42 @@
                         </div>
                     </div>
                 </div>
+            </div> -->
+
+            @if(sizeof($basketImages) > 0)
+            <div class="row basket-image-div">
+                <div class="col-md-8">
+                    <div class="form-group">
+                        <div class="col-md-12 col-xs-offset-3">
+                            <div class="files-table table-container">
+                                <table role="presentation" class="table table-striped table-bordered clearfix table-border-separate" id="image-preview-table">
+                                    <thead>
+                                        <tr>
+                                            <th width="1%" class="text-center">#</th>
+                                            <th class="text-center">{{ trans('cruds.product.fields.preview') }}</th>
+                                            <!-- th>{{ trans('cruds.product.fields.file_name') }}</th>
+                                            <th>{{ trans('cruds.product.fields.image_description') }}</th>
+                                            <th>{{ trans('cruds.product.fields.display_order') }}</th -->
+                                            <th class="text-center">{{ trans('cruds.product.fields.actions') }}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="files" id="dvPreview">
+                                        @foreach($basketImages as $key => $image)
+                                            <tr class="row-for-blank" id="blank-row-{{ $image->id }}">
+                                                <td class="text-center">{{ $srNo = $srNo + 1 }}</td>
+                                                <td class="text-center"><img src="{{ asset($image->image_name) }}" alt="" width="60" height="60"></td>
+                                                <td class="text-center"><span class="btn red" id="remove-btn" data-display-order="{{ $image->display_order }}" data-image-id="{{ $image->id }}">Remove</span></td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
+            @endif
+
             <div class="form-group">
                 <label class="required" for="productUnits">{{ trans('cruds.basket.fields.productUnits') }}</label>
                 <div style="padding-bottom: 4px">

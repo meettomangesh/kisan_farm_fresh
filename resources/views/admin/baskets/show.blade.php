@@ -21,7 +21,8 @@
                     </tr>
                     <tr>
                         <th>{{ trans('cruds.basket.fields.basket_image') }}</th>
-                        <td><img src="{{ asset($basket->images) }}" alt="" width="50" height="50"></td>
+                        <!-- <td><img src="{{ asset($basket->images) }}" alt="" width="50" height="50"></td> -->
+                        <td><img src="{{ asset(App\Models\ProductImages::getFirstImage($basket->id)) }}" alt="" width="50" height="50"></td>
                     </tr>
                    
                     <tr>

@@ -12,6 +12,7 @@ use App\Models\Category;
 use App\Models\ProductUnits;
 use App\User;
 use App\Helper\DataHelper;
+use Illuminate\Support\Facades\File;
 use DB;
 
 class Basket extends Model
@@ -58,13 +59,15 @@ class Basket extends Model
     //     return $this->belongsToMany(PinCode::class);
     // }
 
-    protected function storeBasket($params) {
+    protected function storeBasket($params)
+    {
         $params->brand_id = 0;
         $params->category_id = 0;
         $basket = self::create($params->all());
-        
-        $imagePath = DataHelper::uploadImage($params->file('images'), '/images/baskets/',$basket->id);
-        $basket->images = $imagePath;
+
+        //$imagePath = DataHelper::uploadImage($params->file('basket_images'), '/images/baskets/',$basket->id);
+        //$basket->images = $imagePath;
+        $this->storeBasketImages($params, $basket->id, 1);
         $basket->is_basket = 1;
         $basket->brand_id = 0;
         $basket->category_id = 0;
@@ -72,19 +75,27 @@ class Basket extends Model
         return $basket;
     }
 
-    protected function updateBasket($params, $basket) {
+    protected function updateBasket($params, $basket)
+    {
         $params->brand_id = 0;
         $params->category_id = 0;
         $inputs = $params->all();
         $basket->update($inputs);
-        $imagePath = $basket->images;
-        if ($params->hasFile('images')) {
-            $imagePath = DataHelper::uploadImage($params->file('images'), '/images/baskets/',$basket->id);
-            if(file_exists(public_path($basket->images))) {
-                unlink(public_path($basket->images));
-            }
+        // $imagePath = $basket->images;
+        // if ($params->hasFile('images')) {
+        //     $imagePath = DataHelper::uploadImage($params->file('images'), '/images/baskets/', $basket->id);
+        //     if (file_exists(public_path($basket->images))) {
+        //         unlink(public_path($basket->images));
+        //     }
+        // }
+        //$basket->images = $imagePath;
+        if ($params->hasFile('basket_images') && $basket->id > 0) {
+            $this->storeBasketImages($params, $basket->id, 2);
         }
-        $basket->images = $imagePath;
+
+        if($inputs['removed_images'] != '' && $basket->id > 0) {
+            $this->removeProductImages($inputs['removed_images']);
+        }
         $basket->is_basket = 1;
         $basket->brand_id = 0;
         $basket->category_id = 0;
@@ -93,9 +104,21 @@ class Basket extends Model
     }
 
 
-    protected function storeProductImages($params, $productId, $flag)
+    protected function removeProductImages($ids) {
+        $imageIds = explode(',', $ids);
+        foreach($imageIds as $key => $val) {
+            $prodImage = ProductImages::select('id','image_name','display_order')->where('id', $val)->get()->toArray();
+            if(isset($prodImage[0]['image_name']) && file_exists(public_path($prodImage[0]['image_name']))) {
+                unlink(public_path($prodImage[0]['image_name']));
+            }
+            ProductImages::destroy($val);
+        }
+        return true;
+    }
+
+    protected function storeBasketImages($params, $productId, $flag)
     {
-        $images = $params->file('product_images');
+        $images = $params->file('basket_images');
         $inputs = $params->all();
         $userId = 0;
         if ($flag == 1) {
@@ -103,17 +126,28 @@ class Basket extends Model
         } elseif ($flag == 2) {
             $userId = $inputs['updated_by'];
         }
-        if ($params->hasFile('product_images')) {
-            $path = '/images/products/';
+        if ($params->hasFile('basket_images')) {
+            // $path = '/images/baskets/';
+            // if ($productId != 0) {
+            //     $path .= $productId;
+            //     if (!File::exists(public_path() . $path)) {
+            //         File::makeDirectory(public_path() . $path, 0775, true);
+            //     }
+            //     $path .= '/';
+            // }
+
+
             $i = 0;
             foreach ($images as $item) {
-                $var = date_create();
-                $time = date_format($var, 'YmdHis');
-                $imageName = $time . '-' . $item->getClientOriginalName();
-                $item->move(base_path() . '/public' . $path, $imageName);
+                // $var = date_create();
+                // $time = date_format($var, 'YmdHis');
+                // $imageName = $time . '-' . $item->getClientOriginalName();
+                // $item->move(base_path() . '/public' . $path, $imageName);
+                $imagePath = DataHelper::uploadImage($item, '/images/baskets/',$productId);
+       
                 ProductImages::create(array(
                     'products_id' => $productId,
-                    'image_name' => $path . $imageName,
+                    'image_name' => $imagePath,
                     'display_order' => $i,
                     'created_by' => $userId
                 ));
@@ -123,12 +157,12 @@ class Basket extends Model
         return true;
     }
 
-    protected function getProductImages($productId)
+    protected function getBasketImages($productId)
     {
         return ProductImages::select('id', 'image_name')->where('products_id', $productId)->get();
     }
 
-    protected function removeProductImages($ids)
+    protected function removeBasketImages($ids)
     {
         $imageIds = explode(',', $ids);
         foreach ($imageIds as $key => $val) {
@@ -235,25 +269,29 @@ class Basket extends Model
         return $this->belongsToMany(ProductUnits::class);
     }
 
-    protected function getCurrentQuantity($productUnitsId) {
+    protected function getCurrentQuantity($productUnitsId)
+    {
         $productUnitQty = ProductUnits::select('current_quantity')->where('product_units_id', $productUnitsId)->where('status', 1)->get()->toArray();
         return $productUnitQty[0]['current_quantity'];
     }
 
-    protected function getProductUnitIds($productsId) {
+    protected function getProductUnitIds($productsId)
+    {
         $unitIds = ProductUnits::select(DB::raw('GROUP_CONCAT(unit_id) AS ids'))->where('products_id', $productsId)->get()->toArray();
         return $unitIds[0]['ids'];
     }
 
-    protected function getProductUnitById($productUnitId) {
-        $product = ProductUnits::select('id','products_id','unit_id')->where('id', $productUnitId)->get()->toArray();
+    protected function getProductUnitById($productUnitId)
+    {
+        $product = ProductUnits::select('id', 'products_id', 'unit_id')->where('id', $productUnitId)->get()->toArray();
         return $product[0];
     }
 
-    protected function storeInventory ($params) {
-        $qty = ProductLocationInventory::select('id','current_quantity')->where('product_units_id', $params['product_unit_id'])->get()->toArray();
+    protected function storeInventory($params)
+    {
+        $qty = ProductLocationInventory::select('id', 'current_quantity')->where('product_units_id', $params['product_unit_id'])->get()->toArray();
         $currentQuantity = $qty[0]['current_quantity'];
-        if($params['inventory_type'] == 1) {
+        if ($params['inventory_type'] == 1) {
             $currentQuantity = $currentQuantity + $params['quantity'];
         } else {
             $currentQuantity = $currentQuantity - $params['quantity'];
@@ -264,10 +302,9 @@ class Basket extends Model
 
         ProductInventory::create(array(
             'product_units_id' => $params['product_unit_id'],
-            'quantity' => ($params['inventory_type'] == 1) ? $params['quantity'] : '-'.$params['quantity'],
+            'quantity' => ($params['inventory_type'] == 1) ? $params['quantity'] : '-' . $params['quantity'],
             'created_by' => 1
         ));
         return true;
     }
-
 }

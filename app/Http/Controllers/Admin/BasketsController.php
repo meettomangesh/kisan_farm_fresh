@@ -20,7 +20,7 @@ class BasketsController extends Controller
     public function index()
     {
         abort_if(Gate::denies('basket_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-        $baskets = Basket::all()->where('is_basket',1);
+        $baskets = Basket::all()->where('is_basket', 1);
         return view('admin.baskets.index', compact('baskets'));
     }
 
@@ -30,12 +30,12 @@ class BasketsController extends Controller
         //$categories = Category::all()->where('status', 1)->pluck('cat_name', 'id')->prepend(trans('global.pleaseSelect'), '');
         // $regions = Region::all()->where('status', 1)->pluck('region_name', 'id');
         $productUnits = ProductUnits::all()->where('status', 1);
-        return view('admin.baskets.create', compact('categories','productUnits'));
+        return view('admin.baskets.create', compact('categories', 'productUnits'));
     }
 
     public function store(StoreBasketRequest $request)
     {
-        if ($request->hasFile('images')) {
+        if ($request->hasFile('basket_images')) {
             $basket = Basket::storeBasket($request);
             $basket->productUnits()->sync($request->input('productUnits', []));
         }
@@ -46,8 +46,10 @@ class BasketsController extends Controller
     {
         abort_if(Gate::denies('basket_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $productUnits = ProductUnits::all()->where('status', 1);
+        $basketImages = Basket::getBasketImages($basket->id);
+        $srNo = 0;
         $basket->load('productUnits');
-        return view('admin.baskets.edit', compact('basket','productUnits'));
+        return view('admin.baskets.edit', compact('basket', 'productUnits','basketImages','srNo'));
     }
 
     public function update(UpdateBasketRequest $request, Basket $basket)

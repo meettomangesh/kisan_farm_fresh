@@ -9,6 +9,7 @@ use App\Http\Requests\UpdateDeliveryBoyRequest;
 use App\Role;
 use App\DeliveryBoy;
 use App\User;
+use App\Models\UserDetails;
 use App\Region;
 use Gate;
 use Illuminate\Http\Request;
@@ -78,7 +79,7 @@ class DeliveryBoysController extends Controller
 
         $deliveryboy->load('roles');
         $deliveryboy->load('regions');
-
+        $deliveryboy->load('details');
         return view('admin.deliveryboys.show', compact('deliveryboy'));
     }
 
@@ -96,5 +97,12 @@ class DeliveryBoysController extends Controller
         DeliveryBoy::whereIn('id', request('ids'))->delete();
 
         return response(null, Response::HTTP_NO_CONTENT);
+    }
+
+    public function changeKYCStatus(Request $request)
+    {
+        $user = UserDetails::find($request->user_id)->update(['status' => $request->status]);
+
+        return response()->json(['success'=>'Status changed successfully.']);
     }
 }

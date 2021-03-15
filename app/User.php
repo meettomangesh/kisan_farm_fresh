@@ -106,6 +106,11 @@ class User extends Authenticatable
         return $this->hasMany('App\Models\UserAddress');
     }
 
+    public function details()
+    {
+        return $this->hasOne('App\Models\UserDetails');
+    }
+
 
     /**
      * Get pin code details

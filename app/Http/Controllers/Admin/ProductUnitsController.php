@@ -30,7 +30,7 @@ class ProductUnitsController extends Controller
     public function create()
     {
         abort_if(Gate::denies('product_unit_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-        $products = Product::all()->where('status', 1)->pluck('product_name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $products = Product::all()->where('is_basket', 0)->where('status', 1)->pluck('product_name', 'id')->prepend(trans('global.pleaseSelect'), '');
         return view('admin.product_units.create', compact('products'));
     }
 

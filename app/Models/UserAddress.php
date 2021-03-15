@@ -44,6 +44,16 @@ class UserAddress extends Model
         return $this->belongsTo('App\User');
     }
 
+    public function city()
+    {
+        return $this->belongsTo('App\City');
+    }
+
+    public function state()
+    {
+        return $this->belongsTo('App\State');
+    }
+
     public function pincode()
     {
         return $this->belongsToMany(PinCode::class);

@@ -31,6 +31,7 @@ class CreateCustomerOrdersTable extends Migration
             $table->tinyInteger('purchased_from')->default(1)->unsigned()->index();
             $table->tinyInteger('is_coupon_applied')->default(0)->unsigned()->index()->comment = "1: Yes, 0:No";
             $table->string('coupon_applied', 20)->nullable();
+            $table->tinyInteger('is_basket_in_order')->default(0)->unsigned()->index()->comment = "1: Yes, 0: No";
             $table->tinyInteger('order_status')->default(1)->unsigned()->index()->comment = "1: Pending, 2: Ordered, 3: In Process, 4: Completed, 5: Cancelled";
             $table->integer('created_by')->unsigned();
             $table->integer('updated_by')->default(0)->unsigned();

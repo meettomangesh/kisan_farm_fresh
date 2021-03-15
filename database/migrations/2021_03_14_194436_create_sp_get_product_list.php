@@ -13,7 +13,7 @@ class CreateSpGetProductList extends Migration
      */
     public function up()
     {
-        DB::unprepared("DROP PROCEDURE IF EXISTS getProductList$$
+        DB::unprepared("DROP PROCEDURE IF EXISTS getProductList;
         CREATE PROCEDURE getProductList(IN inputData JSON)
         getProductList:BEGIN
             DECLARE searchValue,sortType,sortOn VARCHAR(100) DEFAULT '';
@@ -46,7 +46,7 @@ class CreateSpGetProductList extends Migration
             SET @orderBy = ' p.product_name ASC ';
             SET @whrSearch = ' 1=1 ';
             IF searchValue != '' AND searchValue != 'null' THEN
-                SET @whrSearch = CONCAT(' p.product_name LIKE "%', searchValue, '%"');
+              SET @whrSearch = CONCAT(' p.product_name LIKE '%', searchValue, '%');
             END IF;
         
             SET @sqlStmt = CONCAT('SELECT p.id,p.product_name,p.short_description,p.expiry_date,TRUNCATE(p.selling_price, 2) AS selling_price,TRUNCATE(p.special_price, 2) AS special_price,p.special_price_start_date,p.special_price_end_date,p.is_basket,p.min_quantity,p.max_quantity

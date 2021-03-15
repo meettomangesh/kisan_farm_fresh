@@ -13,7 +13,7 @@ class CreateSpGetOrderList extends Migration
      */
     public function up()
     {
-        DB::unprepared("DROP PROCEDURE IF EXISTS getOrderList$$
+        DB::unprepared("DROP PROCEDURE IF EXISTS getOrderList;
         CREATE PROCEDURE getOrderList(IN inputData JSON)
         getOrderList:BEGIN
             DECLARE customerId,noOfRecords,pageNumber INTEGER(10) DEFAULT 0;

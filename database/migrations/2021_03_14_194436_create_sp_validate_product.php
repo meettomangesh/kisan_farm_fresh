@@ -13,7 +13,7 @@ class CreateSpValidateProduct extends Migration
      */
     public function up()
     {
-        DB::unprepared("DROP PROCEDURE IF EXISTS validateProduct$$
+        DB::unprepared("DROP PROCEDURE IF EXISTS validateProduct;
         CREATE PROCEDURE validateProduct(IN inputData JSON)
         validateProduct:BEGIN
             DECLARE productsId,productUnitId,quantity,notFound,productUnitsId INTEGER(10) DEFAULT 0;

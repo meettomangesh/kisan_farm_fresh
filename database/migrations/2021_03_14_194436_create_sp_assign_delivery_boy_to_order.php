@@ -13,7 +13,7 @@ class CreateSpAssignDeliveryBoyToOrder extends Migration
      */
     public function up()
     {
-        DB::unprepared("DROP PROCEDURE IF EXISTS assignDeliveryBoyToOrder$$
+        DB::unprepared("DROP PROCEDURE IF EXISTS assignDeliveryBoyToOrder;
         CREATE PROCEDURE assignDeliveryBoyToOrder(IN inputData JSON)
         assignDeliveryBoyToOrder:BEGIN
             DECLARE orderId,userId,maxOrderCount INTEGER(10) DEFAULT 0;

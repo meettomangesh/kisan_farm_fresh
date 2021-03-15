@@ -13,7 +13,7 @@ class CreateSpCancelOrder extends Migration
      */
     public function up()
     {
-        DB::unprepared("DROP PROCEDURE IF EXISTS cancelOrder$$
+        DB::unprepared("DROP PROCEDURE IF EXISTS cancelOrder;
         CREATE PROCEDURE cancelOrder(IN inputData JSON)
         cancelOrder:BEGIN
             DECLARE orderId,codId,codbId,productUnitsId,productUnitsIdOne,itemQuantity,itemQuantityOne,notFound,notFoundBasket INTEGER(10) DEFAULT 0;

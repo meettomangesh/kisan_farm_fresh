@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateSpValidateBasketProducts extends Migration
+class CreateSpValidateBasketProduct extends Migration
 {
     /**
      * Run the migrations.
@@ -13,7 +13,7 @@ class CreateSpValidateBasketProducts extends Migration
      */
     public function up()
     {
-        DB::unprepared("DROP PROCEDURE IF EXISTS validateBasketProducts$$
+        DB::unprepared("DROP PROCEDURE IF EXISTS validateBasketProducts;
         CREATE PROCEDURE validateBasketProducts(IN inputData JSON)
         validateBasketProducts:BEGIN
             DECLARE basketId,productsId,productUnitsId,notFound INTEGER(10) DEFAULT 0;

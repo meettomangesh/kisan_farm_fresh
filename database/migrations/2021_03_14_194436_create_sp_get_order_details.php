@@ -13,7 +13,7 @@ class CreateSpGetOrderDetails extends Migration
      */
     public function up()
     {
-        DB::unprepared("DROP PROCEDURE IF EXISTS getOrderDetails$$
+        DB::unprepared("DROP PROCEDURE IF EXISTS getOrderDetails;
         CREATE PROCEDURE getOrderDetails(IN inputData JSON)
         getOrderDetails:BEGIN
             DECLARE orderId,customerId INTEGER(10) DEFAULT 0;

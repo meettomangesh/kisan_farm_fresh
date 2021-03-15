@@ -13,7 +13,7 @@ class CreateSpPlaceOrderDetails extends Migration
      */
     public function up()
     {
-        DB::unprepared("DROP PROCEDURE IF EXISTS placeOrderDetails$$
+        DB::unprepared("DROP PROCEDURE IF EXISTS placeOrderDetails;
         CREATE PROCEDURE placeOrderDetails(IN inputData JSON)
         placeOrderDetails:BEGIN
             DECLARE productsId,productUnitId,quantity,orderId,lastInsertId,lastInsertIdOrderDetails,customerId,productUnitsId,notFound,productsIdNew INTEGER(10) DEFAULT 0;

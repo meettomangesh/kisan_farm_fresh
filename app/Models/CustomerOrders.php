@@ -25,7 +25,7 @@ class CustomerOrders extends Model
         'deleted_at',
     ];
 
-    protected $fillable = ['customer_id','delivery_boy_id','shipping_address_id','billing_address_id','delivery_date','net_amount','gross_amount','discounted_amount','payment_type','payment_id','total_items','total_items_quantity','reject_cancel_reason','purchased_from','is_coupon_applied','order_status','created_by','updated_by','created_at','updated_at'];
+    protected $fillable = ['customer_id','delivery_boy_id','shipping_address_id','billing_address_id','delivery_date','net_amount','gross_amount','discounted_amount','payment_type','payment_id','total_items','total_items_quantity','reject_cancel_reason','purchased_from','is_coupon_applied','is_basket_in_order','order_status','created_by','updated_by','created_at','updated_at'];
 
     protected function serializeDate(DateTimeInterface $date)
     {
@@ -135,6 +135,7 @@ class CustomerOrders extends Model
             $stmt->execute([$inputData]);
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
             $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+            $stmt->closeCursor();
             $reponse = json_decode($result['response']);
             if($reponse->status == "FAILURE" && $reponse->statusCode != 200) {
                 return false;
@@ -175,6 +176,7 @@ class CustomerOrders extends Model
             $stmt->execute([$inputData]);
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
             $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+            $stmt->closeCursor();
             $reponse = json_decode($result['response']);
             if($reponse->status == "FAILURE" && $reponse->statusCode != 200) {
                 $this->cancelOrder($orderId, 1);
@@ -191,6 +193,7 @@ class CustomerOrders extends Model
         $stmt->execute([$inputData]);
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
         $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+        $stmt->closeCursor();
         return true;
     }
 

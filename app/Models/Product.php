@@ -13,6 +13,7 @@ use App\Models\ProductUnits;
 use App\Models\BasketProduct;
 use App\User;
 use DB;
+use PDO;
 
 class Product extends Model
 {
@@ -157,7 +158,6 @@ class Product extends Model
                         unset($queryResult[$key]);
                     }
                 } else {
-                    // $baskets = BasketProduct::select('id')->where('basket_id', $val->id)->where('status', 1)->get()->toArray();
                     $basketData['basket_id'] = $val->id;
                     $inputData = json_encode($basketData);
                     $pdo = DB::connection()->getPdo();
@@ -166,10 +166,12 @@ class Product extends Model
                     $stmt->execute([$inputData]);
                     $result = $stmt->fetch(PDO::FETCH_ASSOC);
                     $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+                    $stmt->closeCursor();
                     $reponse = json_decode($result['response']);
                     if($reponse->status == "FAILURE" && $reponse->statusCode != 200) {
                         unset($queryResult[$key]);
                     } else {
+                        $pdo->setAttribute(PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, true);
                         $queryResult[$key]->product_units = array();
                         $queryResult[$key]->product_images = ProductImages::select('image_name')->where('products_id', $val->id)->where('status', 1)->get()->toArray();
                     }

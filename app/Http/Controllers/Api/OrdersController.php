@@ -34,7 +34,7 @@ class OrdersController extends BaseController
             'products' => 'required',
             'products.*.is_basket' => 'in:1,0|required|integer',
             'products.*.id' => 'required|integer|gt:0',
-            'products.*.product_unit_id' => 'required|integer|gt:0',
+            'products.*.product_unit_id' => 'required|integer',
             'products.*.quantity' => 'required|numeric|gt:0',
             'products.*.selling_price' => 'required|gt:0',
             'products.*.special_price' => 'required',

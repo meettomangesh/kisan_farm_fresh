@@ -33,7 +33,7 @@ class CreateSpValidateBasketProducts extends Migration
                 DECLARE basketProductUnitsCursor CURSOR FOR
                 SELECT bpu.product_units_id, pu.products_id
                 FROM basket_product_units AS bpu
-                JOIN prdouct_units AS pu ON pu.id = bpu.product_units_id
+                JOIN product_units AS pu ON pu.id = bpu.product_units_id
                 WHERE bpu.basket_id = basketId;
         
                 DECLARE CONTINUE HANDLER FOR NOT FOUND SET notFound = 1;

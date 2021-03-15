@@ -40,7 +40,7 @@
                     <label>{{ $customerOrder->customerShippingAddress->city->name }}, {{ $customerOrder->customerShippingAddress->state->name }}</label>
                 </div>
                 <div class="col-md-6">
-                    <p></p>
+                    <label><b>{{ trans('cruds.order.fields.payment_type') }}:</b> {{ $customerOrder->payment_type }}</label>
                     <h4>{{ trans('cruds.order.fields.delivery_boy_details') }}:</h4>
                     <label><b>{{ $customerOrder->userDeliveryBoy->first_name ?? '' }}</b> <b>{{ $customerOrder->userDeliveryBoy->last_name ?? '' }}</b></label><br>
                     <label>{{ $customerOrder->userDeliveryBoy->mobile_number ?? '' }}</label>

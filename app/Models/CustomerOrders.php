@@ -11,6 +11,7 @@ use App\Models\CustomerOrderStatusTrack;
 use App\Models\ProductLocationInventory;
 use App\Models\UserAddress;
 use DB;
+use PDO;
 
 class CustomerOrders extends Model
 {
@@ -24,7 +25,7 @@ class CustomerOrders extends Model
         'deleted_at',
     ];
 
-    protected $fillable = ['customer_id','delivery_boy_id','shipping_address_id','billing_address_id','delivery_date','net_amount','gross_amount','discounted_amount','payment_type','payment_id','total_items','total_items_quantity','reject_cancel_reason','purchased_from','is_coupon_applied','order_status','created_by','updated_by','created_at','updated_at'];
+    protected $fillable = ['customer_id','delivery_boy_id','shipping_address_id','billing_address_id','delivery_date','net_amount','gross_amount','discounted_amount','payment_type','payment_id','total_items','total_items_quantity','reject_cancel_reason','purchased_from','is_coupon_applied','is_basket_in_order','order_status','created_by','updated_by','created_at','updated_at'];
 
     protected function serializeDate(DateTimeInterface $date)
     {
@@ -51,18 +52,28 @@ class CustomerOrders extends Model
         return $this->belongsTo(UserAddress::class, 'billing_address_id');
     }
 
+    public function orderDetails() {
+        return $this->hasMany(CustomerOrderDetails::class, 'order_id');
+    }
+
     protected function cancelOrder($orderId, $type) {
-        /* $cancelData = array('order_id' => $orderId, 'type' => 2);
-        $cancelData = json_encode($cancelData);
-        $result = DB::select('call cancelOrder(?)', [$cancelData]);
-        $reponse = json_decode($result[0]->response);
+        $cancelData = array('order_id' => $orderId, 'type' => $type);
+        $inputData = json_encode($cancelData);
+        $pdo = DB::connection()->getPdo();
+        $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, true);
+        $stmt = $pdo->prepare("CALL cancelOrder(?)");
+        $stmt->execute([$inputData]);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+        $stmt->closeCursor();
+        $reponse = json_decode($result['response']);
         if($reponse->status == "FAILURE" && $reponse->statusCode != 200) {
             return false;
         }
-        return true; */
-        $statusCancelled = 5;
+        return true;
+        /* $statusCancelled = 5;
         $statusIds = explode(',', '1');        
-        $codData = CustomerOrderDetails::select('id','product_units_id','item_quantity')->where('order_id', $orderId)->whereIn('order_status', $statusIds)->get()->toArray();
+        $codData = CustomerOrderDetails::select('id','product_units_id','item_quantity','is_basket')->where('order_id', $orderId)->whereIn('order_status', $statusIds)->get()->toArray();
         if(sizeof($codData) > 0) {
             foreach($codData as $key => $value) {
                 if($type == 1) {
@@ -93,7 +104,7 @@ class CustomerOrders extends Model
             }
             return true;
         }
-        return false;        
+        return false; */
     }
 
     public function cancelOrderAPI($params) {
@@ -103,7 +114,8 @@ class CustomerOrders extends Model
     public function placeOrder($params) {
         // validate customer
         $usersData = User::select('id')->where('id', $params['user_id'])->where('status', 1)->get()->toArray();
-        if(sizeof($usersData) == 0 || sizeof($params['products']) == 0) {
+        $userAddressData = UserAddress::select('id')->where('id', $params['delivery_details']['address']['id'])->where('user_id', $params['user_id'])->where('status', 1)->get()->toArray();
+        if(sizeof($usersData) == 0 || sizeof($params['products']) == 0 || sizeof($userAddressData) == 0) {
             return false;
         }
         // validate delivery date
@@ -111,16 +123,26 @@ class CustomerOrders extends Model
             return false;
         }
 
-        $orderAmount = $totalItemQty = 0;
+        $orderAmount = $totalItemQty = $isBasketInOrder = 0;
         // validate product
         foreach($params['products'] as $key => $value) {
             $orderAmount = $orderAmount + ((($value['special_price'] > 0) ? $value['special_price'] : $value['selling_price']) * $value['quantity']);
             $totalItemQty = $totalItemQty + $value['quantity'];
             $inputData = json_encode($value);
-            $result = DB::select('call validateProduct(?)', [$inputData]);
-            $reponse = json_decode($result[0]->response);
+            // $result = DB::select('call validateProduct(?)', [$inputData]);
+            $pdo = DB::connection()->getPdo();
+            $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, true);
+            $stmt = $pdo->prepare("CALL validateProduct(?)");
+            $stmt->execute([$inputData]);
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+            $stmt->closeCursor();
+            $reponse = json_decode($result['response']);
             if($reponse->status == "FAILURE" && $reponse->statusCode != 200) {
                 return false;
+            }
+            if($value['is_basket'] == 1) {
+                $isBasketInOrder = 1;
             }
         }
 
@@ -139,6 +161,7 @@ class CustomerOrders extends Model
             'shipping_address_id' => $params['delivery_details']['address']['id'],
             'billing_address_id' => $params['delivery_details']['address']['id'],
             'delivery_date' => $params['delivery_details']['date'],
+            'is_basket_in_order' => $isBasketInOrder,
             'created_by' => 1
         ));
         $orderId = $customerOrdersResponse->id;
@@ -146,13 +169,32 @@ class CustomerOrders extends Model
             $value['order_id'] = $orderId;
             $value['customer_id'] = $params['user_id'];
             $inputData = json_encode($value);
-            $result = DB::select('call placeOrderDetails(?)', [$inputData]);
-            $reponse = json_decode($result[0]->response);
+            /* $result = DB::select('call placeOrderDetails(?)', [$inputData]);
+            $reponse = json_decode($result[0]->response); */
+            $pdo = DB::connection()->getPdo();
+            $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, true);
+            $stmt = $pdo->prepare("CALL placeOrderDetails(?)");
+            $stmt->execute([$inputData]);
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+            $stmt->closeCursor();
+            $reponse = json_decode($result['response']);
             if($reponse->status == "FAILURE" && $reponse->statusCode != 200) {
                 $this->cancelOrder($orderId, 1);
                 return false;
             }
         }
+
+        // Assign delivery boy
+        $assignData['order_id'] = $orderId;
+        $inputData = json_encode($assignData);
+        $pdo = DB::connection()->getPdo();
+        $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, true);
+        $stmt = $pdo->prepare("CALL assignDeliveryBoyToOrder(?)");
+        $stmt->execute([$inputData]);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+        $stmt->closeCursor();
         return true;
     }
 

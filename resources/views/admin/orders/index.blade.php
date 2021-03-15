@@ -38,7 +38,7 @@
                             <td></td>
                             <td>{{ $customerOrder->id ?? '' }}</td>
                             <td><b>{{ $customerOrder->userCustomer->first_name }}</b><br>{{ $customerOrder->userCustomer->mobile_number }}</td>
-                            <td><b>{{ $customerOrder->userDeliveryBoy->first_name ?? '-' }}</b>{{ $customerOrder->userDeliveryBoy->mobile_number ?? '' }}</td>
+                            <td><b>{{ $customerOrder->userDeliveryBoy->first_name ?? '-' }}</b><br>{{ $customerOrder->userDeliveryBoy->mobile_number ?? '' }}</td>
                             <td>{{ round($customerOrder->net_amount, 2) ?? '' }}</td>
                             <td>{{ round($customerOrder->gross_amount, 2) ?? '' }}</td>
                             <td>{{ $customerOrder->payment_type ?? '' }}</td>

@@ -65,6 +65,7 @@ class CustomerOrders extends Model
         $stmt->execute([$inputData]);
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
         $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+        $stmt->closeCursor();
         $reponse = json_decode($result['response']);
         if($reponse->status == "FAILURE" && $reponse->statusCode != 200) {
             return false;

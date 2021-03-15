@@ -79,8 +79,8 @@ class CreateSpPlaceOrderDetails extends Migration
                             LEAVE basketProductUnitsLoop;
                         END IF;
         
-                        INSERT INTO customer_order_details_basket (customer_id,order_id,order_details_id,products_id,product_units_id,item_quantity,expiry_date,selling_price,special_price,special_price_start_date,special_price_end_date,is_basket,created_by)
-                        VALUES (customerId,orderId,lastInsertIdOrderDetails,productsIdNew,productUnitsId,quantity,expiryDate,sellingPrice,specialPrice,specialPriceStartDate,specialPriceEndDate,isBasket,1);
+                        INSERT INTO customer_order_details_basket (customer_id,order_id,order_details_id,products_id,product_units_id,item_quantity,expiry_date,selling_price,special_price,special_price_start_date,special_price_end_date,created_by)
+                        VALUES (customerId,orderId,lastInsertIdOrderDetails,productsIdNew,productUnitsId,quantity,expiryDate,sellingPrice,specialPrice,specialPriceStartDate,specialPriceEndDate,1);
         
                         IF LAST_INSERT_ID() > 0 THEN
                             SET lastInsertId = LAST_INSERT_ID();

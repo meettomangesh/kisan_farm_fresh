@@ -187,6 +187,7 @@ class RegisterController extends BaseController
             $success['id'] = $user->id;
             $success['role'] = $user->load('roles')->roles[0]->id;
             $success['role_name'] = $user->load('roles')->roles[0]->title;
+            $success['details'] = ($user->details) ? $user->details : (object)[];
             return $this->sendResponse($success, 'User login successfully.');
         } else {
             return $this->sendError('Unauthorised.', ['error' => 'Unauthorised']);

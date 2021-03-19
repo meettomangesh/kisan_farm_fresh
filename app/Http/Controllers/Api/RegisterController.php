@@ -185,8 +185,8 @@ class RegisterController extends BaseController
             $success['gender'] =  $user->gender;
             $success['email'] =  $user->email;
             $success['id'] = $user->id;
-            $success['role'] = $user->load('roles')->roles[0]->id;
-            $success['role_name'] = $user->load('roles')->roles[0]->title;
+            $success['role'] = ($user->load('roles')) ? $user->load('roles')->roles[0]->id : 0;
+            $success['role_name'] = ($user->load('roles')->roles) ? $user->load('roles')->roles[0]->title : "";
             $userDetails = $user->details;
             unset($userDetails->id);
             unset($userDetails->user_id);

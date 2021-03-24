@@ -177,16 +177,24 @@ class RegisterController extends BaseController
             //$token = $user->createToken(getenv('APP_NAME'));
             $tokenResult = $user->createToken(getenv('APP_NAME'));
             $tokenResult->token->expires_at = Carbon::now()->addDays(10);
+            
             $success['token'] =  $tokenResult->accessToken;
             $success['expires_at'] =  $tokenResult->token->expires_at;
+            
             $success['name'] =  $user->first_name . " " . $user->last_name;
             $success['dob'] =  $user->date_of_birth;
             $success['marital_status'] =  $user->marital_status;
             $success['gender'] =  $user->gender;
             $success['email'] =  $user->email;
             $success['id'] = $user->id;
-            $success['role'] = $user->load('roles')->roles[0]->id;
-            $success['role_name'] = $user->load('roles')->roles[0]->title;
+            $success['role'] = (!empty($user->load('roles')->roles->toArray())) ? $user->load('roles')->roles[0]->id : 0;
+            $success['role_name'] = (!empty($user->load('roles')->roles->toArray())) ? $user->load('roles')->roles[0]->title : "";
+            
+            $userDetails = $user->details;
+            unset($userDetails->id);
+            unset($userDetails->user_id);
+            unset($userDetails->role_id);
+            $success['details'] = ($user->details) ? $user->details : (object)[];
             return $this->sendResponse($success, 'User login successfully.');
         } else {
             return $this->sendError('Unauthorised.', ['error' => 'Unauthorised']);

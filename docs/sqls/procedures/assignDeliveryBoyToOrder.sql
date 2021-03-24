@@ -22,7 +22,8 @@ assignDeliveryBoyToOrder:BEGIN
     JOIN pin_code_region AS pcr ON pcr.pin_code_id = pc.id
     JOIN region_user AS ru ON ru.region_id = pcr.region_id
     JOIN region_master AS rm ON rm.id = ru.region_id
-    WHERE co.id = orderId AND co.order_status NOT IN (4,5) AND ua.status = 1 AND pc.status = 1 AND pcr.status = 1 AND ru.status = 1 AND rm.status = 1;
+    WHERE co.id = orderId AND co.order_status NOT IN (4,5) AND ua.status = 1 AND pc.status = 1 AND pcr.status = 1 AND ru.status = 1 AND rm.status = 1
+    AND IF((SELECT status FROM users WHERE id = ru.user_id) = 1, true, false);
 
     IF userId > 0 AND maxOrderCount > 0 AND (SELECT COUNT(id) FROM customer_orders WHERE order_status NOT IN (4,5) AND delivery_boy_id = userId) < maxOrderCount THEN
         UPDATE customer_orders SET delivery_boy_id = userId WHERE id = orderId;

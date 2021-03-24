@@ -129,4 +129,39 @@ class OrdersController extends BaseController
         }
         return $response;
     }
+
+    public function getOrderListForDeliveryBoy(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'platform' => 'required',
+            'user_id' => 'required|integer',
+            'no_of_records' => 'required',
+            'page_number' => 'required'
+        ]);
+        if ($validator->fails()) {
+            return $this->sendError(parent::VALIDATION_ERROR, $validator->errors());
+        }
+
+        try {
+            $params = [
+                'platform' => $request->platform,
+                'user_id' => $request->user_id,
+                'no_of_records' => $request->no_of_records,
+                'page_number' => $request->page_number
+            ];
+            $params = json_encode($params);
+            //Create order object to call functions
+            $customerOrders = new CustomerOrders();
+            // Function call to get order list
+            $responseDetails = $customerOrders->getOrderListForDeliveryBoy($params);
+            $message = 'Order list.';
+            if(sizeof($responseDetails) == 0) {
+                $message = 'No record found.';
+            }
+            $response = $this->sendResponse($responseDetails, $message);
+        } catch (Exception $e) {
+            $response = $this->sendResponse(array(), $e->getMessage());
+        }
+        return $response;
+    }
 }

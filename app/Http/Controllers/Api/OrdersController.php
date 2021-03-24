@@ -164,4 +164,36 @@ class OrdersController extends BaseController
         }
         return $response;
     }
+
+    public function changeOrderStatus(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'platform' => 'required',
+            'order_id' => 'required|integer',
+            'order_status' => 'in:3,4,5|required',
+        ]);
+        if ($validator->fails()) {
+            return $this->sendError(parent::VALIDATION_ERROR, $validator->errors());
+        }
+
+        try {
+            $params = [
+                'platform' => $request->platform,
+                'order_id' => $request->order_id,
+                'order_status' => $request->order_status,
+            ];
+            //Create order object to call functions
+            $customerOrders = new CustomerOrders();
+            // Function call to cancel order
+            $responseDetails = $customerOrders->changeOrderStatus($params);
+            $message = 'Failed to change order status.';
+            if($responseDetails) {
+                $message = 'Order status changed successfully';
+            }
+            $response = $this->sendResponse([], $message);
+        } catch (Exception $e) {
+            $response = $this->sendResponse(array(), $e->getMessage());
+        }
+        return $response;
+    }
 }

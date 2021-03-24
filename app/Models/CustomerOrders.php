@@ -291,4 +291,20 @@ class CustomerOrders extends Model
         }
         return $orderList;
     }
+
+    public function changeOrderStatus($params) {
+        $inputData = json_encode($params);
+        $pdo = DB::connection()->getPdo();
+        $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, true);
+        $stmt = $pdo->prepare("CALL changeOrderStatus(?)");
+        $stmt->execute([$inputData]);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+        $stmt->closeCursor();
+        $reponse = json_decode($result['response']);
+        if($reponse->status == "FAILURE" && $reponse->statusCode != 200) {
+            return false;
+        }
+        return true;
+    }
 }

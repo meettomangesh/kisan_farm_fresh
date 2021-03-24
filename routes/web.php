@@ -45,18 +45,18 @@ Route::group([
     Route::resource('countries', 'CountriesController');
 
     // Cities
-    
+
     Route::delete('pincodes/destroy', 'PinCodesController@massDestroy')->name('pincodes.massDestroy');
     Route::get('pincodes/getStates/{cid?}', 'PinCodesController@getStates')->name('pincodes.getStates');
     Route::get('pincodes/getCities/{cid?}/{sid?}', 'PinCodesController@getCities')->name('pincodes.getCities');
     Route::resource('pincodes', 'PinCodesController');
 
     // Cities
-    
+
     Route::delete('cities/destroy', 'CitiesController@massDestroy')->name('cities.massDestroy');
     Route::get('cities/getStates/{cid?}', 'CitiesController@getStates')->name('cities.getStates');
     Route::resource('cities', 'CitiesController');
-    
+
     // Regions
 
     Route::delete('regions/destroy', 'RegionsController@massDestroy')->name('regions.massDestroy');
@@ -109,16 +109,17 @@ Route::group([
     Route::delete('baskets/destroy', 'BasketsController@massDestroy')->name('baskets.massDestroy');
     Route::resource('baskets', 'BasketsController');
 
-        
+    // Communications
+    Route::delete('communications/destroy', 'UserCommunicationMessagesController@massDestroy')->name('communications.massDestroy');
+    Route::resource('communications', 'UserCommunicationMessagesController');
 
     // Orders
     // Route::delete('orders/destroy', 'OrdersController@massDestroy')->name('orders.massDestroy');
     Route::get('orders/cancelOrder/{cid?}', 'OrdersController@cancelOrder')->name('orders.cancelOrder');
     Route::resource('orders', 'OrdersController');
-
 });
 Route::group(['prefix' => 'profile', 'as' => 'profile.', 'namespace' => 'Auth', 'middleware' => ['auth']], function () {
-// Change password
+    // Change password
     if (file_exists(app_path('Http/Controllers/Auth/ChangePasswordController.php'))) {
         Route::get('password', 'ChangePasswordController@edit')->name('password.edit');
         Route::post('password', 'ChangePasswordController@update')->name('password.update');

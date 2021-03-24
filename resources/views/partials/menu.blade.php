@@ -216,7 +216,16 @@
                 </a>
             </li>
             @endcan
-  
+
+            @can('communication_access')
+            <li class="nav-item">
+                <a href="{{ route("admin.communications.index") }}" class="nav-link {{ request()->is('admin/communications') || request()->is('admin/communications/*') ? 'active' : '' }}">
+                    <i class="fa-fw fas fa-cogs nav-icon"></i>
+                    {{ trans('cruds.communication.title') }}
+                </a>
+            </li>
+            @endcan
+            
             @if(file_exists(app_path('Http/Controllers/Auth/ChangePasswordController.php')))
             @can('profile_password_edit')
             <li class="nav-item">

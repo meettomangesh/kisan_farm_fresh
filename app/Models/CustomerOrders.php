@@ -244,4 +244,67 @@ class CustomerOrders extends Model
         }
         return $orderList;
     }
+
+    public function getOrderListForDeliveryBoy($params) {
+        $queryResult = DB::select('call getOrderListForDeliveryBoy(?)', [$params]);
+        // $result = collect($queryResult);
+        $orderList = [];
+        if(sizeof($queryResult) > 0) {
+            foreach($queryResult as $key => $val) {
+                $orders["order_id"] = $val->id;
+                $orders["delivery_details"] = array(
+                    "date" => $val->delivery_date,
+                    "slot" => "",
+                    "order_status" => $val->order_status,
+                    "address" => array(
+                        "name" => $val->ua_user_name,
+                        "address" => $val->address,
+                        "landmark" => $val->landmark,
+                        "pin_code" => $val->pin_code,
+                        "area" => $val->area,
+                        "city_name" => $val->city_name,
+                        "state_name" => $val->state_name,
+                        "is_primary" => $val->is_primary,
+                        "mobile_number" => $val->mobile_number
+                    ),
+                    "delivery_boy_name" => $val->delivery_boy_name
+                );
+                $orders["payment_details"] = array(
+                    "type" => $val->payment_type,
+                    "net_amount" => round($val->net_amount, 2),
+                    "gross_amount" => round($val->gross_amount, 2),
+                    "discounted_amount" => round($val->discounted_amount, 2),
+                    "order_id" => "",
+                    "bill_no" => "",
+                    "total_items" => $val->total_items,
+                );
+                $orderList[$key] = $orders;
+                $inputData = array('order_id' => $val->id, 'user_id' => $val->customer_id);
+                $inputData = json_encode($inputData);
+                $orderDetails = DB::select('call getOrderDetails(?)', [$inputData]);
+                if(sizeof($orderDetails) > 0) {
+                    $orderList[$key]["products"] = $orderDetails;
+                } else {
+                    unset($orderList[$key]);
+                }
+            }
+        }
+        return $orderList;
+    }
+
+    public function changeOrderStatus($params) {
+        $inputData = json_encode($params);
+        $pdo = DB::connection()->getPdo();
+        $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, true);
+        $stmt = $pdo->prepare("CALL changeOrderStatus(?)");
+        $stmt->execute([$inputData]);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+        $stmt->closeCursor();
+        $reponse = json_decode($result['response']);
+        if($reponse->status == "FAILURE" && $reponse->statusCode != 200) {
+            return false;
+        }
+        return true;
+    }
 }

@@ -34,12 +34,16 @@ class UserCommunicationMessagesController extends Controller
     public function create()
     {
         abort_if(Gate::denies('communication_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-
+        $loyaltyTierIdsNames=[];
+        $merchantListData = [];
+        $deepLinkScreeningData = [];
+        $deepLinkScreeningDataGolbal = [];
+        $deepLinkScreeningDataGolbalList = [];
         //$roles = Role::all()->pluck('title', 'id');
         $roles = Role::all()->whereNotIn('title', ['Delivery Boy', 'Customer'])->pluck('title', 'id');
 
 
-        return view('admin.communications.create', compact('roles'));
+        return view('admin.communications.create', compact('roles','loyaltyTierIdsNames','merchantListData','deepLinkScreeningData','deepLinkScreeningDataGolbal','deepLinkScreeningDataGolbalList'));
     }
 
     public function store(StoreUserRequest $request)

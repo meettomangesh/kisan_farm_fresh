@@ -171,6 +171,7 @@ class OrdersController extends BaseController
             'platform' => 'required',
             'order_id' => 'required|integer',
             'order_status' => 'in:3,4,5|required',
+            'order_note' => 'required',
         ]);
         if ($validator->fails()) {
             return $this->sendError(parent::VALIDATION_ERROR, $validator->errors());
@@ -181,6 +182,7 @@ class OrdersController extends BaseController
                 'platform' => $request->platform,
                 'order_id' => $request->order_id,
                 'order_status' => $request->order_status,
+                'order_note' => $request->order_note,
             ];
             //Create order object to call functions
             $customerOrders = new CustomerOrders();

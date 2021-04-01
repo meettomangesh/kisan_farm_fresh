@@ -25,9 +25,19 @@ return [
     ],
 
     'ses' => [
-        'key' => env('AWS_ACCESS_KEY_ID'),
-        'secret' => env('AWS_SECRET_ACCESS_KEY'),
-        'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
+       // 'key' => env('AWS_ACCESS_KEY_ID'),
+       // 'secret' => env('AWS_SECRET_ACCESS_KEY'),
+       // 'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
+        
+        'key'    => env('SES_KEY', ''),
+        'secret' => env('SES_KEY_SECRET', ''),
+        'region' => env('SES_REGION', 'ap-south-1'),
+        'host' => env('SES_EMAIL_HOST', 'email-smtp.ap-south-1.amazonaws.com'),
+        'email' => env('SES_SENDER_EMAIL', ''),
+        'username'=> env('SES_USERNAME', ''),
+        'password'=> env('SES_PASSWORD', ''),
+        'fromname'=> env('SES_FROM_NAME', ''),
+
     ],
 
 ];

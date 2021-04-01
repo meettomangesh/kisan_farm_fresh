@@ -4,6 +4,7 @@ CREATE PROCEDURE changeOrderStatus(IN inputData JSON)
 changeOrderStatus:BEGIN
     DECLARE orderId,codId,notFound INTEGER(10) DEFAULT 0;
     DECLARE orderStatus TINYINT(1) DEFAULT 0;
+    DECLARE orderNote VARCHAR(255) DEFAULT NULL;
 
     IF inputData IS NOT NULL AND JSON_VALID(inputData) = 0 THEN
         SELECT JSON_OBJECT('status', 'FAILURE', 'message', 'Please provide valid data.','data',JSON_OBJECT(),'statusCode',520) AS response;
@@ -11,6 +12,7 @@ changeOrderStatus:BEGIN
     END IF;
     SET orderId = JSON_UNQUOTE(JSON_EXTRACT(inputData,'$.order_id'));
     SET orderStatus = JSON_UNQUOTE(JSON_EXTRACT(inputData,'$.order_status'));
+    SET orderNote = JSON_UNQUOTE(JSON_EXTRACT(inputData,'$.order_note'));
 
     IF orderId = 0 AND orderStatus = 0 THEN
         SELECT JSON_OBJECT('status', 'FAILURE', 'message', 'Please provide valid data.','data',JSON_OBJECT(),'statusCode',520) AS response;
@@ -36,7 +38,7 @@ changeOrderStatus:BEGIN
         CLOSE orderCursor;
     END block1;
 
-    UPDATE customer_orders SET order_status = orderStatus WHERE id = orderId;
+    UPDATE customer_orders SET order_status = orderStatus, reject_cancel_reason = orderNote WHERE id = orderId;
 
     SELECT JSON_OBJECT('status', 'SUCCESS', 'message', 'Order status changed successfully.','data',JSON_OBJECT(),'statusCode',200) AS response;
     LEAVE changeOrderStatus;

@@ -30,322 +30,56 @@ siteObjJs.admin.communicationMessageJs = function () {
     };
     // Method to fetch and place edit form with data using ajax call
 
-    var fetchDataForEdit = function () {
-        $('body').on('click', '.edit-form-link', function () {
-            var cat_id = $(this).attr("id");
-            var actionUrl = 'customer-communication-message/' + cat_id + '/edit';
-            CKEDITOR.instances.email_body.destroy(true);
-            $('#edit-communication').find('#email_tags').tagsinput('removeAll');
-            $.ajax({
-                url: actionUrl,
-                cache: false,
-                dataType: "json",
-                type: "GET",
-                success: function (data) {
-                    $("#edit_form").html(data.form);
-                    $('#edit-communication').find('#send-email-btn').prop('disabled', true);
-                    $('#edit-communication').find('#send-sms-btn').prop('disabled', true);
-                    $('#edit-communication').find('#test_email_addresses').val('');
-                    $('#edit-communication').find('#test_mobile_numbers').val('');
-                    if (data.message_data.test_mode == 1) {
-                        $('#edit-communication').find('#testing-mode-div').show();
-                    } else {
-                        $('#edit-communication').find('#testing-mode-div').hide();
-                    }
-                    $("#edit_form").find("input#email_tags").tagsinput('refresh');
-                    $('#edit_form .select2me').select2({
-                        placeholder: "Select",
-                        allowClear: true
-                    });
-                    $('form').find('input:radio').uniform();
-                    //  if (data.message_data.merchant_id != 0) {
-                    // $('#edit-communication').find('#loyalty_id').attr('disabled', false);
-                    // $('#edit-communication').find('#loyalty_tier_id').attr('disabled', false);
-                    if (data.message_data.message_type == 1) {
-                        $('#edit-communication').find('#offer_id').attr('disabled', false);
-                        $('#edit-communication').find('#offer_id').select2('val', data.message_data.offer_id);
-                    } else if (data.message_data.message_type == 2) {
-                        $('#edit-communication').find('#offer_id').attr('disabled', true);
-                        $('#edit-communication').find('#product_id').attr('disabled', true);
-                    } else if (data.message_data.message_type == 3) {
-                        $('#edit-communication').find('#offer_id').attr('disabled', true);
-                        $('#edit-communication').find('#product_id').attr('disabled', false);
-                        $('#edit-communication').find('#product_id').select2('val', data.message_data.offer_id);
-                    }
-                    // }                   
-                    if (data.message_data.push_text != '') {
-                        $('#edit-communication').find('#push-text-div').show();
+    var fetchDataForEdit = function (obj) {
+        console.log('fetchDataForEdit', obj);
+        if (obj === 'edit-communication') {
+            var regionTypeFlag = $('#' + obj).find('input[name="region_type"]:checked').val();
+            var userTypeFlag = $('#' + obj).find('input[name="user_type"]:checked').val();
+            var emailFlag = $('#' + obj).find('input[id="email"]:checked').val();
+            var smsFlag = $('#' + obj).find('input[id="sms"]:checked').val();
+            var pushFlag = $('#' + obj).find('input[id="push_notification"]:checked').val();
 
-                        //deep link screen disable for merchant offer
-                        $('#edit-communication').find('#deep_link_screen').prop('disabled', false);
-                        if (data.message_data.push_text != '') {
-                            if (data.message_data.message_type == 1) {
-                                if ($('#edit-communication').find('#deep_link_screen option[value="MERCHANT_OFFERS"]').length > 0) {
-                                    $('#edit-communication').find('#deep_link_screen').select2('val', 'MERCHANT_OFFERS');
-                                    $('#edit-communication').find('#deep_link_screen').prop('disabled', true);
-                                } else {
-                                    $('#edit-communication').find('#deep_link_screen').prop('disabled', false);
-                                    $('#edit-communication').find('#deep_link_screen').select2('val', data.message_data.deep_link_screen);
-                                }
-                            } else if (data.message_data.message_type == 3) {
-                                if ($('#edit-communication').find('#deep_link_screen option[value="MERCHANT_SHOP"]').length > 0) {
-                                    $('#edit-communication').find('#deep_link_screen').select2('val', 'MERCHANT_SHOP');
-                                    $('#edit-communication').find('#deep_link_screen').prop('disabled', true);
-                                } else {
-                                    $('#edit-communication').find('#deep_link_screen').prop('disabled', false);
-                                    $('#edit-communication').find('#deep_link_screen').select2('val', data.message_data.deep_link_screen);
-                                }
-                            } else {
-                                $('#edit-communication').find('#deep_link_screen').prop('disabled', false);
-                                $('#edit-communication').find('#deep_link_screen').select2('val', data.message_data.deep_link_screen);
-                            }
-                        }
-                    }
+            if (regionTypeFlag === '2') {
+                $('#' + obj).find('#region-selection-div').show();
+            } else {
+                $('#' + obj).find('#region-selection-div').hide();
+            }
 
-                    if (data.message_data.sms_text != '') {
-                        $('#edit-communication').find('#sms-text-div').show();
-                    }
-
-                    if ((data.message_data.sms == '1') || (data.message_data.sms_notification == '1')) {
-                        $('#edit-communication').find('#send-sms-btn').prop('disabled', false);
-                        //deep link screen disable for merchant offer
-                        $('#edit-communication').find('#deep_link_screen').prop('disabled', false);
-                        if (data.message_data.sms_notification != '') {
-                            if (data.message_data.message_type == 1) {
-                                if ($('#edit-communication').find('#deep_link_screen option[value="MERCHANT_OFFERS"]').length > 0) {
-                                    $('#edit-communication').find('#deep_link_screen').select2('val', 'MERCHANT_OFFERS');
-                                    $('#edit-communication').find('#deep_link_screen').prop('disabled', true);
-                                } else {
-                                    $('#edit-communication').find('#deep_link_screen').prop('disabled', false);
-                                    $('#edit-communication').find('#deep_link_screen').select2('val', data.message_data.deep_link_screen);
-                                }
-                            } else if (data.message_data.message_type == 3) {
-                                if ($('#edit-communication').find('#deep_link_screen option[value="MERCHANT_SHOP"]').length > 0) {
-                                    $('#edit-communication').find('#deep_link_screen').select2('val', 'MERCHANT_SHOP');
-                                    $('#edit-communication').find('#deep_link_screen').prop('disabled', true);
-                                } else {
-                                    $('#edit-communication').find('#deep_link_screen').prop('disabled', false);
-                                    $('#edit-communication').find('#deep_link_screen').select2('val', data.message_data.deep_link_screen);
-                                }
-                            } else {
-                                $('#edit-communication').find('#deep_link_screen').prop('disabled', false);
-                                $('#edit-communication').find('#deep_link_screen').select2('val', data.message_data.deep_link_screen);
-                            }
-                        }
-                    } else {
-                        $('#edit-communication').find('#send-sms-btn').prop('disabled', true);
-                    }
-
-                    if (data.message_data.email == '1') {
-                        $('#edit-communication').find('#email').prop('checked', true);
-                        $('#edit-communication').find('#email-div').show();
-                        //send test email sms btn enable disable conditions                        
-                        $('#edit-communication').find('#send-email-btn').prop('disabled', false);
-                    } else {
-                        $('#edit-communication').find('#email-div').hide();
-                    }
-                    if (data.message_data.push_notification == '1') {
-                        $('#edit-communication').find('#push_notification').prop('checked', true);
-                        $('#edit-communication').find('#sms_notification').attr("disabled", true);
-                    }
-                    if (data.message_data.sms == '1') {
-                        $('#edit-communication').find('#sms').prop('checked', true);
-                        $('#edit-communication').find('#sms_notification').attr("disabled", true);
-                    }
-                    if (data.message_data.sms_notification == '1') {
-                        $('#edit-communication').find('#sms_notification').prop('checked', true);
-                        $('#edit-communication').find('#push_notification').attr("disabled", true);
-                        $('#edit-communication').find('#sms').attr("disabled", true);
-
-                    }
-
-                    if (data.message_data.test_mode == '1') {
-                        $('#edit-communication').find('#for_testing option[value="1"]').prop("selected", true);
-                        $('#edit-communication').find('#testing-mode-div').show();
-                        $('#edit-communication').find('#test_email_addresses').val(data.message_data.test_email_address);
-                        $('#edit-communication').find('#test_mobile_numbers').val(data.message_data.test_mobile_number);
-                    }
-                    handleBootstrapMaxlength();
-                    handleDatePicker();
-                    handleTimePickers();
-
-                    getMerchantLoyaltyProgram('edit-communication');
-                    getMerchantLoyaltyOfferData('edit-communication');
-                    showEmailFormDiv('edit-communication');
-                    showSmsFormDiv('edit-communication');
-                    showNotificationsFormDiv('edit-communication');
-                    showSmsAndNotificationsFormDiv('edit-communication');
-                    sendTodayDiv('edit-communication');
-                    sendTestSms('edit-communication');
-                    sendTestEmail('edit-communication');
-                    changeMessageType('edit-communication');
-                    enableTestingModeDiv('edit-communication');
+            if (userTypeFlag === '2') {
+                $('#' + obj).find('#user-selection-div').show();
+            } else {
+                $('#' + obj).find('#user-selection-div').hide();
+            }
+            if ($('#' + obj).find('#email').is(":checked")) {
+                $('#' + obj).find('#email-div').show();
+            } else {
+                $('#' + obj).find('#email-div').hide();
+            }
+            if ($('#' + obj).find('#sms').is(":checked")) {
+                $('#' + obj).find('#sms-text-div').show();
+            } else {
+                $('#' + obj).find('#sms-text-div').hide();
+            }
+            if ($('#' + obj).find('#push_notification').is(":checked")) {
+                $('#' + obj).find('#push-text-div').show();
+            } else {
+                $('#' + obj).find('#push-text-div').hide();
+            }
 
 
-
-                    $('#edit-communication').find('#message_send_time').val(data.message_data.message_send_date);
-                    $('#edit-communication').find('#today_time').val(data.message_data.message_send_time);
-
-                    if (typeof (CKEDITOR.instances.email_body) == "object") {
-                        CKEDITOR.instances.email_body.destroy(true);
-                        CKEDITOR.replaceAll("ckeditor");
-                    } else {
-
-                        CKEDITOR.replaceAll("ckeditor");
-                    }
-
-                    $('body').on('click', '#email', function (e) {
-                        if ($(this).is(":checked")) {
-                            $('#edit-communication').find('#email-div').show();
-                        } else {
-                            $('#edit-communication').find('#email-div').hide();
-                        }
-                    });
-
-                    $('body').on('click', '#push_notification', function (e) {
-                        if ($(this).is(":checked") || $('#edit-communication').find('#sms_notification').is(":checked")) {
-                            $('#edit-communication').find('#push-text-div').show();
-                            //deep link screen disable for merchant offer
-                            $('#edit-communication').find('#deep_link_screen').prop('disabled', false);
-                            $('#edit-communication').find("input:radio[name='message_type']").each(function () {
-                                if ($(this).parent().hasClass('checked')) {
-                                    if ($(this).attr("value") == 1) {
-                                        if ($('#edit-communication').find('#deep_link_screen option[value="MERCHANT_OFFERS"]').length > 0) {
-                                            $('#edit-communication').find('#deep_link_screen').select2('val', 'MERCHANT_OFFERS');
-                                            $('#edit-communication').find('#deep_link_screen').prop('disabled', true);
-                                        } else {
-                                            $('#edit-communication').find('#deep_link_screen').prop('disabled', false);
-                                            $('#edit-communication').find('#deep_link_screen').select2('val', '');
-                                        }
-                                    } else if ($(this).attr("value") == 3) {
-                                        if ($('#edit-communication').find('#deep_link_screen option[value="MERCHANT_SHOP"]').length > 0) {
-                                            $('#edit-communication').find('#deep_link_screen').select2('val', 'MERCHANT_SHOP');
-                                            $('#edit-communication').find('#deep_link_screen').prop('disabled', true);
-                                        } else {
-                                            $('#edit-communication').find('#deep_link_screen').prop('disabled', false);
-                                            $('#edit-communication').find('#deep_link_screen').select2('val', '');
-                                        }
-                                    } else {
-                                        $('#edit-communication').find('#deep_link_screen').prop('disabled', false);
-                                        $('#edit-communication').find('#deep_link_screen').select2('val', '');
-                                    }
-
-                                }
-                            });
-                        } else if ($('#edit-communication').find('#push_notification').is(":checked") || $('#edit-communication').find('#sms').is(":checked")) {
-                            $('#edit-communication').find('#push-text-div').hide();
-                        } else {
-                            $('#edit-communication').find('#push-text-div').hide();
-                        }
-                    });
-
-                    $('body').on('click', '#sms', function (e) {
-                        if ($(this).is(":checked") || $('#edit-communication').find('#sms_notification').is(":checked")) {
-                            $('#edit-communication').find('#sms-text-div').show();
-                        } else if ($('#edit-communication').find('#push_notification').is(":checked") || $('#edit-communication').find('#sms').is(":checked")) {
-                            $('#edit-communication').find('#sms-text-div').hide();
-                        } else {
-                            $('#edit-communication').find('#sms-text-div').hide();
-                        }
-                    });
-
-                    $('body').on('click', '#sms_notification', function (e) {
-                        if ($(this).is(":checked") || ($('#edit-communication').find('#push_notification').is(":checked") && $('#edit-communication').find('#sms').is(":checked"))) {
-                            $('#edit-communication').find('#push-text-div').show();
-                            //deep link screen disable for merchant offer
-                            $('#edit-communication').find('#deep_link_screen').prop('disabled', false);
-                            $('#edit-communication').find("input:radio[name='message_type']").each(function () {
-                                if ($(this).parent().hasClass('checked')) {
-                                    if ($(this).attr("value") == 1) {
-                                        if ($('#edit-communication').find('#deep_link_screen option[value="MERCHANT_OFFERS"]').length > 0) {
-                                            $('#edit-communication').find('#deep_link_screen').select2('val', 'MERCHANT_OFFERS');
-                                            $('#edit-communication').find('#deep_link_screen').prop('disabled', true);
-                                        } else {
-                                            $('#edit-communication').find('#deep_link_screen').prop('disabled', false);
-                                            $('#edit-communication').find('#deep_link_screen').select2('val', '');
-                                        }
-                                    } else if ($(this).attr("value") == 3) {
-                                        if ($('#edit-communication').find('#deep_link_screen option[value="MERCHANT_SHOP"]').length > 0) {
-                                            $('#edit-communication').find('#deep_link_screen').select2('val', 'MERCHANT_SHOP');
-                                            $('#edit-communication').find('#deep_link_screen').prop('disabled', true);
-                                        } else {
-                                            $('#edit-communication').find('#deep_link_screen').prop('disabled', false);
-                                            $('#edit-communication').find('#deep_link_screen').select2('val', '');
-                                        }
-                                    } else {
-                                        $('#edit-communication').find('#deep_link_screen').prop('disabled', false);
-                                        $('#edit-communication').find('#deep_link_screen').select2('val', '');
-                                    }
-
-                                }
-                            });
-                            $('#edit-communication').find('#deep_link_screen').prop('disabled', false);
-                            $('#edit-communication').find("input:radio[name='message_type']").each(function () {
-                                if ($(this).parent().hasClass('checked')) {
-                                    if ($(this).attr("value") == 1) {
-                                        $('#edit-communication').find('#deep_link_screen').val('MERCHANT_OFFERS');
-                                        $('#edit-communication').find('#deep_link_screen').prop('disabled', true);
-                                    } else if ($(this).attr("value") == 3) {
-                                        $('#edit-communication').find('#deep_link_screen').val('MERCHANT_SHOP');
-                                        $('#edit-communication').find('#deep_link_screen').prop('disabled', true);
-                                    } else {
-                                        $('#edit-communication').find('#deep_link_screen').prop('disabled', false);
-                                    }
-
-                                }
-                            });
-
-                            $('#edit-communication').find('#sms-text-div').show();
-                        } else {
-                            $('#edit-communication').find('#push-text-div').hide();
-                            $('#edit-communication').find('#sms-text-div').hide();
-                        }
-                    });
-
-                    $('body').on('change', '#for_testing', function (e) {
-                        if ($('#edit-communication').find('#for_testing').val() == 1) {
-                            $('#edit-communication').find('#testing-mode-div').show();
-                        } else {
-                            $('#edit-communication').find('#test_email_addresses').val('');
-                            $('#edit-communication').find('#test_mobile_numbers').val('');
-                            $('#edit-communication').find('#testing-mode-div').hide();
-                        }
-                    });
-
-                    $.uniform.update();
-                    //CKEDITOR.instances.email_body.setData( data.message_data.email_body );
-                    siteObjJs.validation.formValidateInit('#edit-communication', handleEditAjaxRequest);
-
-                },
-                error: function (jqXhr, json, errorThrown) {
-                    var errors = jqXhr.responseJSON;
-                    var errorsHtml = '';
-                    $.each(errors, function (key, value) {
-                        errorsHtml += value[0] + '<br />';
-                    });
-                    // alert(errorsHtml, "Error " + jqXhr.status + ': ' + errorThrown);
-                    Metronic.alert({
-                        type: 'danger',
-                        message: errorsHtml,
-                        container: $('#ajax-response-text'),
-                        place: 'prepend',
-                        closeInSeconds: siteObjJs.admin.commonJs.constants.alertCloseSec
-                    });
-                }
-            });
-        });
+        }
     };
 
-    var handleEditAjaxRequest = function () {
-        var formElement = $(this.currentForm); // Retrive form from DOM and convert it to jquery object
-        var actionUrl = formElement.attr("action");
-        var actionType = formElement.attr("method");
-        var formData = formElement.serialize();
-        var icon = "check";
-        var messageType = "success";
-        if ($('#edit-communication').find('#email').is(':checked') || $('#edit-communication').find('#push_notification').is(':checked') || $('#edit-communication').find('#sms').is(':checked') || $('#edit-communication').find('#sms_notification').is(':checked')) {
 
+
+    // method to handle add ajax request and reponse
+    var handleAjaxRequest = function (form, e) {
+
+        var currentForm1 = $(form);
+        if (currentForm1.find('#email').is(':checked') || currentForm1.find('#push_notification').is(':checked') || currentForm1.find('#sms').is(':checked') || currentForm1.find('#sms_notification').is(':checked')) {
+            
         } else {
+            
             var error = 'Please select atleast one Message Notify By.';
             Metronic.alert({
                 type: 'danger',
@@ -358,244 +92,30 @@ siteObjJs.admin.communicationMessageJs = function () {
             return false;
         }
 
-        var formData = new FormData();
-        // formData.append('merchant_id', $('#edit-communication').find('#merchant_id').val());
-        // formData.append('loyalty_id', $('#edit-communication').find('#loyalty_id').val());
-        // formData.append('loyalty_tier_id', $('#edit-communication').find('#loyalty_tier_id').val());
-
-        var defaultEmail = 0;
-        if ($('#edit-communication').find('#email').is(':checked')) {
-            defaultEmail = 1;
-            $('#edit-communication').find('#send-email-btn').prop('disabled', false);
-            if (($('#edit-communication').find('#for_testing').val() == 1) && ($('#edit-communication').find('#test_email_addresses').val() == '')) {
-                var error = 'Please enter test email.';
-                Metronic.alert({
-                    type: 'danger',
-                    icon: 'times',
-                    message: error,
-                    container: $('#ajax-response-text'),
-                    place: 'prepend',
-                    closeInSeconds: siteObjJs.admin.commonJs.constants.alertCloseSec
-                });
-                return false;
-            }
-        }
-        formData.append('email', defaultEmail);
-
-        var defaultPushNotification = 0;
-        if ($('#edit-communication').find('#push_notification').is(':checked')) {
-            defaultPushNotification = 1;
-        }
-        formData.append('push_notification', defaultPushNotification);
-        formData.append('deep_link_screen', $('#edit-communication').find('#deep_link_screen').val());
-
-        var defaultSms = 0;
-        if ($('#edit-communication').find('#sms').is(':checked')) {
-            defaultSms = 1;
-            $('#edit-communication').find('#send-sms-btn').prop('disabled', false);
-            if (($('#edit-communication').find('#for_testing').val() == 1) && ($('#edit-communication').find('#test_mobile_numbers').val() == '')) {
-                var error = 'Please enter test mobile number.';
-                Metronic.alert({
-                    type: 'danger',
-                    icon: 'times',
-                    message: error,
-                    container: $('#ajax-response-text'),
-                    place: 'prepend',
-                    closeInSeconds: siteObjJs.admin.commonJs.constants.alertCloseSec
-                });
-                return false;
-            }
-        }
-        formData.append('sms', defaultSms);
-
-        var defaultSmsNotification = 0;
-        if ($('#edit-communication').find('#sms_notification').is(':checked')) {
-            defaultSmsNotification = 1;
-            $('#edit-communication').find('#send-sms-btn').prop('disabled', false);
-            if (($('#edit-communication').find('#for_testing').val() == 1) && ($('#edit-communication').find('#test_mobile_numbers').val() == '')) {
-                var error = 'Please enter test mobile number.';
-                Metronic.alert({
-                    type: 'danger',
-                    icon: 'times',
-                    message: error,
-                    container: $('#ajax-response-text'),
-                    place: 'prepend',
-                    closeInSeconds: siteObjJs.admin.commonJs.constants.alertCloseSec
-                });
-                return false;
-            }
-        }
-        formData.append('sms_notification', defaultSmsNotification);
-
-        var defaultMessageType = 0;
-        var radioMessageValue = $('#edit-communication').find("input[name='message_type']:checked").val();
-        if (radioMessageValue == 1) {
-            defaultMessageType = 1;
-        } else if (radioMessageValue == 2) {
-            defaultMessageType = 2;
-        } else if (radioMessageValue == 3) {
-            defaultMessageType = 3;
-        }
-        formData.append('message_title', $('#edit-communication').find('#message_title').val());
-        formData.append('message_type', defaultMessageType);
-        formData.append('offer_id', $('#edit-communication').find('#offer_id').val());
-        formData.append('product_id', $('#edit-communication').find('#product_id').val());
-        formData.append('push_text', $('#edit-communication').find('#push_text').val());
-        formData.append('sms_text', $('#edit-communication').find('#sms_text').val());
-        //formData.append('image_url', $('#edit-communication').find('#image_url').val());
-        formData.append('email_from_name', $('#edit-communication').find('#email_from_name').val());
-        formData.append('email_from_email', $('#edit-communication').find('#email_from_email').val());
-        formData.append('email_subject', $('#edit-communication').find('#email_subject').val());
-        //formData.append('email_body', $('#edit-communication').find('#email_body').val());
-        var emailBody = CKEDITOR.instances.email_body.getData()
-        formData.append('email_body', emailBody);
-        formData.append('message_send_time', $('#edit-communication').find('#message_send_time').val());
-        var defaultTodayTime = 0;
-        if ($('#edit-communication').find('#send_today').is(':checked')) {
-            defaultTodayTime = 1;
-
-        }
-        formData.append('send_today', defaultTodayTime);
-        formData.append('today_time', $('#edit-communication').find('#today_time').val());
-
-        var defaultStatus = 0;
-        var radioStatus = $('#edit-communication').find("input[name='status']:checked").val();
-        if (radioStatus == 1) {
-            defaultStatus = 1;
-        } else if (radioStatus == 0) {
-            defaultStatus = 0;
-        }
-        formData.append('status', defaultStatus);
-
-        formData.append('for_testing', $('#edit-communication').find('#for_testing').val());
-        formData.append('test_email_addresses', $('#edit-communication').find('#test_email_addresses').val());
-        formData.append('test_mobile_numbers', $('#edit-communication').find('#test_mobile_numbers').val());
-
-        var tags = $('#edit-communication').find("input#email_tags").tagsinput('items');
-        formData.append('email_tags', tags);
-
-
-        $.ajax(
-            {
-                url: actionUrl,
-                type: 'POST',
-                data: formData,
-                cache: false,
-                processData: false,
-                contentType: false,
-                "headers": { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
-                success: function (data) {
-                    //data: return data from server
-                    if (data.status === "error") {
-                        icon = "times";
-                        messageType = "danger";
-                    }
-
-                    //Empty the form fields
-                    $("#ajax-response-text").html("");
-
-                    $('.form-group').removeClass('has-error');
-                    $('.form-group').removeClass('has-success');
-                    $('.help-block-error').remove();
-
-                    formElement.find('#push-text-div').hide();
-                    formElement.find('#sms-text-div').hide();
-                    formElement.find('#testing-mode-div').hide();
-
-                    var $el = formElement.find("#loyalty_id");
-                    $el.empty(); // remove old options
-                    $el.append($('<option>', {
-                        value: '',
-                        text: 'Select Loyalty',
-                    }));
-                    var $elt = formElement.find("#loyalty_tier_id");
-                    $elt.empty(); // remove old options
-                    $elt.append($('<option>', {
-                        value: '',
-                        text: 'Select Loyalty Tier',
-                    }));
-                    var $elo = formElement.find("#offer_id");
-                    $elo.empty(); // remove old options
-                    $elo.append($('<option>', {
-                        value: '',
-                        text: 'Select Offer',
-                    }));
-                    formElement.find("input[type=text], textarea").val("");
-                    // formElement.find("#merchant_id").select2("val", "");
-                    // formElement.find("#loyalty_id").select2("val", "");
-                    // formElement.find("#loyalty_tier_id").select2("val", "");
-                    formElement.find("#offer_id").select2("val", "");
-
-                    formElement.find('#loyalty_id').attr('disabled', true);
-                    formElement.find('#loyalty_tier_id').attr('disabled', true);
-                    formElement.find('#offer_id').attr('disabled', true);
-                    formElement.find("input[name=message_type][value=1]").prop('checked', 'checked');
-                    formElement.find("input[name=status][value=1]").prop('checked', 'checked');
-                    $.uniform.update();
-                    //formElement.find('#offer_image_url').empty();
-
-                    // formElement.find('#merchant_id option[value="0"]').prop("selected", true);
-                    var validator = formElement.validate();
-                    validator.resetForm();
-                    formElement[0].reset();
-
-                    //trigger cancel button click event to collapse form and show title of add page
-                    $('.edit-form-main').hide();
-                    $('.add-form-main').show();
-
-                    $('.collapse.box-expand-form').trigger('click');
-                    //reload the data in the datatable
-                    grid.getDataTable().ajax.reload();
-                    Metronic.alert({
-                        type: messageType,
-                        icon: icon,
-                        message: data.message,
-                        container: $('#ajax-response-text'),
-                        place: 'prepend',
-                        closeInSeconds: siteObjJs.admin.commonJs.constants.alertCloseSec
-                    });
-
-                    /*setTimeout(function () {
-                     window.location.href = document.URL;
-                     }, 2000);*/
-
-                },
-                error: function (jqXhr, json, errorThrown) {
-                    var errors = jqXhr.responseJSON;
-                    var errorsHtml = '';
-                    $.each(errors, function (key, value) {
-                        errorsHtml += value[0] + '<br />';
-                    });
-                    //alert(errorsHtml, "Error " + jqXhr.status + ': ' + errorThrown);
-                    Metronic.alert({
-                        type: 'danger',
-                        message: errorsHtml,
-                        container: $('#ajax-response-text'),
-                        place: 'prepend',
-                        closeInSeconds: siteObjJs.admin.commonJs.constants.alertCloseSec
-                    });
-                }
-            }
-        );
+        form.submit();
+        //$('ol').append('<li>' + $(form[0]).val() + '</li>');
+        // validator = form.validate();
+        // validator.resetForm();
+        // validator.showErrors({ field: 'Validation failed'} );
+        // console.log('inside handler');
     };
+    var handleAjaxRequest2 = function (obj, e) {
 
-    // method to handle add ajax request and reponse
-
-    var handleAjaxRequest = function (obj,e) {
-        
-        // var formElement = $(this.currentForm); // Retrive form from DOM and convert it to jquery object
-        // var actionUrl = formElement.attr("action");
+        var formElement = $(this.currentForm); // Retrive form from DOM and convert it to jquery object
+         var actionUrl = formElement.attr("action");
         // var actionType = formElement.attr("method");
         // var formData = formElement.serialize();
         // var formObj = $('#merchant_id').closest("form");
         // var currentForm1 = formObj.attr("id");
-        currentForm1 = obj;
+      
+        currentForm1 = $(obj);
         var icon = "check";
         var messageType = "success";
 
         if (currentForm1.find('#email').is(':checked') || currentForm1.find('#push_notification').is(':checked') || currentForm1.find('#sms').is(':checked') || currentForm1.find('#sms_notification').is(':checked')) {
-
+            
         } else {
+            
             var error = 'Please select atleast one Message Notify By.';
             Metronic.alert({
                 type: 'danger',
@@ -608,10 +128,13 @@ siteObjJs.admin.communicationMessageJs = function () {
             return false;
         }
 
-        var formData = new FormData();
-        // formData.append('merchant_id', currentForm1.find('#merchant_id').val());
-        // formData.append('loyalty_id', currentForm1.find('#loyalty_id').val());
-        // formData.append('loyalty_tier_id', currentForm1.find('#loyalty_tier_id').val());
+            var validator = currentForm1.validate();
+            validator.resetForm();
+            formElement[0].reset();
+
+        //currentForm1.submit();
+         var formData = new FormData();
+
 
         var defaultEmail = 0;
         if (currentForm1.find('#email').is(':checked')) {
@@ -630,7 +153,7 @@ siteObjJs.admin.communicationMessageJs = function () {
             }
         }
         formData.append('email', defaultEmail);
-
+        
         var defaultPushNotification = 0;
         if (currentForm1.find('#push_notification').is(':checked')) {
             defaultPushNotification = 1;
@@ -719,7 +242,9 @@ siteObjJs.admin.communicationMessageJs = function () {
 
         var tags = currentForm1.find("input#email_tags").tagsinput('items');
         formData.append('email_tags', tags);
-
+        console.log('on line 220'); 
+        //currentForm1.submit();
+        console.log('on line 222'); 
         $.ajax(
             {
                 url: actionUrl,
@@ -1520,11 +1045,11 @@ siteObjJs.admin.communicationMessageJs = function () {
     };
 
     var sendTodayDiv = function (currentForm) {
-        
+
         $('body').on('click', '#send_today', function (e) {
-            
+
             if ($(this).is(":checked")) {
-                
+
                 $('#' + currentForm).find("#row-message-send-date-div").hide();
                 if (currentForm !== 'edit-communication') {
                     $('#' + currentForm).find("#message_send_time").val('');
@@ -2006,10 +1531,10 @@ siteObjJs.admin.communicationMessageJs = function () {
     return {
         //main function to initiate the module
         init: function (obj) {
-            console.log(obj);
+
             initializeListener();
             // handleTable();
-            fetchDataForEdit();
+            fetchDataForEdit(obj);
             handleBootstrapMaxlength();
             getMerchantLoyaltyProgram(obj);
             getMerchantLoyaltyOfferData(obj);
@@ -2028,11 +1553,14 @@ siteObjJs.admin.communicationMessageJs = function () {
             sendTestEmail(obj);
             checkPastTime(obj);
             changeMessageType(obj);
-            userDataCommon(obj)
+            if (obj === 'create-communication') {
+                userDataCommon(obj);
+            }
             //bind the validation method to 'add' form on load
             siteObjJs.validation.formValidateInit('#' + obj, handleAjaxRequest);
             $('#' + obj).find('input:checkbox').uniform();
             $('#' + obj).find('input:radio').uniform();
+
         }
 
     };

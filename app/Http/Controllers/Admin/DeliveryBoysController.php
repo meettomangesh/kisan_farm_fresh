@@ -67,7 +67,8 @@ class DeliveryBoysController extends Controller
     }
 
     public function update(UpdateDeliveryBoyRequest $request, User $deliveryboy)
-    {
+    {   
+
         $deliveryboy->update($request->all());
         $deliveryboy->roles()->sync($request->input('roles', []));
         $deliveryboy->regions()->sync($request->input('regions', []));

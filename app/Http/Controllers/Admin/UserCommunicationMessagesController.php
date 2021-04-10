@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\MassDestroyUserRequest;
 use App\Http\Requests\StoreUserRequest;
-use App\Http\Requests\UpdateUserRequest;
+use App\Http\Requests\UpdateUserCommunicationMessagesRequest;
 use App\Role;
 use App\User;
 use Gate;
@@ -120,8 +120,51 @@ class UserCommunicationMessagesController extends Controller
         // echo 'email is sent' . $result;
         // exit;
         $userCommunicationMessages = UserCommunicationMessages::all();
+        foreach ($userCommunicationMessages as $key => $userCommunicationMessage) {
+            $notifyType = '';
+            $notify = $userCommunicationMessage->notify_users_by;
+            $email = trans('cruds.communication.fields.email');
+            $push_notification = trans('cruds.communication.fields.push-notification');
+            $sms = trans('cruds.communication.fields.sms');
+            $sms_notification = trans('cruds.communication.fields.sms-notification');
+
+            $notifyStr = '';
+            if ($notify == '1000') {
+                $notifyStr = $email;
+            } else if ($notify == '0100') {
+                $notifyStr = $push_notification;
+            } else if ($notify == '0010') {
+                $notifyStr = $sms;
+            } else if ($notify == '1100') {
+                $notifyStr = $email . ', ' . $push_notification;
+            } else if ($notify == '1010') {
+                $notifyStr = $email . ', ' . $sms;
+            } else if ($notify == '1110') {
+                $notifyStr = $email . ', ' . $push_notification . ', ' . $sms;
+            } else if ($notify == '1001') {
+                $notifyStr = $email . ', ' . $sms_notification;
+            } else if ($notify == '1011') {
+                $notifyStr = $email . ', ' . $sms . ', ' . $sms_notification;
+            } else if ($notify == '1101') {
+                $notifyStr = $email . ', ' . $push_notification . ', ' . $sms_notification;
+            } else if ($notify == '1111') {
+                $notifyStr = $email . ', ' . $push_notification . ', ' . $sms . ', ' . $sms_notification;
+            } else if ($notify == '0110') {
+                $notifyStr = $push_notification . ', ' . $sms;
+            } else if ($notify == '0001') {
+                $notifyStr = $sms_notification;
+            } else if ($notify == '0011') {
+                $notifyStr = $sms . ', ' . $sms_notification;
+            } else if ($notify == '0101') {
+                $notifyStr = $push_notification . ', ' . $sms_notification;
+            } else if ($notify == '0111') {
+                $notifyStr = $push_notification . ', ' . $sms . ', ' . $sms_notification;
+            }
+            $userCommunicationMessages[$key]->notifyStr = $notifyStr;  
+            
+    }
         // print_r($userCommunicationMessages); exit;
-        return view('admin.communications.index', compact('userCommunicationMessages'));
+        return view('admin.communications.index', compact('userCommunicationMessages','notifyStr'));
     }
 
     public function create()
@@ -261,15 +304,73 @@ class UserCommunicationMessagesController extends Controller
         $userCommunicationMessages->message_send_date = date('Y-m-d', strtotime($userCommunicationMessages->message_send_time));
         $userCommunicationMessages->message_send_time = date('g:h A', strtotime($userCommunicationMessages->message_send_time));
 
+
+        $roles = Role::all()->where('title', 'Delivery Boy')->pluck('title', 'id');
         $regions = Region::all()->where('status', 1)->pluck('region_name', 'id');
-        $productMerchantCollect = [];
-        return view('admin.communications.edit', compact('userCommunicationMessages', 'regions','productMerchantCollect'));
+        //$users = $userCommunicationMessages->users()->get()->pluck('name', 'id');
+        // echo '<pre>';
+        // print_r($userCommunicationMessages->users()->get()->pluck('id')); exit;
+        $inputData = array('user_type' => $userCommunicationMessages->user_role, 'custom_region' => implode(",",$userCommunicationMessages->regions()->get()->pluck('id')->toArray()), 'region_type' => $userCommunicationMessages->region_type);
+        $inputData = json_encode($inputData);
+        $users = collect(DB::select('call getUserTypeRegionData(?)', [$inputData]))->pluck('name','id');
+        return view('admin.communications.edit', compact('userCommunicationMessages','regions', 'users','productMerchantCollect'));
     }
 
-    public function update(UpdateUserRequest $request, User $user)
+    public function update(Request $request, UserCommunicationMessages $userCommunicationMessages)
     {
-        $user->update($request->all());
-        $user->roles()->sync($request->input('roles', []));
+        // $user->update($request->all());
+        // $user->roles()->sync($request->input('roles', []));
+        
+        
+        $inputs = $request->all();
+        //  echo '<pre>'; print_r($inputs);
+        //  exit;
+        $userCommunicationMessages = UserCommunicationMessages::find($inputs['id']);
+        $inputs['email'] = isset($inputs['email']) ? $inputs['email'] : 0;
+        $inputs['push_notification'] = isset($inputs['push_notification']) ? $inputs['push_notification'] : 0;
+        $inputs['sms'] = isset($inputs['sms']) ? $inputs['sms'] : 0;
+        $inputs['sms_notification'] = isset($inputs['sms_notification']) ? $inputs['sms_notification'] : 0;
+        $inputs['min_points_filter'] = isset($inputs['min_points_filter']) ? $inputs['min_points_filter'] : 0;
+        $inputs['max_points_filter'] = isset($inputs['max_points_filter']) ? $inputs['max_points_filter'] : 0;
+        $inputs['sms_text'] = isset($inputs['sms_text']) ? $inputs['sms_text'] : '';
+        $inputs['uploaded_data'] = isset($inputs['uploaded_data']) ? $inputs['uploaded_data'] : '';
+        $inputs['test_email_address'] = isset($inputs['test_email_address']) ? $inputs['test_email_address'] : '';
+        $inputs['test_mobile_number'] = isset($inputs['test_mobile_number']) ? $inputs['test_mobile_number'] : '';
+        $inputs['created_by'] = Auth::id();
+        $inputs['updated_by'] = Auth::id();
+        $inputs['notify_users_by'] = $inputs['email'] . $inputs['push_notification'] . $inputs['sms'] . $inputs['sms_notification'];
+        $inputs['reference_id'] = 0;
+        if ($inputs['message_type'] == 1) {
+            $inputs['reference_id'] = isset($inputs['offer_id']) ? $inputs['offer_id'] : 0;
+        } else if ($inputs['message_type'] == 3) {
+            $inputs['reference_id'] = isset($inputs['product_id']) ? $inputs['product_id'] : 0;
+        }
+
+        if ($inputs['push_notification'] > 0 || $inputs['sms_notification'] > 0) {
+            $inputs['push_text'] = isset($inputs['push_text']) ? $inputs['push_text'] : '';
+
+            $inputs['deep_link_screen'] = isset($inputs['deep_link_screen']) ? $inputs['deep_link_screen'] : '';
+        } else {
+            $inputs['push_text'] = '';
+            $inputs['deep_link_screen'] = '';
+        }
+        
+       // $inputs['message_send_time'] = '';
+        $send_today = isset($inputs['send_today']) ? $inputs['send_today'] : 0;
+        if ($send_today > 0) {
+            $today_time = $inputs['today_time'];
+            $inputs['message_send_time'] = Carbon::now()->toDateString() . ' ' . date('H:i:s', strtotime($today_time));
+        } else {
+            $originalDate = $inputs['message_send_time'];
+            $today_time = $inputs['today_time'];
+            $newDate = date("Y-m-d", strtotime($originalDate));
+            $newDateTime = date('H:i:s', strtotime($today_time));
+            $inputs['message_send_time'] = $newDate . ' ' . $newDateTime;
+        }   
+        //echo '<pre>'; print_r($userCommunicationMessages); exit;
+        $userCommunicationMessages->update($inputs);
+        $userCommunicationMessages->regions()->sync($request->input('regions', []));
+        $userCommunicationMessages->users()->sync($request->input('users', []));
 
         return redirect()->route('admin.communications.index');
     }

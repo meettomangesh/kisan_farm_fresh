@@ -47,7 +47,7 @@
                             {{ $userCommunicationMessage->id ?? '' }}
                         </td>
                         <td>
-                            {{ $userCommunicationMessage->notification ?? '' }}
+                            {{ $userCommunicationMessage->notifyStr ?? '' }}
                         </td>
                         <td>
                             {{ $userCommunicationMessage->message_type ?? '' }}

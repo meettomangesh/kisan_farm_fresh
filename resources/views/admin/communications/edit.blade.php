@@ -7,7 +7,8 @@
     </div>
 
     <div class="card-body">
-        <form method="POST" id="edit-communication" action="{{ route("admin.communications.update", [$userCommunicationMessages->id]) }}" enctype="multipart/form-data">
+        <form method="POST" id="edit-communication" action="{{ route("admin.communications.update", [$userCommunicationMessages->id]) }}" enctype="multipart/form-data" novalidate >
+            <input type="hidden" id="id" name="id" value="{{$userCommunicationMessages->id}}">
             @method('PUT')
             @csrf
             @section('page-level-styles')
@@ -30,6 +31,7 @@
                         <div class="radio-list">
                             <!-- <label class="radio-inline">{!! Form::radio('region_type', '1', true) !!} {{ trans('cruds.communication.fields.all') }}</label>
                             <label class="radio-inline">{!! Form::radio('region_type', '2') !!} {{ trans('cruds.communication.fields.custom') }}</label> -->
+                            
                             <label class="radio-inline"><input type="radio" name="region_type" value="{{ old('region_type', '1') }}" {{ $userCommunicationMessages->region_type == '1' ? 'checked' : '' }} required> {!! trans('cruds.communication.fields.all') !!}</label>
                             <label class="radio-inline"><input type="radio" name="region_type" value="{{ old('region_type', '2') }}" {{ $userCommunicationMessages->region_type == '2' ? 'checked' : '' }} required> {!! trans('cruds.communication.fields.custom') !!}</label>
                         </div>
@@ -47,7 +49,7 @@
                     </div>
                     <select class="form-control select2 {{ $errors->has('regions') ? 'is-invalid' : '' }}" name="regions[]" id="regions" multiple data-rule-required="true" data-msg-required="Please select the target regions.">
                         @foreach($regions as $id => $regions)
-                        <option value="{{ $id }}" {{ (in_array($id, old('regions', [])) || $userCommunicationMessages->regions->contains($id)) ? 'selected' : '' }}>>{{ $regions }}</option>
+                        <option value="{{ $id }}" {{ (in_array($id, old('regions', [])) || $userCommunicationMessages->regions->contains($id)) ? 'selected' : '' }}>{{ $regions }}</option>
                         @endforeach
                     </select>
                     @if($errors->has('regions'))
@@ -99,8 +101,14 @@
                         <span class="btn btn-info btn-xs select-all" style="border-radius: 0">{{ trans('global.select_all') }}</span>
                         <span class="btn btn-info btn-xs deselect-all" style="border-radius: 0">{{ trans('global.deselect_all') }}</span>
                     </div>
+    
                     <select class="form-control select2 {{ $errors->has('users') ? 'is-invalid' : '' }}" name="users[]" id="users" multiple data-rule-required="true" data-msg-required="Please select the target users.">
-
+                        
+                        @foreach($users as $id => $users)
+                       
+                        <option value="{{ $id }}" {{ (in_array($id, old('users', [])) || $userCommunicationMessages->users->contains($id)) ? 'selected' : '' }}>{{ $users }}</option>
+                        @endforeach
+                    
                     </select>
                     @if($errors->has('users'))
                     <div class="invalid-feedback">
@@ -132,9 +140,9 @@
 
                         {!! Form::checkbox('sms', 3, null, ['id' => 'sms', 'class' => 'notification form-control']) !!}
                         {{ trans('cruds.communication.fields.sms') }} -->
-                        <input type="checkbox" class="notification form-control" id="email" name="email" value="{{ old('email', '1') }}" {{ $userCommunicationMessages->email == '1' ? 'checked' : '' }} required> {!! trans('cruds.communication.fields.email') !!}
-                        <input type="checkbox" class="notification form-control" id="push_notification" name="push_notification" value="{{ old('push_notification', '2') }}" {{ $userCommunicationMessages->push_notification == '1' ? 'checked' : '' }} required> {!! trans('cruds.communication.fields.push-notification') !!}
-                        <input type="checkbox" class="notification form-control" id="sms"  name="sms" value="{{ old('sms', '1') }}" {{ $userCommunicationMessages->sms == '1' ? 'checked' : '' }} required> {!! trans('cruds.communication.fields.sms') !!}
+                        <input type="checkbox" class="notification form-control" id="email" name="email" value="{{ old('email', '1') }}" {{ $userCommunicationMessages->email == '1' ? 'checked' : '' }} > {!! trans('cruds.communication.fields.email') !!}
+                        <input type="checkbox" class="notification form-control" id="push_notification" name="push_notification" value="{{ old('push_notification', '1') }}" {{ $userCommunicationMessages->push_notification == '1' ? 'checked' : '' }} > {!! trans('cruds.communication.fields.push-notification') !!}
+                        <input type="checkbox" class="notification form-control" id="sms"  name="sms" value="{{ old('sms', '1') }}" {{ $userCommunicationMessages->sms == '1' ? 'checked' : '' }} > {!! trans('cruds.communication.fields.sms') !!}
 
                         <!-- {!! Form::checkbox('sms_notification', 4, null, ['id' => 'sms_notification',  'class' => 'notification form-control']) !!}
                         {{ trans('cruds.communication.fields.sms-notification') }} -->
@@ -182,11 +190,11 @@
             <div class="col-md-6" id="push-text-div" style="display:none">
                 <div class="form-group">
                     <label class="control-label col-md-4">{{ trans('cruds.communication.fields.push-text') }}
-                        <span class="required"> </span>
+                        <!-- <span class="required"> </span> -->
                     </label>
                     <div class="col-md-8">
                         <!-- {!! Form::textArea('push_text', null, ['class'=>'form-control','rows'=>8,'id'=>'push_text', 'validPushText'=>'true', 'data-rule-required'=>'false', 'data-msg-required'=>"Please enter the push notification text", 'maxlength'=>320, 'data-rule-maxlength'=>'320', 'data-msg-maxlength'=>"Notification text should be 320 chars" ])!!} -->
-                        <textarea class="form-control {{ $errors->has('push_text') ? 'is-invalid' : '' }}" type="text" name="push_text" id="push_text" validPushText="true" value="{{ old('push_text', $userCommunicationMessages->push_text) }}" maxlength="320" required>{{ old('push_text', $userCommunicationMessages->push_text) }}</textarea>
+                        <textarea class="form-control {{ $errors->has('push_text') ? 'is-invalid' : '' }}" type="text" name="push_text" id="push_text" validPushText="false" data-rule-required="true" data-msg-required="Please enter the push notification text." value="{{ old('push_text', $userCommunicationMessages->push_text) }}" maxlength="320" >{{ old('push_text', $userCommunicationMessages->push_text) }}</textarea>
                         <div class="help-block"></div>
                     </div>
                 </div>
@@ -196,11 +204,11 @@
             <div class="col-md-6" id="sms-text-div" style="display:none">
                 <div class="form-group">
                     <label class="control-label col-md-4">{{ trans('cruds.communication.fields.sms-text') }}
-                        <span class="required"> </span>
+                        <!-- <span class="required"> </span> -->
                     </label>
                     <div class="col-md-8">
                         <!-- {!! Form::textArea('sms_text', null, ['class'=>'form-control','rows'=>8,'id'=>'sms_text', 'validSmsText'=>'true', 'data-rule-required'=>'false', 'data-msg-required'=>"Please enter the SMS text", 'maxlength'=>480, 'data-rule-maxlength'=>'480', 'data-msg-maxlength'=>"SMS text should be less than 480 chars" ])!!} -->
-                        <textarea class="form-control {{ $errors->has('sms_text') ? 'is-invalid' : '' }}" type="textarea" name="sms_text" id="sms_text" validSmsText="true" value="{{ old('sms_text', $userCommunicationMessages->sms_text) }}" maxlength="480" required>{{ old('sms_text', $userCommunicationMessages->sms_text) }} </textarea> 
+                        <textarea class="form-control {{ $errors->has('sms_text') ? 'is-invalid' : '' }}" type="textarea" name="sms_text" id="sms_text" validSmsText="false" value="{{ old('sms_text', $userCommunicationMessages->sms_text) }}" data-rule-required="true" data-msg-required="Please enter the SMS text."  maxlength="480" >{{ old('sms_text', $userCommunicationMessages->sms_text) }} </textarea> 
                         <div class="help-block"></div>
                     </div>
                 </div>
@@ -421,6 +429,7 @@
                 <button class="btn btn-danger" type="submit">
                     {{ trans('global.save') }}
                 </button>
+                <!-- <input type="submit" name="save"  id= "save" class="btn btn-danger"> -->
             </div>
         </form>
     </div>

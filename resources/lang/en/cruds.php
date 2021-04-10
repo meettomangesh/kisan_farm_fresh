@@ -682,6 +682,7 @@ return [
             'inactive'                => 'Inactive',
             'sms' => 'SMS',
             'email_count'       => 'Email count',
+            'sms-notification' => 'SMS Notification',
             'all' => 'All',
             'region' => 'Region',
             'regions' => 'Regions',

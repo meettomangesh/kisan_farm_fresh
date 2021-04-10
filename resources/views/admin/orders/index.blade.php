@@ -44,11 +44,11 @@
                             <td>{{ $customerOrder->payment_type ?? '' }}</td>
                             <td>
                                 @if($customerOrder->order_status == 1)
-                                    {{ trans('cruds.order.fields.pending') }}
+                                    {{ trans('cruds.order.fields.placed') }}
                                 @elseif($customerOrder->order_status == 2)
-                                    {{ trans('cruds.order.fields.ordered') }}
+                                    {{ trans('cruds.order.fields.picked') }}
                                 @elseif($customerOrder->order_status == 3)
-                                    {{ trans('cruds.order.fields.in_process') }}
+                                    {{ trans('cruds.order.fields.out_for_delivery') }}
                                 @elseif($customerOrder->order_status == 4)
                                     {{ trans('cruds.order.fields.delivered') }}
                                 @elseif($customerOrder->order_status == 5)

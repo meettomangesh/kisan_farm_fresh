@@ -241,6 +241,8 @@ class RegisterController extends BaseController
         $validator = Validator::make($request->all(), [
             'platform' => 'required',
             'user_id' => 'required|integer',
+            'user_role_id' => 'required|integer',
+            'device_id' => 'required',
             'device_token' => 'required',
         ]);
         if ($validator->fails()) {
@@ -251,6 +253,8 @@ class RegisterController extends BaseController
             $params = [
                 'platform' => $request->platform,
                 'user_id' => $request->user_id,
+                'user_role_id' => $request->user_role_id,
+                'device_id' => $request->device_id,
                 'device_token' => $request->device_token,
             ];
 

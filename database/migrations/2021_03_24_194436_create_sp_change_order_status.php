@@ -13,7 +13,7 @@ class CreateSpChangeOrderStatus extends Migration
      */
     public function up()
     {
-        DB::unprepared("DROP PROCEDURE IF EXISTS changeOrderStatus$$
+        DB::unprepared("DROP PROCEDURE IF EXISTS changeOrderStatus;
         CREATE PROCEDURE changeOrderStatus(IN inputData JSON)
         changeOrderStatus:BEGIN
             DECLARE orderId,codId,notFound INTEGER(10) DEFAULT 0;

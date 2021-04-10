@@ -170,8 +170,8 @@ class OrdersController extends BaseController
         $validator = Validator::make($request->all(), [
             'platform' => 'required',
             'order_id' => 'required|integer',
-            'order_status' => 'in:3,4,5|required',
-            'order_note' => 'required',
+            'order_status' => 'in:2,3,4,5|required',
+            'order_note' => 'required_if:order_status,==,5|string|max:255',
         ]);
         if ($validator->fails()) {
             return $this->sendError(parent::VALIDATION_ERROR, $validator->errors());

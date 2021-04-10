@@ -150,3 +150,7 @@ table.dataTable thead .sorting_desc {
   .sidebar-toggler:focus {
       outline:none;
   }
+
+  .fade.in {
+    opacity: 1
+}

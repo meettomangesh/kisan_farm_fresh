@@ -152,4 +152,5 @@ class DataHelper
         $fileObj->move(base_path() . '/public' . $path, $imageName);
         return $path . $imageName;
     }
+
 }

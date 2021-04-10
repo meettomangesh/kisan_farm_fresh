@@ -111,6 +111,10 @@ Route::group([
 
     // Communications
     Route::delete('communications/destroy', 'UserCommunicationMessagesController@massDestroy')->name('communications.massDestroy');
+    Route::get('communications/check-past-time/{id}', 'UserCommunicationMessagesController@checkPastTime')->name('communications.checkPastTime');
+    Route::post('communications/send-test-sms', 'UserCommunicationMessagesController@sendTestSms')->name('communications.sendTestSms');
+    Route::post('communications/send-test-email', 'UserCommunicationMessagesController@sendTestEmail')->name('communications.sendTestEmail');
+    Route::post('communications/get-user-type-data', 'UserCommunicationMessagesController@getUserTypeData')->name('communications.getUserTypeData');
     Route::resource('communications', 'UserCommunicationMessagesController');
 
     // Orders

@@ -62,23 +62,32 @@ siteObjJs.validation = function () {
     }
 
     function errorPlacement(error, element) { // render error placement for each input type
-        if (element.parents('.input-medium-suffix').size() > 0) {            
+        if (element.parents('.input-medium-suffix').length > 0) {            
             error.appendTo(element.parents('.input-medium-suffix').attr('data-error-container'));
-        } else if (element.parent('.input-group').size() > 0) {
+            console.log('inside validations.js on line 67 ');
+        } else if (element.parent('.input-group').length > 0) {
             error.insertAfter(element.parent('.input-group'));
+            console.log('inside validations.js on line 70 ');
         } else if (element.attr('data-error-container')) {
             error.appendTo(element.attr('data-error-container'));
-        } else if (element.parents('.radio-list').size() > 0) {
+            console.log('inside validations.js on line 73 ');
+        } else if (element.parents('.radio-list').length > 0) {
             error.appendTo(element.parents('.radio-list').attr('data-error-container'));
-        } else if (element.parents('.radio-inline').size() > 0) {
+            console.log('inside validations.js on line 76 ');
+        } else if (element.parents('.radio-inline').length > 0) {
             error.appendTo(element.parents('.radio-inline').attr('data-error-container'));
-        } else if (element.parents('.checkbox-list').size() > 0) {
+            console.log('inside validations.js on line 79 ');
+        } else if (element.parents('.checkbox-list').length > 0) {
             error.appendTo(element.parents('.checkbox-list').attr('data-error-container'));
-        } else if (element.parents('.checkbox-inline').size() > 0) {
+            console.log('inside validations.js on line 82 ');
+        } else if (element.parents('.checkbox-inline').length > 0) {
             error.appendTo(element.parents('.checkbox-inline').attr('data-error-container'));
+            console.log('inside validations.js on line 85 ');
         } else {
             error.insertAfter(element); // for other inputs, just perform default behavior
+            console.log('inside validations.js on line 88 ');
         }
+        console.log('inside validations.js on line 90 ');
     }
 
     return {

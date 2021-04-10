@@ -201,9 +201,9 @@ var Metronic = function() {
             return;
         }
         var test = $("input[type=checkbox]:not(.toggle, .md-check, .md-radiobtn, .make-switch, .icheck), input[type=radio]:not(.toggle, .md-check, .md-radiobtn, .star, .make-switch, .icheck)");
-        if (test.size() > 0) {
+        if (test.length > 0) {
             test.each(function() {
-                if ($(this).parents(".checker").size() === 0) {
+                if ($(this).parents(".checker").length === 0) {
                     $(this).show();
                     $(this).uniform();
                 }
@@ -600,8 +600,8 @@ var Metronic = function() {
         },
 
         // wrMetronicer function to scroll(focus) to an element
-        scrollTo: function(el, offeset) {
-            var pos = (el && el.size() > 0) ? el.offset().top : 0;
+        scrollTo: function(el, offeset) {          
+            var pos = (el && el.length > 0) ? el.offset().top : 0;
 
             if (el) {
                 if ($('body').hasClass('page-header-fixed')) {
@@ -818,6 +818,7 @@ var Metronic = function() {
             }
 
             if (options.focus) {
+                console.log('inside metronic js',id);
                 Metronic.scrollTo($('#' + id));
             }
 

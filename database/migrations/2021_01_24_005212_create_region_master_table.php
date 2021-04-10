@@ -14,7 +14,7 @@ class CreateRegionMasterTable extends Migration
     public function up()
     {
         Schema::create('region_master', function (Blueprint $table) {
-            $table->id();
+            $table->increments('id')->unsigned();
             $table->string('region_name', 255)->index();
             $table->tinyInteger('status')->default(1)->unsigned()->index()->comment = "1: Active, 0: Inactive";
             $table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP'));

@@ -12,7 +12,7 @@
 namespace App\Helper;
 
 use Illuminate\Support\Facades\File;
-use App\Models\CustomerLoyalty;
+use App\Models\SystemEmail;
 use PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
@@ -49,7 +49,7 @@ class EmailHelper
             if (!empty($emailData['attachment'])) {
                 foreach ($emailData['attachment'] as $key => $value) {
                     $mail->addAttachment($value['attachment']);
-                }             
+                }
             }
 
 
@@ -181,45 +181,39 @@ class EmailHelper
      *
      * @return Response
      */
-    // public static function getCustomerEmailTemplate($merchantId, $emailBody)
-    // {
-    //     $inloyalLogo1 = ConfigConstantHelper::getValue('INLOYAL_LOGO_URL');
+    public static function getCustomerEmailTemplate($email_teplate_name, $emailBody)
+    {
+        $inloyalLogo1 = config('services.miscellaneous.kff_logo_url');
 
-    //     $vars['emailBody'] = isset($emailBody) ? $emailBody : '';
-    //     if (!empty($merchantId) && $merchantId != 0) {
-    //         $getMerchantInfoForEmail = DB::select('call getMerchantInfoForEmail(?)', array($merchantId));
-    //         $vars['merchantLogo'] = $getMerchantInfoForEmail[0]->merchant_logo;
-    //         $vars['merchantName'] = $getMerchantInfoForEmail[0]->merchant_name;
-    //         if (!empty($getMerchantInfoForEmail[0]->merchant_logo)) {
-    //             $vars['merchantLogo'] = ImageHelper::getFileUrl($getMerchantInfoForEmail[0]->merchant_logo);
-    //         } else {
-    //             $vars['merchantLogo'] = $inloyalLogo1;
-    //         }
-    //         $vars['clubLogo'] = $getMerchantInfoForEmail[0]->loyalty_program_logo;
-    //         $vars['loyaltyClub'] = $getMerchantInfoForEmail[0]->loyalty_program_name;
-    //         if (!empty($getMerchantInfoForEmail[0]->loyalty_program_logo)) {
-    //             $vars['clubLogo'] = ImageHelper::getFileUrl($getMerchantInfoForEmail[0]->loyalty_program_logo);
-    //         } else {
-    //             $vars['clubLogo'] = asset('images/no-img-trans.png');
-    //         }
-    //     } else {
-    //         $vars['merchantLogo'] = $inloyalLogo1;
-    //         $vars['merchantName'] = 'inloyal';
-    //         $vars['clubLogo'] = asset('images/no-img-trans.png');
-    //         $vars['loyaltyClub'] = '';
-    //     }
-    //     $vars['baseInloyalLogo'] = $inloyalLogo1;
-    //     $vars['iosLogo'] = ConfigConstantHelper::getValue('EMAIL_IOS_LOGO');
-    //     $vars['androidLogo'] = ConfigConstantHelper::getValue('EMAIL_ANDROID_LOGO');
+        $vars['emailBody'] = isset($emailBody) ? $emailBody : '';
 
-    //     $email_teplate_name = 'IN_CUSTOMER_COMMUNICATION_MESSAGES';
-    //     $emailContent = SystemEmail::whereName($email_teplate_name)->firstOrFail()->toArray();
+        $vars['baseLogo'] = asset(config('services.miscellaneous.kff_logo_url'));
+        $vars['iosLogo'] = asset(config('services.miscellaneous.ios_logo_url'));
+        $vars['androidLogo'] = asset(config('services.miscellaneous.android_logo_url'));
 
-    //     $emailMessage = $emailContent['text1'];
-    //     foreach ($vars as $key => $var) {
-    //         $emailMessage = preg_replace('/{\$(' . preg_quote($key) . ')}/i', $var, $emailMessage);
-    //     }
+        //$email_teplate_name = 'IN_USER_COMMUNICATION_MESSAGES';
+        $emailContent = SystemEmail::whereName($email_teplate_name)->firstOrFail()->toArray();
 
-    //     return html_entity_decode($emailMessage);
-    // }
+        $emailMessage = $emailContent['text1'];
+        foreach ($vars as $key => $var) {
+            $emailMessage = preg_replace('/{\$(' . preg_quote($key) . ')}/i', $var, $emailMessage);
+        }
+
+        return html_entity_decode($emailMessage);
+    }
+
+
+
+    public function map_explode($email)
+    {
+        return ['email' => $email];
+    }
+
+    public function explodeEmails($emails)
+    {
+        if (empty($emails)) {
+            return '';
+        }
+        return  array_map(array($this, 'map_explode'),  explode(",", $emails));
+    }
 }

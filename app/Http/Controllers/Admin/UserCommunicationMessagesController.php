@@ -13,6 +13,10 @@ use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use App\Models\UserCommunicationMessages;
 use App\Helper\EmailHelper;
+use Carbon\Carbon as Carbon;
+use App\Region;
+use DB;
+use Auth;
 
 class UserCommunicationMessagesController extends Controller
 {
@@ -51,39 +55,39 @@ class UserCommunicationMessagesController extends Controller
         //                             <td style="font-size:14px;color:#454545;line-height:24px;padding-bottom:10px" valign="top" align="left">
         //                                 <label>
         //                                     <span>Sponsor Name:</span> 
-                                        
+
         //                                 </lable>
         //                                 <br>
         //                                     <label>
         //                                         <span>Sponsor Code:</span> 
-                                            
+
         //                                     </lable>
         //                                     <br>
         //                                         <label>
         //                                             <span>Amount:</span> 
-                                                    
+
         //                                         </lable>
         //                                         <br>
         //                                             <label>
         //                                                 <span>Bank Name:</span> 
-                                                        
+
         //                                             </lable>
         //                                             <br>
         //                                                 <label>
         //                                                     <span>Account Number:</span> 
-                                                        
+
         //                                                 </lable>
         //                                                 <br>
         //                                                     <label>
         //                                                         <span>Swift Code:</span> 
-                                                        
+
         //                                                     </lable>
         //                                                 </td>
         //                                             </tr>
         //                                             <tr>
         //                                                 <td style="font-size:14px;color:#454545;line-height:24px;padding-bottom:10px" valign="top" align="left">
         //                 Regards,
-                                                        
+
         //                                                     <br>
         //                                                         <span style="color:#8cb53f;text-transform:uppercase;font-weight:bold">Team Frendzi</span>
         //                                                     </td>
@@ -130,28 +134,136 @@ class UserCommunicationMessagesController extends Controller
         $deepLinkScreeningDataGolbalList = [];
         //$roles = Role::all()->pluck('title', 'id');
         $roles = Role::all()->whereNotIn('title', ['Delivery Boy', 'Customer'])->pluck('title', 'id');
+        $regions = Region::all()->where('status', 1)->pluck('region_name', 'id');
 
-
-        return view('admin.communications.create', compact('roles', 'loyaltyTierIdsNames', 'merchantListData', 'deepLinkScreeningData', 'deepLinkScreeningDataGolbal', 'deepLinkScreeningDataGolbalList'));
+        return view('admin.communications.create', compact('roles', 'loyaltyTierIdsNames', 'merchantListData', 'deepLinkScreeningData', 'deepLinkScreeningDataGolbal', 'deepLinkScreeningDataGolbalList', 'regions'));
     }
 
-    public function store(StoreUserRequest $request)
+    public function store(Request $request)
     {
-        $user = User::create($request->all());
-        $user->roles()->sync($request->input('roles', []));
+
+        $inputs = $request->all();
+        $inputs['email'] = isset($inputs['email']) ? $inputs['email'] : 0;
+        $inputs['push_notification'] = isset($inputs['push_notification']) ? $inputs['push_notification'] : 0;
+        $inputs['sms'] = isset($inputs['sms']) ? $inputs['sms'] : 0;
+        $inputs['sms_notification'] = isset($inputs['sms_notification']) ? $inputs['sms_notification'] : 0;
+        $inputs['min_points_filter'] = isset($inputs['min_points_filter']) ? $inputs['min_points_filter'] : 0;
+        $inputs['max_points_filter'] = isset($inputs['max_points_filter']) ? $inputs['max_points_filter'] : 0;
+        $inputs['sms_text'] = isset($inputs['sms_text']) ? $inputs['sms_text'] : '';
+        $inputs['uploaded_data'] = isset($inputs['uploaded_data']) ? $inputs['uploaded_data'] : '';
+        $inputs['test_email_address'] = isset($inputs['test_email_address']) ? $inputs['test_email_address'] : '';
+        $inputs['test_mobile_number'] = isset($inputs['test_mobile_number']) ? $inputs['test_mobile_number'] : '';
+        $inputs['created_by'] = Auth::id();
+        $inputs['updated_by'] = Auth::id();
+        $inputs['notify_users_by'] = $inputs['email'] . $inputs['push_notification'] . $inputs['sms'] . $inputs['sms_notification'];
+        $inputs['reference_id'] = 0;
+        if ($inputs['message_type'] == 1) {
+            $inputs['reference_id'] = isset($inputs['offer_id']) ? $inputs['offer_id'] : 0;
+        } else if ($inputs['message_type'] == 3) {
+            $inputs['reference_id'] = isset($inputs['product_id']) ? $inputs['product_id'] : 0;
+        }
+
+        if ($inputs['push_notification'] > 0 || $inputs['sms_notification'] > 0) {
+            $inputs['push_text'] = isset($inputs['push_text']) ? $inputs['push_text'] : '';
+
+            $inputs['deep_link_screen'] = isset($inputs['deep_link_screen']) ? $inputs['deep_link_screen'] : '';
+        } else {
+            $inputs['push_text'] = '';
+            $inputs['deep_link_screen'] = '';
+        }
+        
+        $inputs['message_send_time'] = '';
+        $send_today = isset($inputs['send_today']) ? $inputs['send_today'] : 0;
+        if ($send_today > 0) {
+            $today_time = $inputs['today_time'];
+            $inputs['message_send_time'] = Carbon::now()->toDateString() . ' ' . date('H:i:s', strtotime($today_time));
+        } else {
+            $originalDate = $inputs['message_send_time'];
+            $today_time = $inputs['today_time'];
+            $newDate = date("Y-m-d", strtotime($originalDate));
+            $newDateTime = date('H:i:s', strtotime($today_time));
+            $inputs['message_send_time'] = $newDate . ' ' . $newDateTime;
+        }
+
+        $userCommunication = UserCommunicationMessages::create($inputs);
+        $userCommunication->regions()->sync($request->input('regions', []));
+        $userCommunication->users()->sync($request->input('users', []));
 
         return redirect()->route('admin.communications.index');
     }
 
-    public function edit(User $user)
+    public function edit($id)
     {
         abort_if(Gate::denies('communication_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+       // print_r($userCommunicationMessages);exit;
 
-        $roles = Role::all()->whereNotIn('title', ['Delivery Boy', 'Customer'])->pluck('title', 'id');
+        $userCommunicationMessages = UserCommunicationMessages::find($id);
 
-        $user->load('roles');
+        $notify = $userCommunicationMessages->notify_users_by;
+        $email = 0;
+        $push_notification = 0;
+        $sms = 0;
+        $sms_notification = 0;
 
-        return view('admin.communications.edit', compact('roles', 'user'));
+        if ($notify == '1000') {
+            $email = 1;
+        } else if ($notify == '0100') {
+            $push_notification = 1;
+        } else if ($notify == '0010') {
+            $sms = 1;
+        } else if ($notify == '1100') {
+            $email = 1;
+            $push_notification = 1;
+        } else if ($notify == '1010') {
+            $email = 1;
+            $sms = 1;
+        } else if ($notify == '1110') {
+            $email = 1;
+            $push_notification = 1;
+            $sms = 1;
+        } else if ($notify == '1001') {
+            $email = 1;
+            $sms_notification = 1;
+        } else if ($notify == '1011') {
+            $email = 1;
+            $sms = 1;
+            $sms_notification = 1;
+        } else if ($notify == '1101') {
+            $email = 1;
+            $push_notification = 1;
+            $sms_notification = 1;
+        } else if ($notify == '1111') {
+            $email = 1;
+            $push_notification = 1;
+            $sms = 1;
+            $sms_notification = 1;
+        } else if ($notify == '0110') {
+            $push_notification = 1;
+            $sms = 1;
+        } else if ($notify == '0001') {
+            $sms_notification = 1;
+        } else if ($notify == '0011') {
+            $sms = 1;
+            $sms_notification = 1;
+        } else if ($notify == '0101') {
+            $push_notification = 1;
+            $sms_notification = 1;
+        } else if ($notify == '0111') {
+            $push_notification = 1;
+            $sms = 1;
+            $sms_notification = 1;
+        }
+
+        $userCommunicationMessages->email = $email;
+        $userCommunicationMessages->push_notification = $push_notification;
+        $userCommunicationMessages->sms = $sms;
+        $userCommunicationMessages->sms_notification = $sms_notification;
+        $userCommunicationMessages->message_send_date = date('Y-m-d', strtotime($userCommunicationMessages->message_send_time));
+        $userCommunicationMessages->message_send_time = date('g:h A', strtotime($userCommunicationMessages->message_send_time));
+
+        $regions = Region::all()->where('status', 1)->pluck('region_name', 'id');
+        $productMerchantCollect = [];
+        return view('admin.communications.edit', compact('userCommunicationMessages', 'regions','productMerchantCollect'));
     }
 
     public function update(UpdateUserRequest $request, User $user)
@@ -185,5 +297,123 @@ class UserCommunicationMessagesController extends Controller
         User::whereIn('id', request('ids'))->delete();
 
         return response(null, Response::HTTP_NO_CONTENT);
+    }
+
+    public function checkPastTime($todayTime)
+    {
+        $now = Carbon::now()->toDateTimeString();
+        $messageSendTime = Carbon::now()->toDateString() . ' ' . date('H:i:s', strtotime($todayTime));
+        $response = [];
+        $response['status'] = '';
+        $response['message'] = '';
+        if (strtotime($now) > strtotime($messageSendTime)) { //today's time but past time
+            $response['status'] = 'error';
+            $response['message'] = 'Send Notification Time should be greater than current time.';
+        }
+        return $response;
+    }
+
+    public function getUserTypeData(Request $request)
+    {
+        $input = $request->all();
+
+        // formData.append('user_type', id);
+        // formData.append('custom_region', customRegion);
+        // formData.append('region_type', regionTypeFlag);
+        $inputData = array('user_type' => $input['user_type'], 'custom_region' => $input['custom_region'], 'region_type' => $input['region_type']);
+        $inputData = json_encode($inputData);
+        $users = collect(DB::select('call getUserTypeRegionData(?)', [$inputData]));
+
+
+        //Array ( [user_type] => 3 [custom_region] => 4,5 [region_type] => 2 )
+        // if ($input['user_type'] == 3) {
+        //     $users = User::select(DB::raw('CONCAT(users.first_name, " ", users.last_name) AS name'), 'users.id')
+        //         ->whereHas(
+        //             'roles',
+        //             function ($q) {
+        //                 $q->where('title', 'Delivery Boy');
+        //             }
+        //         )->get();
+        // } else if ($input['user_type'] == 4) {
+        //     $users = User::select(DB::raw('CONCAT(users.first_name, " ", users.last_name) AS name'), 'users.id')
+        //         ->whereHas(
+        //             'roles',
+        //             function ($q) {
+        //                 $q->where('title', 'Customer');
+        //             }
+        //         )->get();
+        // }
+
+
+        $response['user_details'] = $users->pluck('name', 'id');
+
+        $response['status'] = '';
+        $response['message'] = '';
+
+        return response()->json($response);
+    }
+
+
+
+    /**
+     * Store an updated resource in storage.
+     *
+     * @param  Modules\Admin\Http\Requests\ProductCreateRequest $request, Modules\Admin\Models\CustomerCommunicationMessages $customerCommunicationMessages
+     * @return json encoded Response
+     */
+    public function sendTestSms(Request $request)
+    {
+        $inputs = $request->all();
+
+        if (array_key_exists($inputs['merchant_id'], $this->fromArray)) {
+            $from = $this->fromArray[$inputs['merchant_id']];
+        }
+
+        $response = SmsHelper::send($inputs['test_mobile_numbers'], $inputs['sms_text'], $from);
+
+        $result = array();
+        if ($response == true) {
+            $result['status'] = 'success';
+            $result['message'] = 'Test SMS Send.';
+        } else {
+            $result['status'] = 'error';
+            $result['message'] = 'Test SMS Sending Problem.';
+        }
+        return response()->json($result);
+    }
+
+    /**
+     * Store an updated resource in storage.
+     *
+     * @param  Modules\Admin\Http\Requests\ProductCreateRequest $request, Modules\Admin\Models\CustomerCommunicationMessages $customerCommunicationMessages
+     * @return json encoded Response
+     */
+    public function sendTestEmail(Request $request)
+    {
+        $inputs = $request->all();
+
+        $responseMail = EmailHelper::getCustomerEmailTemplate('IN_USER_COMMUNICATION_MESSAGES', $inputs['email_body']);
+
+        $toEmails = (new EmailHelper())->explodeEmails($inputs['test_email_addresses']);
+        $response = EmailHelper::send(array(
+            'subject' => isset($inputs['email_subject']) ? $inputs['email_subject'] : '',
+            'message' => $responseMail,
+            'from' => [
+                "name" => isset($inputs['email_from_name']) ? $inputs['email_from_name'] : '',
+                "email" => isset($inputs['email_from_email']) ? $inputs['email_from_email'] : '',
+            ],
+            'to' => $toEmails,
+        ));
+
+
+        $result = array();
+        if ($response == true) {
+            $result['status'] = 'success';
+            $result['message'] = 'Test Email Send.';
+        } else {
+            $result['status'] = 'error';
+            $result['message'] = 'Test Email Sending Problem.';
+        }
+        return response()->json($result);
     }
 }

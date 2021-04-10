@@ -39,6 +39,7 @@ class CategoriesController extends Controller
     public function edit(Category $category)
     {
         abort_if(Gate::denies('category_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+        echo '<pre>'; print_r($category); exit;
         return view('admin.categories.edit', compact('category'));
     }
 

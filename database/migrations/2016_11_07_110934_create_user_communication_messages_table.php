@@ -19,7 +19,10 @@ class CreateUserCommunicationMessagesTable extends Migration {
             $table->string('message_title', 100);
             $table->boolean('message_type')->index()->default(1)->comment = "1 : Message";
             $table->integer('reference_id')->unsigned()->index()->nullable();  
-            $table->integer('offer_id')->unsigned()->index()->nullable();            
+            $table->integer('offer_id')->unsigned()->index()->nullable();
+            $table->integer('region_type')->default(1)->unsigned()->index()->nullable();
+            $table->integer('user_role')->default(4)->unsigned()->index()->nullable();
+            $table->integer('user_type')->default(1)->unsigned()->index()->nullable();                    
             $table->string('push_text', 320);
             $table->string('deep_link_screen', 50);
             $table->string('sms_text', 500);

@@ -57,10 +57,10 @@
             <span class="navbar-brand-minimized">{{ trans('panel.site_title') }}</span>
         </a> -->
 
-      <a class="navbar-brand" id="page-logo"  href="{!! URL::to('/') !!}">
-        <img src="{!! URL::asset('images/logo.png') !!}" alt="" class="logo-default img-responsive" />
-      </a>
-  
+    <a class="navbar-brand" id="page-logo" href="{!! URL::to('/') !!}">
+      <img src="{!! URL::asset('images/logo.png') !!}" alt="" class="logo-default img-responsive" />
+    </a>
+
     <button class="navbar-toggler sidebar-toggler d-md-down-none" type="button" data-toggle="sidebar-lg-show">
       <span class="navbar-toggler-icon"></span>
     </button>
@@ -86,7 +86,7 @@
   <div class="app-body">
     @include('partials.menu')
     <main class="main">
-
+    <div id="ajax-response-text"></div>
 
       <div style="padding-top: 20px" class="container-fluid">
         @if(session('message'))
@@ -147,6 +147,7 @@
   <script src="{{ asset('global/plugins/jquery.blockui.min.js') }}"></script>
   <script src="{{ asset('global/plugins/uniform/jquery.uniform.min.js') }}"></script>
   <script src="{{ asset('js/main.js') }}"></script>
+  <script src="{{ asset('global/scripts/metronic.js') }}"></script>
   <script src="{{ asset('js/admin/common.js') }}"></script>
   <script src="{{ asset('js/validation.js') }}"></script>
   <script>
@@ -282,6 +283,10 @@
       $.fn.dataTable.ext.classes.sPageButton = '';
     });
   </script>
+  <script>
+    var adminUrl = '{!!URL::to("/admin")!!}';
+  </script>
+  
   @yield('global-level-scripts')
   @yield('page-level-scripts')
   @yield('template-level-scripts')

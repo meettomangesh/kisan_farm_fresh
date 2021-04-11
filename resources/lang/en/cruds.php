@@ -668,6 +668,8 @@ return [
             'message-type'      => 'Message type',
             'message-title'     => 'Message title',
             'message-send-date-time' => 'Message send date time',
+            'message-send-date' => 'Message send date',
+            'message-send-time' => 'Message send time',
             'filter_or_upload'  => '',
             'apply_filters' => 'Apply filters',
             'upload_files' => 'Upload files',

@@ -109,10 +109,10 @@
                     @endif
                     {{ trans('cruds.communication.fields.email') }}
 
-                    {!! Form::checkbox('push_notification', 2, null, ['id' => 'push_notification', 'class' => 'notification form-control']) !!}
+                    {!! Form::checkbox('push_notification', 1, null, ['id' => 'push_notification', 'class' => 'notification form-control']) !!}
                     {{ trans('cruds.communication.fields.push-notification') }}
 
-                    {!! Form::checkbox('sms', 3, null, ['id' => 'sms', 'class' => 'notification form-control']) !!}
+                    {!! Form::checkbox('sms', 1, null, ['id' => 'sms', 'class' => 'notification form-control']) !!}
                     {{ trans('cruds.communication.fields.sms') }}
 
                     <!-- {!! Form::checkbox('sms_notification', 4, null, ['id' => 'sms_notification',  'class' => 'notification form-control']) !!}

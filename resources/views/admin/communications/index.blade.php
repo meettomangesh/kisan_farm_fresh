@@ -26,7 +26,7 @@
                         <th> {{ trans('cruds.communication.fields.id') }} </th>
                         
                         <th width='10%'>{{ trans('cruds.communication.fields.notification') }} </th>
-                        <th width='15%'>{{ trans('cruds.communication.fields.message-type') }} </th>
+                        <!-- <th width='15%'>{{ trans('cruds.communication.fields.message-type') }} </th> -->
                         <th width='20%'>{{ trans('cruds.communication.fields.message-title') }} </th>
                         <th width='20%'>{{ trans('cruds.communication.fields.message-send-date-time') }} </th>
                         <th width='10%'>{{ trans('cruds.communication.fields.email_count') }}</th>
@@ -49,9 +49,9 @@
                         <td>
                             {{ $userCommunicationMessage->notifyStr ?? '' }}
                         </td>
-                        <td>
+                        <!-- <td>
                             {{ $userCommunicationMessage->message_type ?? '' }}
-                        </td>
+                        </td> -->
                         <td>
                             {{ $userCommunicationMessage->message_title ?? '' }}
                         </td>

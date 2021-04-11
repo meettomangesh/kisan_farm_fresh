@@ -307,9 +307,7 @@ class UserCommunicationMessagesController extends Controller
 
         $roles = Role::all()->where('title', 'Delivery Boy')->pluck('title', 'id');
         $regions = Region::all()->where('status', 1)->pluck('region_name', 'id');
-        //$users = $userCommunicationMessages->users()->get()->pluck('name', 'id');
-        // echo '<pre>';
-        // print_r($userCommunicationMessages->users()->get()->pluck('id')); exit;
+
         $inputData = array('user_type' => $userCommunicationMessages->user_role, 'custom_region' => implode(",",$userCommunicationMessages->regions()->get()->pluck('id')->toArray()), 'region_type' => $userCommunicationMessages->region_type);
         $inputData = json_encode($inputData);
         $users = collect(DB::select('call getUserTypeRegionData(?)', [$inputData]))->pluck('name','id');
@@ -375,13 +373,67 @@ class UserCommunicationMessagesController extends Controller
         return redirect()->route('admin.communications.index');
     }
 
-    public function show(User $user)
+    public function show($id)
     {
         abort_if(Gate::denies('communication_show'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
-        $user->load('roles');
+        $userCommunicationMessages = UserCommunicationMessages::find($id);
 
-        return view('admin.communicationsshow', compact('user'));
+        $notify = $userCommunicationMessages->notify_users_by;
+        $notifyType = '';
+        
+        $email = trans('cruds.communication.fields.email');
+        $push_notification = trans('cruds.communication.fields.push-notification');
+        $sms = trans('cruds.communication.fields.sms');
+        $sms_notification = trans('cruds.communication.fields.sms-notification');
+
+        $notifyStr = '';
+        if ($notify == '1000') {
+            $notifyStr = $email;
+        } else if ($notify == '0100') {
+            $notifyStr = $push_notification;
+        } else if ($notify == '0010') {
+            $notifyStr = $sms;
+        } else if ($notify == '1100') {
+            $notifyStr = $email . ', ' . $push_notification;
+        } else if ($notify == '1010') {
+            $notifyStr = $email . ', ' . $sms;
+        } else if ($notify == '1110') {
+            $notifyStr = $email . ', ' . $push_notification . ', ' . $sms;
+        } else if ($notify == '1001') {
+            $notifyStr = $email . ', ' . $sms_notification;
+        } else if ($notify == '1011') {
+            $notifyStr = $email . ', ' . $sms . ', ' . $sms_notification;
+        } else if ($notify == '1101') {
+            $notifyStr = $email . ', ' . $push_notification . ', ' . $sms_notification;
+        } else if ($notify == '1111') {
+            $notifyStr = $email . ', ' . $push_notification . ', ' . $sms . ', ' . $sms_notification;
+        } else if ($notify == '0110') {
+            $notifyStr = $push_notification . ', ' . $sms;
+        } else if ($notify == '0001') {
+            $notifyStr = $sms_notification;
+        } else if ($notify == '0011') {
+            $notifyStr = $sms . ', ' . $sms_notification;
+        } else if ($notify == '0101') {
+            $notifyStr = $push_notification . ', ' . $sms_notification;
+        } else if ($notify == '0111') {
+            $notifyStr = $push_notification . ', ' . $sms . ', ' . $sms_notification;
+        }
+        $userCommunicationMessages->notifyStr = $notifyStr;  
+
+        $userCommunicationMessages->message_send_date = date('Y-m-d', strtotime($userCommunicationMessages->message_send_time));
+        $userCommunicationMessages->message_send_time = date('g:h A', strtotime($userCommunicationMessages->message_send_time));
+
+
+        $roles = Role::all()->where('title', 'Delivery Boy')->pluck('title', 'id');
+        $regions = Region::all()->where('status', 1)->pluck('region_name', 'id');
+
+        $inputData = array('user_type' => $userCommunicationMessages->user_role, 'custom_region' => implode(",",$userCommunicationMessages->regions()->get()->pluck('id')->toArray()), 'region_type' => $userCommunicationMessages->region_type);
+        $inputData = json_encode($inputData);
+        $users = collect(DB::select('call getUserTypeRegionData(?)', [$inputData]));
+       
+        return view('admin.communications.show', compact('userCommunicationMessages','regions', 'users','productMerchantCollect'));
+
     }
 
     public function destroy(User $user)

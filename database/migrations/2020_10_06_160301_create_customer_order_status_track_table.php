@@ -16,7 +16,7 @@ class CreateCustomerOrderStatusTrackTable extends Migration
         Schema::create('customer_order_status_track', function (Blueprint $table) {
             $table->increments('id')->unsigned();
             $table->integer('order_details_id')->default(0)->unsigned()->index();
-            $table->tinyInteger('order_status')->default(1)->unsigned()->index()->comment = "1: Pending, 2: Ordered, 3: In Process, 4: Completed";
+            $table->tinyInteger('order_status')->default(1)->unsigned()->index()->comment = "1: Placed, 2: Picked, 3: Out for delivery, 4: Delivered, 5: Cancelled";
             $table->integer('created_by')->unsigned();
             $table->integer('updated_by')->default(0)->unsigned();
             $table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP'));

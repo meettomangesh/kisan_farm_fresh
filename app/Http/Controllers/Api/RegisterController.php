@@ -235,4 +235,41 @@ class RegisterController extends BaseController
         return $response;
         // $this->response->setContent(json_encode($response)); // send response in json format
     }
+
+    public function storeDeviceToken(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'platform' => 'required',
+            'user_id' => 'required|integer',
+            'user_role_id' => 'required|integer',
+            'device_id' => 'required',
+            'device_token' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return $this->sendError(parent::VALIDATION_ERROR, $validator->errors());
+        }
+
+        try {
+            $params = [
+                'platform' => $request->platform,
+                'user_id' => $request->user_id,
+                'user_role_id' => $request->user_role_id,
+                'device_id' => $request->device_id,
+                'device_token' => $request->device_token,
+            ];
+
+            //Create user object to call functions
+            $user = new User();
+            // Function call to get product list
+            $responseDetails = $user->storeDeviceToken($params);
+            $message = 'Failed to store device token.';
+            if($responseDetails) {
+                $message = 'Device token stored successfully';
+            }
+            $response = $this->sendResponse([], $message);
+        } catch (Exception $e) {
+            $response = $this->sendResponse(array(), $e->getMessage());
+        }
+        return $response;
+    }
 }

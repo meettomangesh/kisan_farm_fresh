@@ -56,8 +56,8 @@ class CustomerOrders extends Model
         return $this->hasMany(CustomerOrderDetails::class, 'order_id');
     }
 
-    protected function cancelOrder($orderId, $type) {
-        $cancelData = array('order_id' => $orderId, 'type' => $type);
+    protected function cancelOrder($orderId, $type, $reason) {
+        $cancelData = array('order_id' => $orderId, 'type' => $type, 'reason' => $reason);
         $inputData = json_encode($cancelData);
         $pdo = DB::connection()->getPdo();
         $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, true);
@@ -108,7 +108,7 @@ class CustomerOrders extends Model
     }
 
     public function cancelOrderAPI($params) {
-        return $this->cancelOrder($params['order_id'], 2);
+        return $this->cancelOrder($params['order_id'], 2, '');
     }
 
     public function placeOrder($params) {
@@ -293,6 +293,9 @@ class CustomerOrders extends Model
     }
 
     public function changeOrderStatus($params) {
+        if($params['order_status'] == 5) {
+            return $this->cancelOrder($params['order_id'], 2, $params['order_note']);
+        }
         $inputData = json_encode($params);
         $pdo = DB::connection()->getPdo();
         $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, true);

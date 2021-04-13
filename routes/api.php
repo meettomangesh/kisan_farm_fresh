@@ -39,7 +39,7 @@ Route::post('saveAddressByUserId', 'Api\UserAddressController@saveAddressByUserI
 Route::post('updateAddressByUserId', 'Api\UserAddressController@updateAddressByUserId');
 Route::post('deleteAddressByUserId', 'Api\UserAddressController@deleteAddressByUserId');
 Route::post('uploadImage', 'Api\MiscellaneousController@uploadImage');
-
+Route::post('storeDeviceToken', 'Api\RegisterController@storeDeviceToken');
 
 Route::middleware('auth:api')->group( function () {
     // Route::resource('products', 'API\ProductsController');

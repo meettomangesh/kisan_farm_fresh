@@ -136,4 +136,31 @@ class User extends Authenticatable
             return $this->sendError('Error.', $$e->getMessage());
         }
     }
+
+    /**
+     * Store device token
+     * @param array $params
+     * @throws Exception  
+     * @return array of data
+     */
+    public function storeDeviceToken($params = [])
+    {
+        try {
+            $inputData = json_encode($params);
+            $pdo = DB::connection()->getPdo();
+            $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, true);
+            $stmt = $pdo->prepare("CALL storeDeviceToken(?)");
+            $stmt->execute([$inputData]);
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+            $stmt->closeCursor();
+            $reponse = json_decode($result['response']);
+            if($reponse->status == "FAILURE" && $reponse->statusCode != 200) {
+                return false;
+            }
+            return true;
+        } catch (Exception $e) {
+            return $this->sendError('Error.', $$e->getMessage());
+        }
+    }
 }

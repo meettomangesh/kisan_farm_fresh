@@ -4,6 +4,7 @@ CREATE PROCEDURE cancelOrder(IN inputData JSON)
 cancelOrder:BEGIN
     DECLARE orderId,codId,codbId,productUnitsId,productUnitsIdOne,itemQuantity,itemQuantityOne,notFound,notFoundBasket INTEGER(10) DEFAULT 0;
     DECLARE actionType,orderStatusCancelled,isBasket TINYINT(1) DEFAULT 0;
+    DECLARE reason VARCHAR(255) DEFAULT NULL;
 
     IF inputData IS NOT NULL AND JSON_VALID(inputData) = 0 THEN
         SELECT JSON_OBJECT('status', 'FAILURE', 'message', 'Please provide valid data.','data',JSON_OBJECT(),'statusCode',520) AS response;
@@ -11,6 +12,7 @@ cancelOrder:BEGIN
     END IF;
     SET orderId = JSON_UNQUOTE(JSON_EXTRACT(inputData,'$.order_id'));
     SET actionType = JSON_UNQUOTE(JSON_EXTRACT(inputData,'$.type'));
+    SET reason = JSON_UNQUOTE(JSON_EXTRACT(inputData,'$.reason'));
     SET orderStatusCancelled = 5;
 
     IF orderId = 0 AND actionType = 0 THEN
@@ -76,7 +78,7 @@ cancelOrder:BEGIN
     IF actionType = 1 THEN
         DELETE FROM customer_orders WHERE id = orderId;
     ELSEIF actionType = 2 THEN
-        UPDATE customer_orders SET order_status = orderStatusCancelled WHERE id = orderId;
+        UPDATE customer_orders SET order_status = orderStatusCancelled, reject_cancel_reason = reason WHERE id = orderId;
     END IF;
 
     SELECT JSON_OBJECT('status', 'SUCCESS', 'message', 'Order cancelled successfully.','data',JSON_OBJECT(),'statusCode',200) AS response;

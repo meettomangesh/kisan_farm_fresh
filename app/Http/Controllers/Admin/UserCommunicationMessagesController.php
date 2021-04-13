@@ -229,6 +229,10 @@ class UserCommunicationMessagesController extends Controller
         }
 
         $userCommunication = UserCommunicationMessages::create($inputs);
+        if ($send_today > 0) {
+            $res = \Illuminate\Support\Facades\Artisan::call('send-notifications', ['--notification_id' => $userCommunication->id]);
+        }
+
         $userCommunication->regions()->sync($request->input('regions', []));
         $userCommunication->users()->sync($request->input('users', []));
 

@@ -213,7 +213,7 @@ class Notifications extends Command
     {
         $staticSeconds = 60;
         if (!empty($notification)) {
-            $pushNotificationData = DB::select('call getPushNotificationData(' . $notification->merchant_id . ',' . $notification->loyalty_id . ',' . $notification->loyalty_tier_id . ')');
+            $pushNotificationData = DB::select('call getPushNotificationData(' . $notificationId . ')');
 
             $pushNotificationDataGroup = array_chunk($pushNotificationData, 500);
 
@@ -294,7 +294,7 @@ class Notifications extends Command
     {
         $smsNotificationData = [];
         if (!empty($notification)) {
-            $smsNotificationData = DB::select('call getSmsNotificationData(' . $notification->merchant_id . ',' . $notification->loyalty_id . ',' . $notification->loyalty_tier_id . ')');
+            $smsNotificationData = DB::select('call getSmsNotificationData(' . $notificationId .')');
             $smsData = [];
             if ($notification->merchant_id != 0) {
                 $getMerchantInfoForEmail = DB::select('call getMerchantInfoForEmail(?)', array($notification->merchant_id));

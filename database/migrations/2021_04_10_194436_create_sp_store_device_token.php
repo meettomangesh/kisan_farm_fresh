@@ -27,7 +27,7 @@ class CreateSpStoreDeviceToken extends Migration
             SET userId = JSON_UNQUOTE(JSON_EXTRACT(inputData,'$.user_id'));
             SET deviceToken = JSON_UNQUOTE(JSON_EXTRACT(inputData,'$.device_token'));
         
-            IF userId = 0 OR (deviceToken = '' OR deviceToken IS NULL) OR (deviceId = '' OR deviceToken IS NULL) THEN
+            IF userId = 0 OR userRoleId = 0 OR (deviceToken = '' OR deviceToken IS NULL) OR (deviceId = '' OR deviceToken IS NULL) THEN
                 SELECT JSON_OBJECT('status', 'FAILURE', 'message', 'Please provide valid data.','data',JSON_OBJECT(),'statusCode',520) AS response;
                 LEAVE storeDeviceToken;
             END IF;

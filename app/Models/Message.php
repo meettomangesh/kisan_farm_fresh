@@ -95,7 +95,6 @@ class Message extends ApiModel
             $response = json_decode(curl_exec($curl));
             $err = curl_error($curl);
             curl_close($curl);
-            print_r($response);
             if ($err || $response->type == 'error') {
                 return 0;
             } else {

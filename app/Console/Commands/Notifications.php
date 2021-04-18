@@ -4,6 +4,9 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use DB;
+use Aws\Credentials\Credentials;
+use Aws\Ses\SesClient;
+use App\Helper\EmailHelper;
 
 class Notifications extends Command
 {
@@ -43,7 +46,7 @@ class Notifications extends Command
         } else {
             $notificationId = 0;
         }
-        
+
         $notificationData = $this->getNotificationdata($notificationId);
         // echo '<pre>'; 
         // print_r($notificationData);
@@ -54,32 +57,32 @@ class Notifications extends Command
             $smsCount = 0;
             $notificationCount = 0;
             switch ($notification->notify_users_by) {
-                case "0001": {
-                        $countArray = $this->pushAndSmsNotifications($notification, $notificationId);
-                        $smsCount = $countArray['smsCount'];
-                        $notificationCount = $countArray['notificationCount'];
-                        break;
-                    }
+                    // case "0001": {
+                    //         $countArray = $this->pushAndSmsNotifications($notification, $notificationId);
+                    //         $smsCount = $countArray['smsCount'];
+                    //         $notificationCount = $countArray['notificationCount'];
+                    //         break;
+                    //     }
                 case "0010": {
                         $smsCount = $this->smsNotifications($notification, $notificationId);
                         break;
                     }
-                case "0011": {
-                        $countArray = $this->pushAndSmsNotifications($notification, $notificationId);
-                        $smsCount = $countArray['smsCount'];
-                        $notificationCount = $countArray['notificationCount'];
-                        break;
-                    }
+                    // case "0011": {
+                    //         $countArray = $this->pushAndSmsNotifications($notification, $notificationId);
+                    //         $smsCount = $countArray['smsCount'];
+                    //         $notificationCount = $countArray['notificationCount'];
+                    //         break;
+                    //     }
                 case "0100": {
                         $notificationCount = $this->pushNotifications($notification, $notificationId);
                         break;
                     }
-                case "0101": {
-                        $countArray = $this->pushAndSmsNotifications($notification, $notificationId);
-                        $smsCount = $countArray['smsCount'];
-                        $notificationCount = $countArray['notificationCount'];
-                        break;
-                    }
+                    // case "0101": {
+                    //         $countArray = $this->pushAndSmsNotifications($notification, $notificationId);
+                    //         $smsCount = $countArray['smsCount'];
+                    //         $notificationCount = $countArray['notificationCount'];
+                    //         break;
+                    //     }
                 case "0110": {
                         $notificationCount = $this->pushNotifications($notification, $notificationId);
                         $smsCount = $this->smsNotifications($notification, $notificationId);
@@ -89,50 +92,50 @@ class Notifications extends Command
                         $emailCount = $this->emailNotifications($notification, $notificationId);
                         break;
                     }
-                case "1001": {
-                        $emailCount = $this->emailNotifications($notification, $notificationId);
-                        $countArray = $this->pushAndSmsNotifications($notification, $notificationId);
-                        $smsCount = $countArray['smsCount'];
-                        $notificationCount = $countArray['notificationCount'];
-                        break;
-                    }
+                    // case "1001": {
+                    //         $emailCount = $this->emailNotifications($notification, $notificationId);
+                    //         $countArray = $this->pushAndSmsNotifications($notification, $notificationId);
+                    //         $smsCount = $countArray['smsCount'];
+                    //         $notificationCount = $countArray['notificationCount'];
+                    //         break;
+                    //     }
                 case "1010": {
                         $emailCount = $this->emailNotifications($notification, $notificationId);
                         $smsCount = $this->smsNotifications($notification, $notificationId);
                         break;
                     }
-                case "1011": {
-                        $emailCount = $this->emailNotifications($notification, $notificationId);
-                        $countArray = $this->pushAndSmsNotifications($notification, $notificationId);
-                        $smsCount = $countArray['smsCount'];
-                        $notificationCount = $countArray['notificationCount'];
-                        break;
-                    }
+                    // case "1011": {
+                    //         $emailCount = $this->emailNotifications($notification, $notificationId);
+                    //         $countArray = $this->pushAndSmsNotifications($notification, $notificationId);
+                    //         $smsCount = $countArray['smsCount'];
+                    //         $notificationCount = $countArray['notificationCount'];
+                    //         break;
+                    //     }
                 case "1100": {
                         $emailCount = $this->emailNotifications($notification, $notificationId);
                         $notificationCount = $this->pushNotifications($notification, $notificationId);
                         break;
                     }
-                case "1101": {
-                        $emailCount = $this->emailNotifications($notification, $notificationId);
-                        $countArray = $this->pushAndSmsNotifications($notification, $notificationId);
-                        $smsCount = $countArray['smsCount'];
-                        $notificationCount = $countArray['notificationCount'];
-                        break;
-                    }
+                    // case "1101": {
+                    //         $emailCount = $this->emailNotifications($notification, $notificationId);
+                    //         $countArray = $this->pushAndSmsNotifications($notification, $notificationId);
+                    //         $smsCount = $countArray['smsCount'];
+                    //         $notificationCount = $countArray['notificationCount'];
+                    //         break;
+                    //     }
                 case "1110": {
                         $emailCount = $this->emailNotifications($notification, $notificationId);
                         $notificationCount = $this->pushNotifications($notification, $notificationId);
                         $smsCount = $this->smsNotifications($notification, $notificationId);
                         break;
                     }
-                case "1111": {
-                        $emailCount = $this->emailNotifications($notification, $notificationId);
-                        $countArray = $this->pushAndSmsNotifications($notification, $notificationId);
-                        $smsCount = $countArray['smsCount'];
-                        $notificationCount = $countArray['notificationCount'];
-                        break;
-                    }
+                    // case "1111": {
+                    //         $emailCount = $this->emailNotifications($notification, $notificationId);
+                    //         $countArray = $this->pushAndSmsNotifications($notification, $notificationId);
+                    //         $smsCount = $countArray['smsCount'];
+                    //         $notificationCount = $countArray['notificationCount'];
+                    //         break;
+                    //     }
                 default: {
                         break;
                     }
@@ -163,10 +166,31 @@ class Notifications extends Command
         $emailNotificationData = [];
         if (!empty($notification)) {
 
-            $mailgun = new Mailgun(config('services.mailgun.secret'));
-            $domain = config('services.mailgun.domain');
+            // $mailgun = new Mailgun(config('services.mailgun.secret'));
+            // $domain = config('services.mailgun.domain');
             $emailCount = 0;
-            $emailNotificationData = DB::select('call getEmailNotificationData(' . $notificationId . '")');
+            $emailNotificationData = DB::select('call getEmailNotificationData(' . $notificationId . ')');
+            
+            $client = new SesClient([
+                'credentials' => new Credentials(config('services.ses.username'), config('services.ses.password')),
+                'region'      => 'ap-south-1',
+                'version'     => 'latest',
+            ]);
+            $responseMail = EmailHelper::getCustomerEmailTemplate('IN_USER_COMMUNICATION_MESSAGES', '');
+
+            $client->createTemplate([
+                'Template' => [
+                    'TemplateName' => 'IN_USER_COMMUNICATION_MESSAGES', //unique template name
+                    'SubjectPart'  => "Hello, {{name}}!",
+                    'TextPart'     => $responseMail,
+                    'HtmlPart'     => $responseMail,
+                ],
+            ]);
+
+            print_r($client);
+            exit;
+
+
             $emailCount = count($emailNotificationData);
             $emailNotificationData = array_chunk($emailNotificationData, 500);
 
@@ -294,7 +318,7 @@ class Notifications extends Command
     {
         $smsNotificationData = [];
         if (!empty($notification)) {
-            $smsNotificationData = DB::select('call getSmsNotificationData(' . $notificationId .')');
+            $smsNotificationData = DB::select('call getSmsNotificationData(' . $notificationId . ')');
             $smsData = [];
             if ($notification->merchant_id != 0) {
                 $getMerchantInfoForEmail = DB::select('call getMerchantInfoForEmail(?)', array($notification->merchant_id));
@@ -325,114 +349,6 @@ class Notifications extends Command
         return $smsCount;
     }
 
-    /**
-     * This function will perfom the action of sending bulk SMS for the valid users
-     * who hasn't installed the app and sends the push notifications to users
-     * who has installed the app.
-     * @param array $notification
-     */
-    public function pushAndSmsNotifications($notification, $notificationId)
-    {
-        $pushAndSmsNotificationData = [];
-        $staticSeconds = 60;
-        if (!empty($notification)) {
-            $pushAndSmsNotificationData = DB::select('call getPushAndSmsNotificationData(' . $notification->merchant_id . ',' . $notification->loyalty_id . ',' . $notification->loyalty_tier_id . ')');
-            $pushNotificationDataGroup = array_chunk($pushAndSmsNotificationData, 500);
-            $counter = 1;
-            if ($notification->merchant_id != 0) {
-                $getMerchantInfoForEmail = DB::select('call getMerchantInfoForEmail(?)', array($notification->merchant_id));
-                $smsFrom = $getMerchantInfoForEmail[0]->sms_sender_name;
-            } else {
-                $smsFrom = '';
-            }
-            $smsCount = 0;
-            $pushNotificationCount = 0;
-            foreach ($pushNotificationDataGroup as $pushAndSmsNotificationData) {
-                $smsData = [];
-                $iosTokensData = [];
-                $androidTokensData = [];
-                $customerPushNotificationData = [];
-                $arrCustomerIds = [];
-                foreach ($pushAndSmsNotificationData as $key => $customerData) {
-                    if (empty($customerData->device_token) || $customerData->device_token == NULL) {
-                        if ($customerData->first_mobile_verified == 1) {
-                            $smsData = [
-                                'message' => $notification->sms_text,
-                                'to' => $customerData->mobile_number,
-                                'from' => $smsFrom
-                            ];
-                            //                TODO: Call the function to send bulk sms notification
-                            $delay = (strtotime($notification->message_send_time) > time()) ? strtotime($notification->message_send_time) - time() : 0;
-
-                            if ($notificationId != 0) {
-                                $job = (new SendBulkSms($smsData))->onQueue('high-bulk-sms')->delay($delay);
-                            } else {
-                                $job = (new SendBulkSms($smsData))->onQueue('bulk-sms')->delay($delay);
-                            }
-                            $this->dispatch($job);
-                            $smsCount++;
-                        }
-                    } elseif ($customerData->status == 1) {
-                        if ($customerData->device_type == 1) {
-                            if (!in_array($customerData->device_token, $androidTokensData)) {
-                                $androidTokensData[] = $customerData->device_token;
-                            }
-                        } else {
-                            if (!in_array($customerData->device_token, $iosTokensData)) {
-                                $iosTokensData[] = $customerData->device_token;
-                            }
-                        }
-                        if (!in_array($customerData->customer_id, $arrCustomerIds)) {
-                            $customerPushNotificationData[] = [
-                                'customer_id' => $customerData->customer_id,
-                                'merchant_id' => $notification->merchant_id,
-                                'loyalty_id' => $notification->loyalty_id,
-                                'custom_data' => $notification->offer_id,
-                                'communication_msg_id' => $notification->id,
-                                'push_text' => $notification->push_text,
-                                'deep_link_screen' => $notification->deep_link_screen,
-                                'created_by' => 1,
-                                'created_at' => date('Y-m-d H:i:s', strtotime($notification->message_send_time))
-                            ];
-                            $arrCustomerIds[] = $customerData->customer_id;
-                        }
-                    }
-                }
-                $pushData = [
-                    'message' => $notification->push_text,
-                    'iosTokens' => $iosTokensData,
-                    'androidTokens' => $androidTokensData,
-                    'deepLink' => $notification->deep_link_screen,
-                    'merchantId' => $notification->merchant_id,
-                    'notificationType' => 0,
-                    'uniqueId' => $notification->id,
-                    'id' => ($notification->offer_id != '') ? $notification->offer_id : 0
-                ];
-                if (count($customerPushNotificationData) > 0) {
-                    $this->saveCustomerPushNotification($customerPushNotificationData);
-                }
-
-                if ($counter > 1) {
-                    $delay = ((strtotime($notification->message_send_time) > time()) ? strtotime($notification->message_send_time) - time() : 0) + ($staticSeconds * $counter);
-                } else {
-                    $delay = (strtotime($notification->message_send_time) > time()) ? strtotime($notification->message_send_time) - time() : 0;
-                }
-
-                if ($notificationId != 0) {
-                    $job = (new SendBulkNotification($pushData))->onQueue('high-bulk-notifications')->delay($delay);
-                } else {
-                    $job = (new SendBulkNotification($pushData))->onQueue('bulk-notifications')->delay($delay);
-                }
-                $this->dispatch($job);
-                $counter++;
-                $pushNotificationCount = $pushNotificationCount + (count($androidTokensData) + count($iosTokensData));
-            }
-        } else {
-            $this->comment(PHP_EOL . "Empty Array" . PHP_EOL);
-        }
-        Log::info('Bulk Actions Call.', ['method' => 'pushAndSmsNotifications', 'process_records' => count($pushAndSmsNotificationData)]);
-        return ['smsCount' => $smsCount, 'pushNotificationCount' => $pushNotificationCount];
-    }
 
     /**
      * This function saves the sent push notification for future use

@@ -17,6 +17,7 @@ class CreateSpStoreDeviceToken extends Migration
         CREATE PROCEDURE storeDeviceToken(IN inputData JSON)
         storeDeviceToken:BEGIN
             DECLARE userId INTEGER(10) DEFAULT 0;
+            DECLARE deviceType INTEGER(10) DEFAULT 1;
             DECLARE userRoleId TINYINT(1) DEFAULT 0;
             DECLARE deviceToken,deviceId VARCHAR(255) DEFAULT NULL;
         
@@ -26,17 +27,17 @@ class CreateSpStoreDeviceToken extends Migration
             END IF;
             SET userId = JSON_UNQUOTE(JSON_EXTRACT(inputData,'$.user_id'));
             SET deviceToken = JSON_UNQUOTE(JSON_EXTRACT(inputData,'$.device_token'));
-        
+
             IF userId = 0 OR (deviceToken = '' OR deviceToken IS NULL) OR (deviceId = '' OR deviceToken IS NULL) THEN
                 SELECT JSON_OBJECT('status', 'FAILURE', 'message', 'Please provide valid data.','data',JSON_OBJECT(),'statusCode',520) AS response;
                 LEAVE storeDeviceToken;
             END IF;
            
             IF EXISTS(SELECT id FROM customer_device_tokens WHERE user_id = userId) THEN
-                UPDATE customer_device_tokens SET device_id = deviceId, device_token = deviceToken, updated_by = 1 WHERE user_id = userId AND user_role_id = userRoleId;
+                UPDATE customer_device_tokens SET device_id = deviceId, device_type = deviceType, device_token = deviceToken, updated_by = 1 WHERE user_id = userId AND user_role_id = userRoleId;
             ELSEIF EXISTS(SELECT id FROM users WHERE id = userId) THEN
-                INSERT INTO customer_device_tokens (user_id,user_role_id,device_id,device_token,created_by)
-                VALUES (userId,userRoleId,deviceId,deviceToken,1);
+                INSERT INTO customer_device_tokens (user_id,user_role_id,device_id,device_token,device_type,created_by)
+                VALUES (userId,userRoleId,deviceId,deviceToken,deviceType,1);
             ELSE
                 SELECT JSON_OBJECT('status', 'FAILURE', 'message', 'Failed to store device token.','data',JSON_OBJECT(),'statusCode',520) AS response;
                 LEAVE storeDeviceToken;

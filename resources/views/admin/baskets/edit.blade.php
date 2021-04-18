@@ -72,20 +72,21 @@
                     </div>
                 </div>
 
-                <!-- <div class="col-md-6">
+                <div class="col-md-6">
                     <div class="form-group">
-                        <label class="control-label col-md-4 required" for="opening_quantity">{{ trans('cruds.basket.fields.opening_quantity') }}</label>
+                        <label class="control-label col-md-4 required" for="category_id">{{ trans('cruds.product.fields.category') }}</label>
+
                         <div class="col-md-8 float-right">
-                            <input class="form-control {{ $errors->has('opening_quantity') ? 'is-invalid' : '' }}" name="opening_quantity" id="opening_quantity" value="{{ old('opening_quantity', $basket->opening_quantity) }}" greaterThanZero = "true" numberOnly="true" required>
-                            @if($errors->has('opening_quantity'))
-                                <div class="invalid-feedback">
-                                    {{ $errors->first('opening_quantity') }}
-                                </div>
-                            @endif
-                            <span class="help-block">{{ trans('cruds.basket.fields.opening_quantity_helper') }}</span>
+                            <label>{{ App\Models\Category::getCategoryName($basket->category_id) }}</label>
                         </div>
+                        @if($errors->has('category'))
+                        <div class="invalid-feedback">
+                            {{ $errors->first('category') }}
+                        </div>
+                        @endif
+                        <span class="help-block">{{ trans('cruds.basket.fields.category_helper') }}</span>
                     </div>
-                </div> -->
+                </div>
             </div>
 
 

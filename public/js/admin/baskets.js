@@ -7,7 +7,7 @@ siteObjJs.admin.basketMerchantJs = function () {
     var imageNamesArr = [];
     var rowNumber;
     var removedImagesIds = [];
-// Initialize all the page-specific event listeners here.
+    // Initialize all the page-specific event listeners here.
 
     var initializeListener = function (formId) {
 
@@ -49,8 +49,7 @@ siteObjJs.admin.basketMerchantJs = function () {
                     var error = siteObjJs.admin.validateUserJs.mimes;
                     $('#file-error').text(error);
                     return false;
-                } else
-                {
+                } else {
                     $('#file-error').text('');
                 }
 
@@ -94,8 +93,8 @@ siteObjJs.admin.basketMerchantJs = function () {
             $("#" + formId + " #product_id").select2("val", "");
             $("#" + formId + " #brand_id").select2("val", "");
             $("#" + formId + " #location_id_1")
-                    .empty()
-                    .append('<option value="">Select Locations</option>');
+                .empty()
+                .append('<option value="">Select Locations</option>');
             $('#' + formId).find('#add-merchant-location').attr('disabled', true);
             $('#' + formId).find(".remove-location-id-div").remove();
             $('#' + formId).find('input[name="voucher_value"]').prop('readonly', true);
@@ -124,10 +123,10 @@ siteObjJs.admin.basketMerchantJs = function () {
             }
         }); */
 
-        $('#edit-basket').on('submit', function() {
-            if($("#dvPreview").children().length == 0 && $('input[type="file"]').val() == '') {
+        $('#edit-basket').on('submit', function () {
+            if ($("#dvPreview").children().length == 0 && $('input[type="file"]').val() == '') {
                 $("#edit-product span#file-error-container").attr("style", "color: red").text("Please select at least one image.").addClass('help-block-error red');
-                setTimeout(function(){
+                setTimeout(function () {
                     $("#edit-product span#file-error-container").text("").removeClass('help-block-error');
                 }, 3000);
                 return false;
@@ -138,10 +137,10 @@ siteObjJs.admin.basketMerchantJs = function () {
             var r = confirm("Are you sure you want to delete this image?");
             if (r == true) {
                 var rowId = $(this).attr('data-image-id');
-                $("#blank-row-"+rowId).remove();
+                $("#blank-row-" + rowId).remove();
                 removedImagesIds.push(rowId);
                 $("#removed_images").val(removedImagesIds);
-                if($("#dvPreview").children().length == 0) {
+                if ($("#dvPreview").children().length == 0) {
                     $(".basket-image-div").remove();
                     $("#basket_image_name").removeAttr('disabled');
                 }
@@ -178,7 +177,7 @@ siteObjJs.admin.basketMerchantJs = function () {
                             }
                             $('input[type="file"]').val(null);
                             $('#' + formId + " span#file-error-container").attr("style", "color: red").text(billSelectError).addClass('help-block-error');
-                            setTimeout(function(){
+                            setTimeout(function () {
                                 $('#' + formId + " span#file-error-container").text("").removeClass('help-block-error');
                             }, 3000);
                             return false;
@@ -186,7 +185,7 @@ siteObjJs.admin.basketMerchantJs = function () {
                     } else {
                         $('input[type="file"]').val(null);
                         $('#' + formId + " span#file-error-container").attr("style", "color: red").text(file[0].name + " is not a valid image file.").addClass('help-block-error');
-                        setTimeout(function(){
+                        setTimeout(function () {
                             $('#' + formId + " span#file-error-container").text("").removeClass('help-block-error');
                         }, 3000);
                         return false;
@@ -490,8 +489,7 @@ siteObjJs.admin.basketMerchantJs = function () {
                 cache: false,
                 dataType: "json",
                 type: "GET",
-                success: function (data)
-                {
+                success: function (data) {
                     $("#edit_form").html(data.form);
                     storedFiles = [];
                     storedNewFiles = [];
@@ -589,8 +587,7 @@ siteObjJs.admin.basketMerchantJs = function () {
                     siteObjJs.validation.formValidateInit('#edit-product-merchant', handleAjaxRequest);
                     handleCustomTextEvents('edit_form');
                 },
-                error: function (jqXhr, json, errorThrown)
-                {
+                error: function (jqXhr, json, errorThrown) {
                     var errors = jqXhr.responseJSON;
                     var errorsHtml = '';
                     $.each(errors, function (key, value) {
@@ -665,56 +662,53 @@ siteObjJs.admin.basketMerchantJs = function () {
         //$('html, body').css("cursor", "wait");
 
         $.ajax(
-                {
-                    url: actionUrl,
-                    type: actionType,
-                    data: form,
-                    cache: false,
-                    processData: false,
-                    contentType: false,
-                    success: function (data)
-                    {
-                        //console.log(data);
-                        //data: return data from server
-                        if (data.status === "error")
-                        {
-                            icon = "times";
-                            messageType = "danger";
-                        }
-
-                        //Empty the form fields
-                        formElement.find("input[type=text], textarea").val("");
-                        //trigger cancel button click event to collapse form and show title of add page
-                        $('.btn-collapse').trigger('click');
-                        formElement.find('input[name="voucher_value"]').prop('readonly', true);
-                        //reload the data in the datatable
-                        grid.getDataTable().ajax.reload();
-                        Metronic.alert({
-                            type: messageType,
-                            icon: icon,
-                            message: data.message,
-                            container: $('#ajax-response-text'),
-                            place: 'prepend',
-                            closeInSeconds: siteObjJs.admin.commonJs.constants.alertCloseSec
-                        });
-                    },
-                    error: function (jqXhr, json, errorThrown)
-                    {
-                        var errors = jqXhr.responseJSON;
-                        var errorsHtml = '';
-                        $.each(errors, function (key, value) {
-                            errorsHtml += value[0] + '<br />';
-                        });
-                        //alert(errorsHtml, "Error " + jqXhr.status + ': ' + errorThrown);
-                        Metronic.alert({
-                            type: 'danger',
-                            message: errorsHtml,
-                            container: $('#ajax-response-text'),
-                            place: 'prepend',
-                            closeInSeconds: siteObjJs.admin.commonJs.constants.alertCloseSec
-                        });
+            {
+                url: actionUrl,
+                type: actionType,
+                data: form,
+                cache: false,
+                processData: false,
+                contentType: false,
+                success: function (data) {
+                    //console.log(data);
+                    //data: return data from server
+                    if (data.status === "error") {
+                        icon = "times";
+                        messageType = "danger";
                     }
+
+                    //Empty the form fields
+                    formElement.find("input[type=text], textarea").val("");
+                    //trigger cancel button click event to collapse form and show title of add page
+                    $('.btn-collapse').trigger('click');
+                    formElement.find('input[name="voucher_value"]').prop('readonly', true);
+                    //reload the data in the datatable
+                    grid.getDataTable().ajax.reload();
+                    Metronic.alert({
+                        type: messageType,
+                        icon: icon,
+                        message: data.message,
+                        container: $('#ajax-response-text'),
+                        place: 'prepend',
+                        closeInSeconds: siteObjJs.admin.commonJs.constants.alertCloseSec
+                    });
+                },
+                error: function (jqXhr, json, errorThrown) {
+                    var errors = jqXhr.responseJSON;
+                    var errorsHtml = '';
+                    $.each(errors, function (key, value) {
+                        errorsHtml += value[0] + '<br />';
+                    });
+                    //alert(errorsHtml, "Error " + jqXhr.status + ': ' + errorThrown);
+                    Metronic.alert({
+                        type: 'danger',
+                        message: errorsHtml,
+                        container: $('#ajax-response-text'),
+                        place: 'prepend',
+                        closeInSeconds: siteObjJs.admin.commonJs.constants.alertCloseSec
+                    });
                 }
+            }
         );
     }
 
@@ -733,35 +727,35 @@ siteObjJs.admin.basketMerchantJs = function () {
                 "lengthMenu": siteObjJs.admin.commonJs.constants.gridLengthMenu,
                 "pageLength": siteObjJs.admin.commonJs.constants.recordsPerPage,
                 "columns": [
-                    {data: null, name: 'rownum', searchable: false, orderable: false},
-                    {data: 'id', name: 'id', visible: false, searchable: false, orderable: false},
-                    {data: 'product_logo', name: 'product_logo', searchable: false, orderable: false},
-                    {data: 'merchant_name', name: 'merchant_name', orderable: false},
-                    {data: 'product_name', name: 'product_name', orderable: false},
-                    {data: 'brand_name', name: 'brand_name', orderable: false},
-                    {data: 'sub_product_name_title', name: 'sub_product_name', orderable: false},
-                    {data: 'voucher_expiry', name: 'voucher_expiry', orderable: false},
-                    {data: 'selling_price', name: 'selling_price', orderable: false},
-                    {data: 'special_price', name: 'special_price', orderable: false},
-                    {data: 'display_custom_text_or_date', name: 'display_custom_text_or_date', orderable: false},
-                    {data: 'custom_text', name: 'custom_text', orderable: false},
-                    {data: 'views_button', name: 'views_button', orderable: false},
-                    {data: 'status', name: 'status', orderable: false},
-                    {data: 'action', name: 'action', orderable: false, searchable: false}
+                    { data: null, name: 'rownum', searchable: false, orderable: false },
+                    { data: 'id', name: 'id', visible: false, searchable: false, orderable: false },
+                    { data: 'product_logo', name: 'product_logo', searchable: false, orderable: false },
+                    { data: 'merchant_name', name: 'merchant_name', orderable: false },
+                    { data: 'product_name', name: 'product_name', orderable: false },
+                    { data: 'brand_name', name: 'brand_name', orderable: false },
+                    { data: 'sub_product_name_title', name: 'sub_product_name', orderable: false },
+                    { data: 'voucher_expiry', name: 'voucher_expiry', orderable: false },
+                    { data: 'selling_price', name: 'selling_price', orderable: false },
+                    { data: 'special_price', name: 'special_price', orderable: false },
+                    { data: 'display_custom_text_or_date', name: 'display_custom_text_or_date', orderable: false },
+                    { data: 'custom_text', name: 'custom_text', orderable: false },
+                    { data: 'views_button', name: 'views_button', orderable: false },
+                    { data: 'status', name: 'status', orderable: false },
+                    { data: 'action', name: 'action', orderable: false, searchable: false }
                 ],
                 "drawCallback": function (settings) {
                     var api = this.api();
-                    var rows = api.rows({page: 'current'}).nodes();
+                    var rows = api.rows({ page: 'current' }).nodes();
                     var last = null;
                     var page = api.page();
                     var recNum = null;
                     var displayLength = settings._iDisplayLength;
-                    api.column(0, {page: 'current'}).data().each(function (group, i) {
+                    api.column(0, { page: 'current' }).data().each(function (group, i) {
                         recNum = ((page * displayLength) + i + 1);
                         $(rows).eq(i).children('td:first-child').html(recNum);
                     });
 
-                    api.column(12, {page: 'current'}).data().each(function (group, i) {
+                    api.column(12, { page: 'current' }).data().each(function (group, i) {
                         var status = $(rows).eq(i).children('td:nth-child(13)').html();
                         var statusBtn = '';
                         if (status == 1) {
@@ -814,8 +808,7 @@ siteObjJs.admin.basketMerchantJs = function () {
                 type: "GET",
                 processData: false,
                 contentType: false,
-                success: function (data)
-                {
+                success: function (data) {
                     $('#view-merchant-name').html('');
                     $('#view-product-master').html();
                     $('#view-sub-product-name').html('');
@@ -950,8 +943,7 @@ siteObjJs.admin.basketMerchantJs = function () {
                     }
 
                 },
-                error: function (jqXhr, json, errorThrown)
-                {
+                error: function (jqXhr, json, errorThrown) {
 
                 }
             });
@@ -972,15 +964,13 @@ siteObjJs.admin.basketMerchantJs = function () {
                 type: "GET",
                 processData: false,
                 contentType: false,
-                success: function (data)
-                {
+                success: function (data) {
                     $("#view-product-image-details-modal").modal();
                     $("#indicators").html(data.carousal_indicators);
                     $("#slider-images").html(data.carousal_inner);
 
                 },
-                error: function (jqXhr, json, errorThrown)
-                {
+                error: function (jqXhr, json, errorThrown) {
 
                 }
             });
@@ -1001,8 +991,7 @@ siteObjJs.admin.basketMerchantJs = function () {
                 type: "GET",
                 processData: false,
                 contentType: false,
-                success: function (data)
-                {
+                success: function (data) {
 
                     $('#location-inventory-table > tbody').empty();
                     $("#view-product-location-inventory-modal").modal();
@@ -1011,21 +1000,20 @@ siteObjJs.admin.basketMerchantJs = function () {
                     if (locationRows > 0) {
                         for (var i = 0, sr_no = 1; i < locationRows; i++, sr_no++) {
                             $('.view_location_rows').append("<tr>" +
-                                    "<td>" + sr_no + " </td>" +
-                                    "<td>" + data[i].location_name + "</td>" +
-                                    "<td>" + data[i].current_quantity + "</td>" +
-                                    "</tr>");
+                                "<td>" + sr_no + " </td>" +
+                                "<td>" + data[i].location_name + "</td>" +
+                                "<td>" + data[i].current_quantity + "</td>" +
+                                "</tr>");
                         }
                     } else {
                         $('.view_location_rows').append("<tr>" +
-                                "<td colspan='3' align='center'>No data available in table</td>" +
-                                "</tr>");
+                            "<td colspan='3' align='center'>No data available in table</td>" +
+                            "</tr>");
                     }
 
 
                 },
-                error: function (jqXhr, json, errorThrown)
-                {
+                error: function (jqXhr, json, errorThrown) {
 
                 }
             });
@@ -1047,14 +1035,12 @@ siteObjJs.admin.basketMerchantJs = function () {
                 type: "GET",
                 processData: false,
                 contentType: false,
-                success: function (data)
-                {
+                success: function (data) {
                     $('#product-inventory-table').empty();
                     $("#view-product-inventory-modal").modal();
                     $('#product-inventory-table').append(data);
                 },
-                error: function (jqXhr, json, errorThrown)
-                {
+                error: function (jqXhr, json, errorThrown) {
 
                 }
             });
@@ -1063,7 +1049,7 @@ siteObjJs.admin.basketMerchantJs = function () {
 
 
     var handleBootstrapMaxlength = function (formId) {
-        $('#'+formId).find("textarea").maxlength({
+        $('#' + formId).find("textarea").maxlength({
             limitReachedClass: "label label-danger",
             alwaysShow: true,
             placement: 'bottom-left',
@@ -1164,8 +1150,7 @@ siteObjJs.admin.basketMerchantJs = function () {
                     cache: false,
                     dataType: "json",
                     type: "GET",
-                    success: function (data)
-                    {
+                    success: function (data) {
                         var $el = $('form').find("#location_id_1");
                         if (data != '') {
                             //$el.select2("val", '');
@@ -1187,8 +1172,7 @@ siteObjJs.admin.basketMerchantJs = function () {
                             $el.append($("<option></option>").attr("value", 'All').text('All Locations'));
                         }
                     },
-                    error: function (jqXhr, json, errorThrown)
-                    {
+                    error: function (jqXhr, json, errorThrown) {
                         var errors = jqXhr.responseJSON;
                         var errorsHtml = '';
                         $.each(errors, function (key, value) {
@@ -1231,8 +1215,7 @@ siteObjJs.admin.basketMerchantJs = function () {
                     cache: false,
                     dataType: "json",
                     type: "GET",
-                    success: function (data)
-                    {
+                    success: function (data) {
                         //fill up brands in select list   
                         var $el = $('form').find("#brand_id");
                         $el.select2("val", '');
@@ -1253,8 +1236,7 @@ siteObjJs.admin.basketMerchantJs = function () {
                             $el.empty(); // remove old options                            
                         }
                     },
-                    error: function (jqXhr, json, errorThrown)
-                    {
+                    error: function (jqXhr, json, errorThrown) {
                         var errors = jqXhr.responseJSON;
                         var errorsHtml = '';
                         $.each(errors, function (key, value) {
@@ -1275,7 +1257,7 @@ siteObjJs.admin.basketMerchantJs = function () {
         });
     };
 
-//get locations from Merchant-Location-Brand relation for Merchant Id and Brand Id selected
+    //get locations from Merchant-Location-Brand relation for Merchant Id and Brand Id selected
     var getLocationsForBrandAndMerchantId = function () {
         var token = $('meta[name="csrf-token"]').attr('content');
         $('.portlet-body').on('change', '#brand_id', function () {
@@ -1303,8 +1285,7 @@ siteObjJs.admin.basketMerchantJs = function () {
                     cache: false,
                     dataType: "json",
                     type: "GET",
-                    success: function (data)
-                    {
+                    success: function (data) {
                         //fill up locations in select list   
                         var $el = $('form').find("#location_id_1");
                         if (data !== '') {
@@ -1327,8 +1308,7 @@ siteObjJs.admin.basketMerchantJs = function () {
                             $el.append($("<option></option>").attr("value", '').text('Select Locations'));
                         }
                     },
-                    error: function (jqXhr, json, errorThrown)
-                    {
+                    error: function (jqXhr, json, errorThrown) {
                         var errors = jqXhr.responseJSON;
                         var errorsHtml = '';
                         $.each(errors, function (key, value) {
@@ -1357,8 +1337,7 @@ siteObjJs.admin.basketMerchantJs = function () {
             cache: false,
             dataType: "json",
             type: "GET",
-            success: function (data)
-            {
+            success: function (data) {
 
                 var locqty_rows = '';
                 if (data.locations !== '') {
@@ -1372,8 +1351,7 @@ siteObjJs.admin.basketMerchantJs = function () {
                 }
 
             },
-            error: function (jqXhr, json, errorThrown)
-            {
+            error: function (jqXhr, json, errorThrown) {
                 var errors = jqXhr.responseJSON;
                 var errorsHtml = '';
                 $.each(errors, function (key, value) {
@@ -1419,28 +1397,28 @@ siteObjJs.admin.basketMerchantJs = function () {
             });
 
             $('#' + formId).find('#merchan-location-div').append('<div class="row remove-location-id-div" id="remove-location-id-div-' + nextTotaDashItem + '">' +
-                    '<div class="col-md-6">' +
-                    '<div class="form-group">' +
-                    '<label class="col-md-4 control-label" id="label_location_id_' + nextTotaDashItem + '">Location ' + nextTotaDashItem + ' <span class="required" aria-required="true">*</span></label>' +
-                    '<div class="col-md-8">' +
-                    '<select name="location_id[' + nextTotaDashItem + ']" class="form-control select-location-item count-location-id" required="true" data-msg="Please select Location." id="location_id_' + nextTotaDashItem + '">' +
-                    '<option value="">Select Location</option>' +
-                    '</select>' +
-                    '</div>' +
-                    '</div>' +
-                    '</div>' +
-                    '<div class="col-md-6">' +
-                    '<div class="form-group">' +
-                    '<label class="col-md-4 control-label" id="label_quantity_id_' + nextTotaDashItem + '">Opening Quantity ' + nextTotaDashItem + ' <span class="required" aria-required="true">*</span></label>' +
-                    '             <div class="col-md-6">' +
-                    '<input type="text" name="current_quantity[' + nextTotaDashItem + ']" id="current_quantity_' + nextTotaDashItem + '" class="form-control" maxlength="10" required="true" data-msg="Please enter Opening Quantity." greaterThanZero = "true" numberOnly="true">' +
-                    '</div>' +
-                    '<div class="col-md-2">' +
-                    '<button type="button" class="remove-location-id btn btn-icon-only red" id="remove_location_id_' + nextTotaDashItem + '"><i class="fa fa-times"></i></button>' +
-                    '</div>' +
-                    '</div>' +
-                    '</div>' +
-                    '</div>');
+                '<div class="col-md-6">' +
+                '<div class="form-group">' +
+                '<label class="col-md-4 control-label" id="label_location_id_' + nextTotaDashItem + '">Location ' + nextTotaDashItem + ' <span class="required" aria-required="true">*</span></label>' +
+                '<div class="col-md-8">' +
+                '<select name="location_id[' + nextTotaDashItem + ']" class="form-control select-location-item count-location-id" required="true" data-msg="Please select Location." id="location_id_' + nextTotaDashItem + '">' +
+                '<option value="">Select Location</option>' +
+                '</select>' +
+                '</div>' +
+                '</div>' +
+                '</div>' +
+                '<div class="col-md-6">' +
+                '<div class="form-group">' +
+                '<label class="col-md-4 control-label" id="label_quantity_id_' + nextTotaDashItem + '">Opening Quantity ' + nextTotaDashItem + ' <span class="required" aria-required="true">*</span></label>' +
+                '             <div class="col-md-6">' +
+                '<input type="text" name="current_quantity[' + nextTotaDashItem + ']" id="current_quantity_' + nextTotaDashItem + '" class="form-control" maxlength="10" required="true" data-msg="Please enter Opening Quantity." greaterThanZero = "true" numberOnly="true">' +
+                '</div>' +
+                '<div class="col-md-2">' +
+                '<button type="button" class="remove-location-id btn btn-icon-only red" id="remove_location_id_' + nextTotaDashItem + '"><i class="fa fa-times"></i></button>' +
+                '</div>' +
+                '</div>' +
+                '</div>' +
+                '</div>');
 
 
             var $el = $("#location_id_" + nextTotaDashItem);
@@ -1522,15 +1500,13 @@ siteObjJs.admin.basketMerchantJs = function () {
                     cache: false,
                     dataType: "json",
                     type: "GET",
-                    success: function (data)
-                    {
+                    success: function (data) {
                         //console.log(data.purchase_type);
                         if (data.purchase_type == 1) {
                             $('#' + formId).find('input[name="voucher_value"]').prop('readonly', false);
                         }
                     },
-                    error: function (jqXhr, json, errorThrown)
-                    {
+                    error: function (jqXhr, json, errorThrown) {
                         var errors = jqXhr.responseJSON;
                         var errorsHtml = '';
                         $.each(errors, function (key, value) {
@@ -1552,6 +1528,65 @@ siteObjJs.admin.basketMerchantJs = function () {
         });
 
     };
+    var getproductData = function (currentForm) {
+
+        $('body').on('change', "#category_id", function (e) {
+
+            productDataCommon(currentForm);
+
+        });
+    };
+
+    var productDataCommon = function (currentForm) {
+        var actionUrl = adminUrl + '/baskets/get-products';
+
+        var categoryId = $('#category_id').val();
+        var categoryName = $('#category_id option:selected').text();
+        if(categoryName === 'Please select'){
+            categoryName = '';
+        }
+        var formData = new FormData();
+        formData.append('category_id', categoryId);
+        formData.append('category_name', categoryName);
+        $.ajax({
+            url: actionUrl,
+            cache: false,
+            type: "POST",
+            data: formData,
+            processData: false,
+            contentType: false,
+            dataType: "json",
+            headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+            success: function (data) {
+                var $ell = $('#' + currentForm).find("#productUnits");
+                $ell.empty();
+                $ell.select2("val", '');
+                $ell.empty(); // remove old options  
+
+                $.each(data.product_details, function (value, key) {
+                    $ell.append($('<option>', {
+                        value: value,
+                        text: key,
+                    }));
+                });
+            },
+            error: function (jqXhr, json, errorThrown) {
+                var errors = jqXhr.responseJSON;
+                var errorsHtml = '';
+                $.each(errors, function (key, value) {
+                    errorsHtml += value[0] + '<br />';
+                });
+                Metronic.alert({
+                    type: 'danger',
+                    message: errorsHtml,
+                    container: $('#ajax-response-text'),
+                    place: 'prepend',
+                    closeInSeconds: siteObjJs.admin.commonJs.constants.alertCloseSec
+                });
+            }
+        });
+
+    }
 
     var removeLocationRow = function () {
         $('.remove-location-id').live('click', function (e) {
@@ -1610,6 +1645,7 @@ siteObjJs.admin.basketMerchantJs = function () {
     return {
         //main function to initiate the module
         init: function (formId) {
+           
             initializeListener(formId);
             // handleTable();
             fetchDataForEdit();
@@ -1626,6 +1662,11 @@ siteObjJs.admin.basketMerchantJs = function () {
             fetchProductInventory();
             changeSpecialPrice('create-product');
             handleCustomTextEvents('create-product');
+            getproductData(formId);
+            if (formId === 'create-basket') {
+                productDataCommon(formId);
+            }
+
             //bind the validation method to 'add' form on load
             siteObjJs.validation.formValidateInit('#create-product', handleAjaxRequest);
         }

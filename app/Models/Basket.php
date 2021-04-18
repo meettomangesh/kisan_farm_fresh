@@ -29,6 +29,7 @@ class Basket extends Model
     protected $fillable = [
         'product_name',
         'description',
+        'category_id',
         'short_description',
         'sku',
         'images',
@@ -70,7 +71,7 @@ class Basket extends Model
         $this->storeBasketImages($params, $basket->id, 1);
         $basket->is_basket = 1;
         $basket->brand_id = 0;
-        $basket->category_id = 0;
+        //$basket->category_id = 0;
         $basket->update();
         return $basket;
     }
@@ -98,7 +99,7 @@ class Basket extends Model
         }
         $basket->is_basket = 1;
         $basket->brand_id = 0;
-        $basket->category_id = 0;
+        //$basket->category_id = 0;
         $basket->update();
         return $basket;
     }

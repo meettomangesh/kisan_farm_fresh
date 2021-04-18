@@ -85,7 +85,7 @@
                     <span class="btn btn-info btn-xs select-all" style="border-radius: 0">{{ trans('global.select_all') }}</span>
                     <span class="btn btn-info btn-xs deselect-all" style="border-radius: 0">{{ trans('global.deselect_all') }}</span>
                 </div>
-                <select class="form-control select2 {{ $errors->has('regions') ? 'is-invalid' : '' }}" name="regions[]" id="regions" multiple required>
+                <select class="form-control select2 {{ $errors->has('regions') ? 'is-invalid' : '' }}" name="regions[]" id="regions"  required>
                     @foreach($regions as $id => $regions)
                         <option value="{{ $id }}" {{ in_array($id, old('regions', [])) ? 'selected' : '' }}>{{ $regions }}</option>
                     @endforeach

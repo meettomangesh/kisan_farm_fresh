@@ -43,6 +43,12 @@ return [
         'kff_logo_url' => env('KFF_LOGO_URL', ''),
         'ios_logo_url' => env('IOS_LOGO_URL', ''),
         'android_logo_url' => env('ANDROID_LOGO_URL', ''),
+        'SMS_VALIDITY_TIME_MINUTES' => env('SMS_VALIDITY_TIME_MINUTES', 10),
+        'FROM_NO' => env('FROM_NO', 10),
+        'SMS_GATEWAY_API_BASE_URL' => env('SMS_GATEWAY_API_BASE_URL', ''),
+        'SMS_GATEWAY_API_AUTH_KEY' => env('SMS_GATEWAY_API_AUTH_KEY', ''),
+        'SMS_GATEWAY_API_SENDER' => env('SMS_GATEWAY_API_SENDER', ''),
+
     ]
 
 ];

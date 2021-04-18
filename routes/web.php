@@ -8,6 +8,7 @@ Route::redirect('/', '/login');
 
 //     return redirect()->route('admin.home');
 // });
+Route::get('/home', 'HomeController@index')->name('admin.home');
 
 Auth::routes(['register' => false]);
 // Admin
@@ -27,7 +28,7 @@ Route::group([
     'namespace' => 'Admin',
     'middleware' => ['auth', 'admin']
 ], function () {
-    Route::get('/', 'HomeController@index')->name('home');
+  //  Route::get('/', 'HomeController@index')->name('home');
     // Permissions
     Route::delete('permissions/destroy', 'PermissionsController@massDestroy')->name('permissions.massDestroy');
     Route::resource('permissions', 'PermissionsController');
@@ -107,6 +108,7 @@ Route::group([
 
     // Baskets
     Route::delete('baskets/destroy', 'BasketsController@massDestroy')->name('baskets.massDestroy');
+    Route::post('baskets/get-products', 'BasketsController@getProducts')->name('communications.getProducts');
     Route::resource('baskets', 'BasketsController');
 
     // Communications

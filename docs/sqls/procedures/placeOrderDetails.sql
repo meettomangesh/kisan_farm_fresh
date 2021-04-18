@@ -5,7 +5,7 @@ placeOrderDetails:BEGIN
     DECLARE productsId,productUnitId,quantity,orderId,lastInsertId,lastInsertIdOrderDetails,customerId,productUnitsId,notFound,productsIdNew INTEGER(10) DEFAULT 0;
     DECLARE sellingPrice,specialPrice DECIMAL(14,4) DEFAULT 0.00;
     DECLARE specialPriceStartDate,specialPriceEndDate,expiryDate DATE DEFAULT NULL;
-    DECLARE isBasket TINYINT(1) DEFAULT 0;
+    DECLARE isBasket,orderStatus TINYINT(1) DEFAULT 0;
 
     IF inputData IS NOT NULL AND JSON_VALID(inputData) = 0 THEN
         SELECT JSON_OBJECT('status', 'FAILURE', 'message', 'Please provide valid data.','data',JSON_OBJECT(),'statusCode',520) AS response;
@@ -19,6 +19,7 @@ placeOrderDetails:BEGIN
     SET orderId = JSON_UNQUOTE(JSON_EXTRACT(inputData,'$.order_id'));
     SET customerId = JSON_UNQUOTE(JSON_EXTRACT(inputData,'$.customer_id'));
     SET isBasket = JSON_UNQUOTE(JSON_EXTRACT(inputData,'$.is_basket'));
+    SET orderStatus = JSON_UNQUOTE(JSON_EXTRACT(inputData,'$.order_status'));
 
     IF JSON_UNQUOTE(JSON_EXTRACT(inputData,'$.special_price_start_date')) != '' AND JSON_UNQUOTE(JSON_EXTRACT(inputData,'$.special_price_start_date')) != 'null' THEN
         SET specialPriceStartDate = JSON_UNQUOTE(JSON_EXTRACT(inputData,'$.special_price_start_date'));
@@ -30,13 +31,13 @@ placeOrderDetails:BEGIN
         SET expiryDate = JSON_UNQUOTE(JSON_EXTRACT(inputData,'$.expiry_date'));
     END IF;
   
-    INSERT INTO customer_order_details (customer_id,order_id,products_id,product_units_id,item_quantity,expiry_date,selling_price,special_price,special_price_start_date,special_price_end_date,is_basket,created_by)
-    VALUES (customerId,orderId,productsId,productUnitId,quantity,expiryDate,sellingPrice,specialPrice,specialPriceStartDate,specialPriceEndDate,isBasket,1);
+    INSERT INTO customer_order_details (customer_id,order_id,products_id,product_units_id,item_quantity,expiry_date,selling_price,special_price,special_price_start_date,special_price_end_date,is_basket,order_status,created_by)
+    VALUES (customerId,orderId,productsId,productUnitId,quantity,expiryDate,sellingPrice,specialPrice,specialPriceStartDate,specialPriceEndDate,isBasket,orderStatus,1);
 
     IF LAST_INSERT_ID() > 0 THEN
         SET lastInsertIdOrderDetails = LAST_INSERT_ID();
-        INSERT INTO customer_order_status_track (order_details_id,created_by)
-        VALUES (lastInsertIdOrderDetails,1);
+        INSERT INTO customer_order_status_track (order_details_id,order_status,created_by)
+        VALUES (lastInsertIdOrderDetails,orderStatus,1);
 
         IF isBasket = 0 THEN
             UPDATE product_location_inventory SET current_quantity = current_quantity - quantity WHERE product_units_id = productUnitId;

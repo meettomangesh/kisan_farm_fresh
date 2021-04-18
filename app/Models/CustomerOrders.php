@@ -116,11 +116,13 @@ class CustomerOrders extends Model
         $usersData = User::select('id')->where('id', $params['user_id'])->where('status', 1)->get()->toArray();
         $userAddressData = UserAddress::select('id')->where('id', $params['delivery_details']['address']['id'])->where('user_id', $params['user_id'])->where('status', 1)->get()->toArray();
         if(sizeof($usersData) == 0 || sizeof($params['products']) == 0 || sizeof($userAddressData) == 0) {
-            return false;
+            // return false;
+            return array("status" => false, "order_id" => 0);
         }
         // validate delivery date
         if($params['delivery_details']['date'] < date('Y-m-d')) {
-            return false;
+            // return false;
+            return array("status" => false, "order_id" => 0);
         }
 
         $orderAmount = $totalItemQty = $isBasketInOrder = 0;
@@ -139,7 +141,8 @@ class CustomerOrders extends Model
             $stmt->closeCursor();
             $reponse = json_decode($result['response']);
             if($reponse->status == "FAILURE" && $reponse->statusCode != 200) {
-                return false;
+                // return false;
+                return array("status" => false, "order_id" => 0);
             }
             if($value['is_basket'] == 1) {
                 $isBasketInOrder = 1;
@@ -147,7 +150,8 @@ class CustomerOrders extends Model
         }
 
         if($orderAmount != $params['payment_details']['net_amount']) {
-            return false;
+            // return false;
+            return array("status" => false, "order_id" => 0);
         }
 
         $customerOrdersResponse = CustomerOrders::create(array(
@@ -162,12 +166,14 @@ class CustomerOrders extends Model
             'billing_address_id' => $params['delivery_details']['address']['id'],
             'delivery_date' => $params['delivery_details']['date'],
             'is_basket_in_order' => $isBasketInOrder,
+            'order_status' => ($params['payment_details']['type'] == 'cod') ? 1 : 0,
             'created_by' => 1
         ));
         $orderId = $customerOrdersResponse->id;
         foreach($params['products'] as $key => $value) {
             $value['order_id'] = $orderId;
             $value['customer_id'] = $params['user_id'];
+            $value['order_status'] = ($params['payment_details']['type'] == 'cod') ? 1 : 0;
             $inputData = json_encode($value);
             /* $result = DB::select('call placeOrderDetails(?)', [$inputData]);
             $reponse = json_decode($result[0]->response); */
@@ -181,7 +187,8 @@ class CustomerOrders extends Model
             $reponse = json_decode($result['response']);
             if($reponse->status == "FAILURE" && $reponse->statusCode != 200) {
                 $this->cancelOrder($orderId, 1);
-                return false;
+                // return false;
+                return array("status" => false, "order_id" => 0);
             }
         }
 
@@ -195,7 +202,8 @@ class CustomerOrders extends Model
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
         $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
         $stmt->closeCursor();
-        return true;
+        // return true;
+        return array("status" => true, "order_id" => $orderId);
     }
 
     public function getOrderList($params) {
@@ -309,5 +317,13 @@ class CustomerOrders extends Model
             return false;
         }
         return true;
+    }
+
+    public function getOrderStatus($params) {
+        $orderStatus = CustomerOrders::select('order_status')->where('customer_id', $params['user_id'])->where('id', $params['order_id'])->get()->toArray();
+        if(sizeof($orderStatus) > 0) {
+            return array("status" => true, "order_status" => $orderStatus[0]['order_status']);
+        }
+        return array("status" => false, "order_status" => "");
     }
 }

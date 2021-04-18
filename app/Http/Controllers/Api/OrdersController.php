@@ -27,6 +27,7 @@ class OrdersController extends BaseController
             'payment_details.net_amount' => 'required|integer|gt:0',
             'payment_details.gross_amount' => 'required|integer|gt:0',
             'payment_details.discounted_amount' => 'required',
+            'payment_details.promo_code'=>'required_if:payment_details.discounted_amount,gt:0',
             'payment_details.order_id'=>'required_if:payment_details.type,online',
             'payment_details.transaction_id'=>'required_if:payment_details.type,online',
             'payment_details.method'=>'required_if:payment_details.type,online',
@@ -52,12 +53,12 @@ class OrdersController extends BaseController
             $customerOrders = new CustomerOrders();
             // Function call to get place order
             $responseDetails = $customerOrders->placeOrder($params);
-            if($responseDetails) {
+            if($responseDetails["status"] == true) {
                 $message = 'Order placed successully!.';
             } else {
-                return $this->sendError('Failed to place order.', [], 422);
+                return $this->sendError('Failed to place order.', $responseDetails, 422);
             }
-            $response = $this->sendResponse([], $message);
+            $response = $this->sendResponse($responseDetails, $message);
         } catch (Exception $e) {
             $response = $this->sendResponse(array(), $e->getMessage());
         }
@@ -193,6 +194,34 @@ class OrdersController extends BaseController
                 $message = 'Order status changed successfully';
             }
             $response = $this->sendResponse([], $message);
+        } catch (Exception $e) {
+            $response = $this->sendResponse(array(), $e->getMessage());
+        }
+        return $response;
+    }
+
+    public function getOrderStatus(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'platform' => 'required',
+            'user_id' => 'required|integer',
+            'order_id' => 'required|integer'
+        ]);
+        if ($validator->fails()) {
+            return $this->sendError(parent::VALIDATION_ERROR, $validator->errors());
+        }
+
+        try {
+            $params = [
+                'platform' => $request->platform,
+                'user_id' => $request->user_id,
+                'order_id' => $request->order_id
+            ];
+            //Create order object to call functions
+            $customerOrders = new CustomerOrders();
+            // Function call to get order list
+            $responseDetails = $customerOrders->getOrderStatus($params);
+            $response = $this->sendResponse($responseDetails, "Order status");
         } catch (Exception $e) {
             $response = $this->sendResponse(array(), $e->getMessage());
         }

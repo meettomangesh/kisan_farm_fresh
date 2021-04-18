@@ -27,7 +27,7 @@ class CreateCustomerOrderDetailsTable extends Migration
             $table->date('special_price_end_date')->nullable()->index();
             $table->string('reject_cancel_reason', 255)->index()->nullable();
             $table->tinyInteger('is_basket')->default(0)->unsigned()->index()->comment = "1: Yes, 0: No";
-            $table->tinyInteger('order_status')->default(1)->unsigned()->index()->comment = "1: Placed, 2: Picked, 3: Out for delivery, 4: Delivered, 5: Cancelled";
+            $table->tinyInteger('order_status')->default(1)->unsigned()->index()->comment = "0: Pending, 1: Placed, 2: Picked, 3: Out for delivery, 4: Delivered, 5: Cancelled";
             $table->integer('created_by')->unsigned();
             $table->integer('updated_by')->default(0)->unsigned();
             $table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP'));

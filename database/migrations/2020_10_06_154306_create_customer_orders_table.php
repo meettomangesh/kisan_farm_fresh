@@ -32,7 +32,7 @@ class CreateCustomerOrdersTable extends Migration
             $table->tinyInteger('is_coupon_applied')->default(0)->unsigned()->index()->comment = "1: Yes, 0:No";
             $table->string('coupon_applied', 20)->nullable();
             $table->tinyInteger('is_basket_in_order')->default(0)->unsigned()->index()->comment = "1: Yes, 0: No";
-            $table->tinyInteger('order_status')->default(1)->unsigned()->index()->comment = "1: Placed, 2: Picked, 3: Out for delivery, 4: Delivered, 5: Cancelled";
+            $table->tinyInteger('order_status')->default(1)->unsigned()->index()->comment = "0: Pending, 1: Placed, 2: Picked, 3: Out for delivery, 4: Delivered, 5: Cancelled";
             $table->integer('created_by')->unsigned();
             $table->integer('updated_by')->default(0)->unsigned();
             $table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP'));

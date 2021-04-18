@@ -10,7 +10,7 @@ class CreateSpGetSmsNotificationData extends Migration {
      * @return void
      */
     public function up() {
-        DB::unprepared("DROP PROCEDURE IF EXISTS getSmsNotificationData$$
+        DB::unprepared("DROP PROCEDURE IF EXISTS getSmsNotificationData;
         CREATE PROCEDURE getSmsNotificationData(IN notificationId INT)
                
                BEGIN

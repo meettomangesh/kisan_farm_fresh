@@ -14,7 +14,7 @@ class CreateSpValidatePromoCode extends Migration
     public function up()
     {
         DB::unprepared("DROP PROCEDURE IF EXISTS validatePromoCode;
-        CREATE PROCEDURE validatePromoCode(IN inputData JSON)
+        CREATE PROCEDURE validatePromoCode(IN inputVoucherData JSON)
         validatePromoCode:BEGIN     
             DECLARE promoCode VARCHAR(100) DEFAULT '';
             DECLARE userId INTEGER DEFAULT 0;
@@ -41,7 +41,7 @@ class CreateSpValidatePromoCode extends Migration
                     LEAVE validatePromoCode;
                 END IF; */
         
-                IF NOT EXISTS(SELECT id FROM users WHERE users.user_id = userId AND users.status = 1) THEN
+                IF NOT EXISTS(SELECT id FROM users WHERE users.id = userId AND users.status = 1) THEN
                     SELECT JSON_OBJECT('status','FAILURE','statusCode',101,'message','No record found for this user id.','data',JSON_OBJECT('user_id',userId)) AS response;
                     LEAVE validatePromoCode;
                 END IF;
@@ -61,11 +61,11 @@ class CreateSpValidatePromoCode extends Migration
                         SELECT JSON_OBJECT('status','SUCCESS','statusCode',200,'message','Promo code is valid.','data',JSON_OBJECT()) AS response;
                         LEAVE validatePromoCode;
                     END IF;
-                ELSEIF EXISTS (SELECT id FROM promo_codes WHERE promo_code = voucherCode) THEN
-                    SELECT JSON_OBJECT('status','FAILURE','statusCode',105,'message','This Promo Code does not belong to your user id.','data',inputData) AS response;
+                ELSEIF EXISTS (SELECT id FROM promo_codes WHERE promo_code = promoCode) THEN
+                    SELECT JSON_OBJECT('status','FAILURE','statusCode',105,'message','This Promo Code does not belong to your user id.','data',inputVoucherData) AS response;
                     LEAVE validatePromoCode;
                 ELSE
-                    SELECT JSON_OBJECT('status','FAILURE','statusCode',105,'message','Promo code is invalid.','data',inputData) AS response;
+                    SELECT JSON_OBJECT('status','FAILURE','statusCode',105,'message','Promo code is invalid.','data',inputVoucherData) AS response;
                     LEAVE validatePromoCode;
                 END IF;
             END IF;                     

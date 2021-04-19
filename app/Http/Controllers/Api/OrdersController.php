@@ -219,9 +219,35 @@ class OrdersController extends BaseController
             ];
             //Create order object to call functions
             $customerOrders = new CustomerOrders();
-            // Function call to get order list
+            // Function call to get order status
             $responseDetails = $customerOrders->getOrderStatus($params);
             $response = $this->sendResponse($responseDetails, "Order status");
+        } catch (Exception $e) {
+            $response = $this->sendResponse(array(), $e->getMessage());
+        }
+        return $response;
+    }
+
+    public function paymentCallbackUrl(Request $request)
+    {
+        try {
+            if(!isset($request->razorpay_payment_id) || !isset($request->razorpay_order_id) || !isset($request->razorpay_signature)) {
+                return false;
+            }
+            $params = [
+                'payment_id' => $request->razorpay_payment_id,
+                'order_id' => $request->razorpay_order_id,
+                'payment_signature' => $request->razorpay_signature
+            ];
+            //Create order object to call functions
+            $customerOrders = new CustomerOrders();
+            // Function call to update order status using payment response
+            $responseDetails = $customerOrders->paymentCallbackUrl($params);
+            $message = 'Success.';
+            if(sizeof($responseDetails) == 0) {
+                $message = 'Failure.';
+            }
+            $response = $this->sendResponse($responseDetails, $message);
         } catch (Exception $e) {
             $response = $this->sendResponse(array(), $e->getMessage());
         }

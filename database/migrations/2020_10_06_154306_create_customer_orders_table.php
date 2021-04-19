@@ -25,12 +25,13 @@ class CreateCustomerOrdersTable extends Migration
             $table->decimal('discounted_amount', 14, 4)->nullable();
             $table->string('payment_type', 20)->index()->nullable();
             $table->string('payment_id', 255)->index()->nullable();
+            $table->string('payment_signature', 255)->index()->nullable();
             $table->integer('total_items')->default(0)->unsigned()->index();
             $table->integer('total_items_quantity')->default(0)->unsigned()->index();
             $table->string('reject_cancel_reason', 255)->index()->nullable();
             $table->tinyInteger('purchased_from')->default(1)->unsigned()->index();
-            $table->tinyInteger('is_coupon_applied')->default(0)->unsigned()->index()->comment = "1: Yes, 0:No";
-            $table->string('coupon_applied', 20)->nullable();
+            $table->tinyInteger('is_coupon_applied')->default(0)->unsigned()->index()->comment = "1: Yes, 0: No";
+            $table->string('promo_code', 20)->nullable();
             $table->tinyInteger('is_basket_in_order')->default(0)->unsigned()->index()->comment = "1: Yes, 0: No";
             $table->tinyInteger('order_status')->default(1)->unsigned()->index()->comment = "0: Pending, 1: Placed, 2: Picked, 3: Out for delivery, 4: Delivered, 5: Cancelled";
             $table->integer('created_by')->unsigned();

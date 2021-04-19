@@ -10,6 +10,7 @@ use App\Models\CustomerOrderDetails;
 use App\Models\CustomerOrderStatusTrack;
 use App\Models\ProductLocationInventory;
 use App\Models\UserAddress;
+use App\Models\PromoCodes;
 use DB;
 use PDO;
 
@@ -25,7 +26,7 @@ class CustomerOrders extends Model
         'deleted_at',
     ];
 
-    protected $fillable = ['customer_id','delivery_boy_id','shipping_address_id','billing_address_id','delivery_date','net_amount','gross_amount','discounted_amount','payment_type','payment_id','total_items','total_items_quantity','reject_cancel_reason','purchased_from','is_coupon_applied','is_basket_in_order','order_status','created_by','updated_by','created_at','updated_at'];
+    protected $fillable = ['customer_id','delivery_boy_id','shipping_address_id','billing_address_id','delivery_date','net_amount','gross_amount','discounted_amount','payment_type','payment_id','payment_signature','total_items','total_items_quantity','reject_cancel_reason','purchased_from','is_coupon_applied','promo_code','is_basket_in_order','order_status','created_by','updated_by','created_at','updated_at'];
 
     protected function serializeDate(DateTimeInterface $date)
     {
@@ -125,6 +126,16 @@ class CustomerOrders extends Model
             return array("status" => false, "order_id" => 0);
         }
 
+        if($params['payment_details']['promo_code'] != '') {
+            $vpcData = array("promo_code" => $params['payment_details']['promo_code'], "user_id" => $params['user_id']);
+            $vpcData = json_encode($vpcData);
+            $promoCodes = new PromoCodes();
+            $vpcResponse = $promoCodes->validatePromoCode($vpcData);
+            if(!$vpcResponse) {
+                return array("status" => false, "order_id" => 0);
+            }
+        }
+
         $orderAmount = $totalItemQty = $isBasketInOrder = 0;
         // validate product
         foreach($params['products'] as $key => $value) {
@@ -167,6 +178,8 @@ class CustomerOrders extends Model
             'delivery_date' => $params['delivery_details']['date'],
             'is_basket_in_order' => $isBasketInOrder,
             'order_status' => ($params['payment_details']['type'] == 'cod') ? 1 : 0,
+            'is_coupon_applied' => !empty($params['payment_details']['promo_code']) ? 1 : 0,
+            'promo_code' => $params['payment_details']['promo_code'],
             'created_by' => 1
         ));
         $orderId = $customerOrdersResponse->id;
@@ -325,5 +338,21 @@ class CustomerOrders extends Model
             return array("status" => true, "order_status" => $orderStatus[0]['order_status']);
         }
         return array("status" => false, "order_status" => "");
+    }
+
+    public function paymentCallbackUrl($params) {
+        if(!empty($params['payment_id']) && !empty($params['order_id']) && !empty($params['payment_signature'])) {
+            $order = CustomerOrders::select('id')->where('id', $params['order_id'])->get()->toArray();
+            if(sizeof($order) > 0) {
+                $updateOrder = CustomerOrders::find($params['order_id']);
+                $updateOrder->order_status = 1;
+                $updateOrder->payment_id = $params['payment_id'];
+                $updateOrder->payment_signature = $params['payment_signature'];
+                $updateOrder->save();
+                return true;
+            }
+            return false;          
+        }
+        return false;
     }
 }

@@ -34,6 +34,7 @@ Route::post('cancelOrder', 'Api\OrdersController@cancelOrder');
 Route::post('orderList', 'Api\OrdersController@getOrderListForDeliveryBoy');
 Route::post('changeOrderStatus', 'Api\OrdersController@changeOrderStatus');
 Route::post('getOrderStatus', 'Api\OrdersController@getOrderStatus');
+Route::post('paymentCallbackUrl', 'Api\OrdersController@paymentCallbackUrl');
 
 Route::post('getAllAddressByUserId', 'Api\UserAddressController@getAllAddressByUserId');
 Route::post('saveAddressByUserId', 'Api\UserAddressController@saveAddressByUserId');

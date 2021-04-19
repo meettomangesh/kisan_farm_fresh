@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use App\Models\Basket;
 use App\Models\ProductUnits;
+use App\Models\Category;
 
 use DB;
 
@@ -27,9 +28,13 @@ class BasketsController extends Controller
     public function create()
     {
         abort_if(Gate::denies('basket_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-        //$categories = Category::all()->where('status', 1)->pluck('cat_name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $categories = Category::all()->where('status', 1)->pluck('cat_name', 'id')->prepend(trans('global.pleaseSelect'), '');
         // $regions = Region::all()->where('status', 1)->pluck('region_name', 'id');
         $productUnits = ProductUnits::all()->where('status', 1);
+        //->where('product.category_id',2);
+        // echo '<pre>';
+        // print_r($productUnits);
+        // exit;
         return view('admin.baskets.create', compact('categories', 'productUnits'));
     }
 
@@ -46,10 +51,13 @@ class BasketsController extends Controller
     {
         abort_if(Gate::denies('basket_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $productUnits = ProductUnits::all()->where('status', 1);
+        $categories = Category::all()->where('status', 1)->pluck('cat_name', 'id')->prepend(trans('global.pleaseSelect'), '');
+
         $basketImages = Basket::getBasketImages($basket->id);
         $srNo = 0;
         $basket->load('productUnits');
-        return view('admin.baskets.edit', compact('basket', 'productUnits','basketImages','srNo'));
+        $basket->load('category');
+        return view('admin.baskets.edit', compact('basket', 'productUnits', 'basketImages', 'srNo', 'categories'));
     }
 
     public function update(UpdateBasketRequest $request, Basket $basket)
@@ -77,5 +85,28 @@ class BasketsController extends Controller
     {
         Product::whereIn('id', request('ids'))->delete();
         return response(null, Response::HTTP_NO_CONTENT);
+    }
+
+    public function getProducts(Request $request)
+    {
+        $input = $request->all();
+        if ($input['category_id'] && ( $input['category_name'] && $input['category_name'] != 'Basket') ) {
+            $productUnits = ProductUnits::all()->where('status', 1)->where('product.category_id', $input['category_id']);
+        } else {
+            $productUnits = ProductUnits::all()->where('status', 1);
+        }
+
+        $productDetails = array();
+        foreach($productUnits as $productUnit) {
+
+            $productDetails[$productUnit->id]= $productUnit->product->product_name.' ('.$productUnit->unit->unit.') ';
+        }
+
+        $response['product_details'] = $productDetails;
+
+        $response['status'] = '';
+        $response['message'] = '';
+
+        return response()->json($response);
     }
 }

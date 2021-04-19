@@ -27,6 +27,7 @@ class DeliveryBoysController extends Controller
                 $q->where('title', 'Delivery Boy');
             }
         )->get();
+
         $regions = Region::all()->where('status', 1)->pluck('region_name', 'id');
 
         return view('admin.deliveryboys.index', compact('deliveryboys','regions'));
@@ -66,7 +67,8 @@ class DeliveryBoysController extends Controller
     }
 
     public function update(UpdateDeliveryBoyRequest $request, User $deliveryboy)
-    {
+    {   
+
         $deliveryboy->update($request->all());
         $deliveryboy->roles()->sync($request->input('roles', []));
         $deliveryboy->regions()->sync($request->input('regions', []));

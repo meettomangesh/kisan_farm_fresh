@@ -8,6 +8,7 @@ Route::redirect('/', '/login');
 
 //     return redirect()->route('admin.home');
 // });
+Route::get('/home', 'HomeController@index')->name('admin.home');
 
 Auth::routes(['register' => false]);
 // Admin
@@ -27,7 +28,7 @@ Route::group([
     'namespace' => 'Admin',
     'middleware' => ['auth', 'admin']
 ], function () {
-    Route::get('/', 'HomeController@index')->name('home');
+  //  Route::get('/', 'HomeController@index')->name('home');
     // Permissions
     Route::delete('permissions/destroy', 'PermissionsController@massDestroy')->name('permissions.massDestroy');
     Route::resource('permissions', 'PermissionsController');
@@ -45,18 +46,18 @@ Route::group([
     Route::resource('countries', 'CountriesController');
 
     // Cities
-    
+
     Route::delete('pincodes/destroy', 'PinCodesController@massDestroy')->name('pincodes.massDestroy');
     Route::get('pincodes/getStates/{cid?}', 'PinCodesController@getStates')->name('pincodes.getStates');
     Route::get('pincodes/getCities/{cid?}/{sid?}', 'PinCodesController@getCities')->name('pincodes.getCities');
     Route::resource('pincodes', 'PinCodesController');
 
     // Cities
-    
+
     Route::delete('cities/destroy', 'CitiesController@massDestroy')->name('cities.massDestroy');
     Route::get('cities/getStates/{cid?}', 'CitiesController@getStates')->name('cities.getStates');
     Route::resource('cities', 'CitiesController');
-    
+
     // Regions
 
     Route::delete('regions/destroy', 'RegionsController@massDestroy')->name('regions.massDestroy');
@@ -107,18 +108,24 @@ Route::group([
 
     // Baskets
     Route::delete('baskets/destroy', 'BasketsController@massDestroy')->name('baskets.massDestroy');
+    Route::post('baskets/get-products', 'BasketsController@getProducts')->name('communications.getProducts');
     Route::resource('baskets', 'BasketsController');
 
-        
+    // Communications
+    Route::delete('communications/destroy', 'UserCommunicationMessagesController@massDestroy')->name('communications.massDestroy');
+    Route::get('communications/check-past-time/{id}', 'UserCommunicationMessagesController@checkPastTime')->name('communications.checkPastTime');
+    Route::post('communications/send-test-sms', 'UserCommunicationMessagesController@sendTestSms')->name('communications.sendTestSms');
+    Route::post('communications/send-test-email', 'UserCommunicationMessagesController@sendTestEmail')->name('communications.sendTestEmail');
+    Route::post('communications/get-user-type-data', 'UserCommunicationMessagesController@getUserTypeData')->name('communications.getUserTypeData');
+    Route::resource('communications', 'UserCommunicationMessagesController');
 
     // Orders
     // Route::delete('orders/destroy', 'OrdersController@massDestroy')->name('orders.massDestroy');
     Route::get('orders/cancelOrder/{cid?}', 'OrdersController@cancelOrder')->name('orders.cancelOrder');
     Route::resource('orders', 'OrdersController');
-
 });
 Route::group(['prefix' => 'profile', 'as' => 'profile.', 'namespace' => 'Auth', 'middleware' => ['auth']], function () {
-// Change password
+    // Change password
     if (file_exists(app_path('Http/Controllers/Auth/ChangePasswordController.php'))) {
         Route::get('password', 'ChangePasswordController@edit')->name('password.edit');
         Route::post('password', 'ChangePasswordController@update')->name('password.update');

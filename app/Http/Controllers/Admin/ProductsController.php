@@ -53,7 +53,7 @@ class ProductsController extends Controller
         return view('admin.products.edit', compact('product','productImages','srNo','categories'));
     }
 
-    public function update(UpdateProductRequest $request, Product $product)
+public function update(UpdateProductRequest $request, Product $product)
     {
         $requestAll = $request->all();
         $product->update($requestAll);

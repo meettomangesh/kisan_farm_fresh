@@ -42,7 +42,7 @@ class SmsController extends BaseController
                 }
             }
 
-            $smsValidityTime = getenv('SMS_VALIDITY_TIME_MINUTES');
+            $smsValidityTime = config('services.miscellaneous.SMS_VALIDITY_TIME_MINUTES');
             $smsgTemplates = new SmsTemplate($this->pdo, $this->redis);
             $requestedParams["template_name"] = $smsTemplateName;
 
@@ -53,18 +53,20 @@ class SmsController extends BaseController
             if ($smsgTemplatesData) {
                 $textMessage = str_replace('$OTP', $otpNumber, $smsgTemplatesData);
                 $textMessage = str_replace('Kisan Farm Fresh', getenv("APP_NAME"), $textMessage);
-                $textMessage = str_replace('$SMS_VALIDITY_TIME_MINUTES', getenv("SMS_VALIDITY_TIME_MINUTES"), $textMessage);
+                $textMessage = str_replace('$SMS_VALIDITY_TIME_MINUTES', $smsValidityTime, $textMessage);
                 $textMessage = '<#> ' . $textMessage;
                 //LP_REGISTRATION_OTP
             }
 
-            $requestedParams['from_no'] = getenv("FROM_NO");
+            $requestedParams['from_no'] = config('services.miscellaneous.from_no');
+            $requestedParams['SMS_VALIDITY_TIME_MINUTES'] = $smsValidityTime;
+            $requestedParams['otp'] = $otpNumber;
             $message = new Message($this->pdo, $this->redis);
             //Call function to send message
-            //$sendMessage = $message->sendMessage($requestedParams["mobile_number"], $textMessage, $requestedParams);
-            //Call function to send otp
+
             $sendMessage = $message->sendOtp($request->mobile_number, $textMessage, $requestedParams);
-            $sendMessage = 1;
+
+
             if ($sendMessage) {
 
                 $params = $request->all();
@@ -108,9 +110,6 @@ class SmsController extends BaseController
         try {
             $ismobilePresent = 0;
             $mobileNumber = 0;
-            //Validate input parameters
-            // $requiredData = array('id', 'otp', 'platform', 'transactionType', 'mobile_number'); //array of required fields
-            // $this->validation($requestedParams, $requiredData);
 
             $validator = Validator::make($request->all(), [
                 'id' => 'required',
@@ -129,8 +128,10 @@ class SmsController extends BaseController
             }
             $smsValidityTime = getenv('SMS_VALIDITY_TIME_MINUTES');
 
-            $customerOtp = new CustomerOtp();
-            $result = $customerOtp->validateOtp($request->otp, $mobileNumber, $request->id, $request->platform, $ismobilePresent, $smsValidityTime);
+            //$customerOtp = new CustomerOtp();
+            //$result = $customerOtp->validateOtp($request->otp, $mobileNumber, $request->id, $request->platform, $ismobilePresent, $smsValidityTime);
+            $message = new Message($this->pdo, $this->redis);
+            $result = $message->verifyOtp($request->mobile_number, $request->otp);
 
             $responseDetails = array("id" => $request->id);
             $response = $this->sendResponse(

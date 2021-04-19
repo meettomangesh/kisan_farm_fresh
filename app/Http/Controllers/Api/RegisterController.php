@@ -251,7 +251,7 @@ class RegisterController extends BaseController
 
         try {
             $params = [
-                'platform' => $request->platform,
+                'device_type' => $request->platform,
                 'user_id' => $request->user_id,
                 'user_role_id' => $request->user_role_id,
                 'device_id' => $request->device_id,

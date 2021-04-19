@@ -9,6 +9,7 @@
     "license": "MIT",
     "require": {
         "php": "^7.2.5",
+        "aws/aws-sdk-php": "^3.178",
         "bugsnag/bugsnag-laravel": "^2.18",
         "doctrine/dbal": "^2.10",
         "fideloper/proxy": "^4.2",
@@ -16,10 +17,12 @@
         "guzzlehttp/guzzle": "^6.3",
         "laravel/dusk": "^5.9",
         "laravel/framework": "^7.0",
+        "laravel/passport": "^8.4",
         "laravel/tinker": "^2.0",
         "laravel/ui": "^2.0",
-        "yajra/laravel-datatables-oracle": "^9.9",
-        "laravel/passport": "^8.4"
+        "laravelcollective/html": "^6.2",
+        "phpmailer/phpmailer": "^6.3",
+        "yajra/laravel-datatables-oracle": "^9.9"
     },
     "require-dev": {
         "facade/ignition": "^2.0",

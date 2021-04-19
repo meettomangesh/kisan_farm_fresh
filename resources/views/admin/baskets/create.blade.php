@@ -67,20 +67,24 @@
                     </div>
                 </div>
 
-                <!-- <div class="col-md-6">
+                <div class="col-md-6">
                     <div class="form-group">
-                        <label class="control-label col-md-4 required" for="opening_quantity">{{ trans('cruds.product_unit.fields.opening_quantity') }}</label>
+                        <label class="control-label col-md-4 required" for="category_id">{{ trans('cruds.basket.fields.category') }}</label>
                         <div class="col-md-8 float-right">
-                            <input class="form-control {{ $errors->has('opening_quantity') ? 'is-invalid' : '' }}" name="opening_quantity" id="opening_quantity" value="{{ old('opening_quantity', '') }}" greaterThanZero = "true" numberOnly="true" required>
-                            @if($errors->has('opening_quantity'))
-                                <div class="invalid-feedback">
-                                    {{ $errors->first('opening_quantity') }}
-                                </div>
-                            @endif
-                            <span class="help-block">{{ trans('cruds.product_unit.fields.opening_quantity_helper') }}</span>
+                            <select class="form-control select2 {{ $errors->has('category') ? 'is-invalid' : '' }}" name="category_id" id="category_id" required>
+                                @foreach($categories as $id => $category)
+                                    <option value="{{ $id }}" {{ old('category_id') == $id ? 'selected' : '' }}>{{ $category }}</option>
+                                @endforeach
+                            </select>
                         </div>
+                        @if($errors->has('category'))
+                        <div class="invalid-feedback">
+                            {{ $errors->first('category') }}
+                        </div>
+                        @endif
+                        <span class="help-block">{{ trans('cruds.basket.fields.category_helper') }}</span>
                     </div>
-                </div> -->
+                </div>
             </div>
 
 

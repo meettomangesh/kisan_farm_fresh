@@ -34,7 +34,7 @@ siteObjJs.validation = function () {
             ignore: ':hidden', // validate all fields including form hidden input
             messages: messages,
             rules: rules,
-            submitHandler: submitHandler,
+            submitHandler:  submitHandler,
             invalidHandler: function (event, validator) { //display error alert on form submit        
                 errorExtra.show();
                 successMsg.hide();
@@ -62,23 +62,32 @@ siteObjJs.validation = function () {
     }
 
     function errorPlacement(error, element) { // render error placement for each input type
-        if (element.parents('.input-medium-suffix').size() > 0) {            
+        if (element.parents('.input-medium-suffix').length > 0) {            
             error.appendTo(element.parents('.input-medium-suffix').attr('data-error-container'));
-        } else if (element.parent('.input-group').size() > 0) {
+            
+        } else if (element.parent('.input-group').length > 0) {
             error.insertAfter(element.parent('.input-group'));
+            
         } else if (element.attr('data-error-container')) {
             error.appendTo(element.attr('data-error-container'));
-        } else if (element.parents('.radio-list').size() > 0) {
+            
+        } else if (element.parents('.radio-list').length > 0) {
             error.appendTo(element.parents('.radio-list').attr('data-error-container'));
-        } else if (element.parents('.radio-inline').size() > 0) {
+           
+        } else if (element.parents('.radio-inline').length > 0) {
             error.appendTo(element.parents('.radio-inline').attr('data-error-container'));
-        } else if (element.parents('.checkbox-list').size() > 0) {
+            
+        } else if (element.parents('.checkbox-list').length > 0) {
             error.appendTo(element.parents('.checkbox-list').attr('data-error-container'));
-        } else if (element.parents('.checkbox-inline').size() > 0) {
+            
+        } else if (element.parents('.checkbox-inline').length > 0) {
             error.appendTo(element.parents('.checkbox-inline').attr('data-error-container'));
+           
         } else {
             error.insertAfter(element); // for other inputs, just perform default behavior
+            
         }
+        
     }
 
     return {

@@ -10,6 +10,7 @@ use App\Models\CustomerOrderDetails;
 use App\Models\CustomerOrderStatusTrack;
 use App\Models\ProductLocationInventory;
 use App\Models\UserAddress;
+use App\Models\PromoCodes;
 use DB;
 use PDO;
 
@@ -25,7 +26,7 @@ class CustomerOrders extends Model
         'deleted_at',
     ];
 
-    protected $fillable = ['customer_id','delivery_boy_id','shipping_address_id','billing_address_id','delivery_date','net_amount','gross_amount','discounted_amount','payment_type','payment_id','total_items','total_items_quantity','reject_cancel_reason','purchased_from','is_coupon_applied','is_basket_in_order','order_status','created_by','updated_by','created_at','updated_at'];
+    protected $fillable = ['customer_id','delivery_boy_id','shipping_address_id','billing_address_id','delivery_date','net_amount','gross_amount','discounted_amount','payment_type','payment_id','payment_signature','total_items','total_items_quantity','reject_cancel_reason','purchased_from','is_coupon_applied','promo_code','is_basket_in_order','order_status','created_by','updated_by','created_at','updated_at'];
 
     protected function serializeDate(DateTimeInterface $date)
     {
@@ -116,11 +117,23 @@ class CustomerOrders extends Model
         $usersData = User::select('id')->where('id', $params['user_id'])->where('status', 1)->get()->toArray();
         $userAddressData = UserAddress::select('id')->where('id', $params['delivery_details']['address']['id'])->where('user_id', $params['user_id'])->where('status', 1)->get()->toArray();
         if(sizeof($usersData) == 0 || sizeof($params['products']) == 0 || sizeof($userAddressData) == 0) {
-            return false;
+            // return false;
+            return array("status" => false, "order_id" => 0);
         }
         // validate delivery date
         if($params['delivery_details']['date'] < date('Y-m-d')) {
-            return false;
+            // return false;
+            return array("status" => false, "order_id" => 0);
+        }
+
+        if($params['payment_details']['promo_code'] != '') {
+            $vpcData = array("promo_code" => $params['payment_details']['promo_code'], "user_id" => $params['user_id']);
+            $vpcData = json_encode($vpcData);
+            $promoCodes = new PromoCodes();
+            $vpcResponse = $promoCodes->validatePromoCode($vpcData);
+            if(!$vpcResponse) {
+                return array("status" => false, "order_id" => 0);
+            }
         }
 
         $orderAmount = $totalItemQty = $isBasketInOrder = 0;
@@ -139,7 +152,8 @@ class CustomerOrders extends Model
             $stmt->closeCursor();
             $reponse = json_decode($result['response']);
             if($reponse->status == "FAILURE" && $reponse->statusCode != 200) {
-                return false;
+                // return false;
+                return array("status" => false, "order_id" => 0);
             }
             if($value['is_basket'] == 1) {
                 $isBasketInOrder = 1;
@@ -147,7 +161,8 @@ class CustomerOrders extends Model
         }
 
         if($orderAmount != $params['payment_details']['net_amount']) {
-            return false;
+            // return false;
+            return array("status" => false, "order_id" => 0);
         }
 
         $customerOrdersResponse = CustomerOrders::create(array(
@@ -162,12 +177,16 @@ class CustomerOrders extends Model
             'billing_address_id' => $params['delivery_details']['address']['id'],
             'delivery_date' => $params['delivery_details']['date'],
             'is_basket_in_order' => $isBasketInOrder,
+            'order_status' => ($params['payment_details']['type'] == 'cod') ? 1 : 0,
+            'is_coupon_applied' => !empty($params['payment_details']['promo_code']) ? 1 : 0,
+            'promo_code' => $params['payment_details']['promo_code'],
             'created_by' => 1
         ));
         $orderId = $customerOrdersResponse->id;
         foreach($params['products'] as $key => $value) {
             $value['order_id'] = $orderId;
             $value['customer_id'] = $params['user_id'];
+            $value['order_status'] = ($params['payment_details']['type'] == 'cod') ? 1 : 0;
             $inputData = json_encode($value);
             /* $result = DB::select('call placeOrderDetails(?)', [$inputData]);
             $reponse = json_decode($result[0]->response); */
@@ -181,7 +200,8 @@ class CustomerOrders extends Model
             $reponse = json_decode($result['response']);
             if($reponse->status == "FAILURE" && $reponse->statusCode != 200) {
                 $this->cancelOrder($orderId, 1);
-                return false;
+                // return false;
+                return array("status" => false, "order_id" => 0);
             }
         }
 
@@ -195,7 +215,8 @@ class CustomerOrders extends Model
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
         $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
         $stmt->closeCursor();
-        return true;
+        // return true;
+        return array("status" => true, "order_id" => $orderId);
     }
 
     public function getOrderList($params) {
@@ -309,5 +330,29 @@ class CustomerOrders extends Model
             return false;
         }
         return true;
+    }
+
+    public function getOrderStatus($params) {
+        $orderStatus = CustomerOrders::select('order_status')->where('customer_id', $params['user_id'])->where('id', $params['order_id'])->get()->toArray();
+        if(sizeof($orderStatus) > 0) {
+            return array("status" => true, "order_status" => $orderStatus[0]['order_status']);
+        }
+        return array("status" => false, "order_status" => "");
+    }
+
+    public function paymentCallbackUrl($params) {
+        if(!empty($params['payment_id']) && !empty($params['order_id']) && !empty($params['payment_signature'])) {
+            $order = CustomerOrders::select('id')->where('id', $params['order_id'])->get()->toArray();
+            if(sizeof($order) > 0) {
+                $updateOrder = CustomerOrders::find($params['order_id']);
+                $updateOrder->order_status = 1;
+                $updateOrder->payment_id = $params['payment_id'];
+                $updateOrder->payment_signature = $params['payment_signature'];
+                $updateOrder->save();
+                return true;
+            }
+            return false;          
+        }
+        return false;
     }
 }

@@ -17,7 +17,7 @@ class CreateSpGetProductList extends Migration
         CREATE PROCEDURE getProductList(IN inputData JSON)
         getProductList:BEGIN
             DECLARE searchValue,sortType,sortOn VARCHAR(100) DEFAULT '';
-            DECLARE categoryId,noOfRecords,pageNumber INTEGER(10) DEFAULT 0;
+            DECLARE categoryId,noOfRecords,pageNumber,basketCategoryId INTEGER(10) DEFAULT 0;
         
             IF inputData IS NOT NULL AND JSON_VALID(inputData) = 0 THEN
                 SELECT JSON_OBJECT('status', 'FAILURE', 'message', 'Please provide valid data.','data',JSON_OBJECT(),'statusCode',520) AS response;
@@ -41,8 +41,16 @@ class CreateSpGetProductList extends Migration
         
             SET @whrCategory = ' 1=1 ';
             IF categoryId > 0 AND categoryId IS NOT NULL THEN
-                SET @whrCategory = CONCAT(' p.category_id = ', categoryId, ' ');
-            END IF;
+        
+            SELECT id INTO basketCategoryId FROM categories_master WHERE cat_name = 'Basket';
+                IF categoryId = basketCategoryId THEN 
+                    SET @whrCategory = CONCAT(' p.is_basket = 1 ');
+                ELSE 
+                    SET @whrCategory = CONCAT(' p.category_id = ', categoryId, ' ');
+                END IF;
+    
+            
+             END IF;
             SET @orderBy = ' p.product_name ASC ';
             SET @whrSearch = ' 1=1 ';
             IF searchValue != '' AND searchValue != 'null' THEN

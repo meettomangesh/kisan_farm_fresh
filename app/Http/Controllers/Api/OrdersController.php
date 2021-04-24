@@ -27,7 +27,7 @@ class OrdersController extends BaseController
             'payment_details.net_amount' => 'required|integer|gt:0',
             'payment_details.gross_amount' => 'required|integer|gt:0',
             'payment_details.discounted_amount' => 'required',
-            'payment_details.promo_code'=>'required_if:payment_details.discounted_amount,gt:0',
+            // 'payment_details.promo_code'=>'required_if:payment_details.discounted_amount,gt:0',
             'payment_details.order_id'=>'required_if:payment_details.type,online',
             'payment_details.transaction_id'=>'required_if:payment_details.type,online',
             'payment_details.method'=>'required_if:payment_details.type,online',

@@ -235,9 +235,9 @@ class OrdersController extends BaseController
                 return false;
             }
             $params = [
-                'payment_id' => $request->razorpay_payment_id,
-                'order_id' => $request->razorpay_order_id,
-                'payment_signature' => $request->razorpay_signature
+                'razorpay_payment_id' => $request->razorpay_payment_id,
+                'razorpay_order_id' => $request->razorpay_order_id,
+                'razorpay_signature' => $request->razorpay_signature
             ];
             //Create order object to call functions
             $customerOrders = new CustomerOrders();

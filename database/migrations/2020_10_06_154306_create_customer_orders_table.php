@@ -24,8 +24,9 @@ class CreateCustomerOrdersTable extends Migration
             $table->decimal('gross_amount', 10, 4);
             $table->decimal('discounted_amount', 14, 4)->nullable();
             $table->string('payment_type', 20)->index()->nullable();
-            $table->string('payment_id', 255)->index()->nullable();
-            $table->string('payment_signature', 255)->index()->nullable();
+            $table->string('razorpay_order_id', 255)->index()->nullable();
+            $table->string('razorpay_payment_id', 255)->index()->nullable();
+            $table->string('razorpay_signature', 255)->index()->nullable();
             $table->integer('total_items')->default(0)->unsigned()->index();
             $table->integer('total_items_quantity')->default(0)->unsigned()->index();
             $table->string('reject_cancel_reason', 255)->index()->nullable();

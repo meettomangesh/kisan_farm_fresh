@@ -26,7 +26,7 @@ class CustomerOrders extends Model
         'deleted_at',
     ];
 
-    protected $fillable = ['customer_id','delivery_boy_id','shipping_address_id','billing_address_id','delivery_date','net_amount','gross_amount','discounted_amount','payment_type','payment_id','payment_signature','total_items','total_items_quantity','reject_cancel_reason','purchased_from','is_coupon_applied','promo_code','is_basket_in_order','order_status','created_by','updated_by','created_at','updated_at'];
+    protected $fillable = ['customer_id','delivery_boy_id','shipping_address_id','billing_address_id','delivery_date','net_amount','gross_amount','discounted_amount','payment_type','razorpay_order_id','razorpay_payment_id','razorpay_signature','total_items','total_items_quantity','reject_cancel_reason','purchased_from','is_coupon_applied','promo_code','is_basket_in_order','order_status','created_by','updated_by','created_at','updated_at'];
 
     protected function serializeDate(DateTimeInterface $date)
     {
@@ -118,12 +118,12 @@ class CustomerOrders extends Model
         $userAddressData = UserAddress::select('id')->where('id', $params['delivery_details']['address']['id'])->where('user_id', $params['user_id'])->where('status', 1)->get()->toArray();
         if(sizeof($usersData) == 0 || sizeof($params['products']) == 0 || sizeof($userAddressData) == 0) {
             // return false;
-            return array("status" => false, "order_id" => 0);
+            return array("status" => false, "order_id" => $orderId, "razorpay_order_id" => 0);
         }
         // validate delivery date
         if($params['delivery_details']['date'] < date('Y-m-d')) {
             // return false;
-            return array("status" => false, "order_id" => 0);
+            return array("status" => false, "order_id" => 0, "razorpay_order_id" => 0);
         }
 
         if($params['payment_details']['promo_code'] != '') {
@@ -132,7 +132,7 @@ class CustomerOrders extends Model
             $promoCodes = new PromoCodes();
             $vpcResponse = $promoCodes->validatePromoCode($vpcData);
             if(!$vpcResponse) {
-                return array("status" => false, "order_id" => 0);
+                return array("status" => false, "order_id" => 0, "razorpay_order_id" => 0);
             }
         }
 
@@ -153,7 +153,7 @@ class CustomerOrders extends Model
             $reponse = json_decode($result['response']);
             if($reponse->status == "FAILURE" && $reponse->statusCode != 200) {
                 // return false;
-                return array("status" => false, "order_id" => 0);
+                return array("status" => false, "order_id" => 0, "razorpay_order_id" => 0);
             }
             if($value['is_basket'] == 1) {
                 $isBasketInOrder = 1;
@@ -162,7 +162,7 @@ class CustomerOrders extends Model
 
         if($orderAmount != $params['payment_details']['net_amount']) {
             // return false;
-            return array("status" => false, "order_id" => 0);
+            return array("status" => false, "order_id" => 0, "razorpay_order_id" => 0);
         }
 
         $customerOrdersResponse = CustomerOrders::create(array(
@@ -201,7 +201,7 @@ class CustomerOrders extends Model
             if($reponse->status == "FAILURE" && $reponse->statusCode != 200) {
                 $this->cancelOrder($orderId, 1);
                 // return false;
-                return array("status" => false, "order_id" => 0);
+                return array("status" => false, "order_id" => 0, "razorpay_order_id" => 0);
             }
         }
 
@@ -216,7 +216,18 @@ class CustomerOrders extends Model
         $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
         $stmt->closeCursor();
         // return true;
-        return array("status" => true, "order_id" => $orderId);
+
+        $razorPayOrderId = 0;
+        if($params['payment_details']['type'] = 'online') {
+            $createOrderIdParams = array("order_amount" => $orderAmount,"order_id" => $orderId);
+            $razorPayOrderId = $this->createOrderAtRazorpay($createOrderIdParams);
+            if(isset($razorPayOrderId) && !empty($razorPayOrderId)) {
+                $updateOrder = CustomerOrders::find($orderId);
+                $updateOrder->razorpay_order_id = $razorPayOrderId;
+                $updateOrder->save();
+            }
+        }
+        return array("status" => true, "order_id" => $orderId, "razorpay_order_id" => $razorPayOrderId);
     }
 
     public function getOrderList($params) {
@@ -344,15 +355,49 @@ class CustomerOrders extends Model
         if(!empty($params['payment_id']) && !empty($params['order_id']) && !empty($params['payment_signature'])) {
             $order = CustomerOrders::select('id')->where('id', $params['order_id'])->get()->toArray();
             if(sizeof($order) > 0) {
-                $updateOrder = CustomerOrders::find($params['order_id']);
+                $updateOrder = CustomerOrders::where('razorpay_order_id', $params['order_id']);
                 $updateOrder->order_status = 1;
-                $updateOrder->payment_id = $params['payment_id'];
-                $updateOrder->payment_signature = $params['payment_signature'];
+                $updateOrder->razorpay_payment_id = $params['razorpay_payment_id'];
+                $updateOrder->razorpay_signature = $params['razorpay_signature'];
                 $updateOrder->save();
                 return true;
             }
             return false;          
         }
         return false;
+    }
+
+    public function createOrderAtRazorpay($params) {
+        try {
+            $inputData = array("amount" => number_format($params["order_amount"], 2, ".", ""), "currency" => "INR", "receipt" => "rcptid_".$params["order_id"]);
+            $curl = curl_init();
+
+            curl_setopt_array($curl, array(
+                CURLOPT_URL => 'https://api.razorpay.com/v1/orders',
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => '',
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 30,
+                // CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_SSL_VERIFYPEER => false,
+                CURLOPT_CUSTOMREQUEST => 'POST',
+                CURLOPT_POSTFIELDS => json_encode($inputData),
+                CURLOPT_HTTPHEADER => array(
+                    'Authorization: Basic cnpwX3Rlc3RfVmFjZVN1U1ZGaURXcTQ6WGdLY1dDb3BTRjlKZDhEUUQ0T3I2bXRr',
+                    'Content-Type: application/json'
+                ),
+            ));
+
+            $response = json_decode(curl_exec($curl));
+            $err = curl_error($curl);
+            curl_close($curl);
+            if($err) {
+                return 0;
+            }
+            return $response['id'];
+        } catch (Exception $e) {
+            throw new Exception($e->getMessage());
+        }
     }
 }

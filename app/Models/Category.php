@@ -18,7 +18,7 @@ class Category extends Model
         'deleted_at',
     ];
 
-    protected $fillable = ['cat_name','cat_image_name','status','cat_description','created_by','updated_by','created_at','updated_at','deleted_at'];
+    protected $fillable = ['cat_parent_id','cat_name','cat_image_name','status','cat_description','created_by','updated_by','created_at','updated_at','deleted_at'];
 
     protected function serializeDate(DateTimeInterface $date)
     {
@@ -34,6 +34,7 @@ class Category extends Model
         $imageName = $time . '-' . $image->getClientOriginalName();
         $image->move(base_path().'/public' . $path, $imageName);
         Category::create(array(
+            'cat_parent_id' => $inputs['cat_parent_id'],
             'cat_name' => $inputs['cat_name'],
             'cat_image_name' => $path.$imageName,
             'cat_description' => $inputs['cat_description'],
@@ -57,7 +58,9 @@ class Category extends Model
                 unlink(public_path($category->cat_image_name));
             }
         }
+        $catParentId = (isset($inputs['cat_parent_id']) && !empty($inputs['cat_parent_id'])) ? $inputs['cat_parent_id'] : 0;
         $category = Category::find($category->id);
+        $category->cat_parent_id = $catParentId;
         $category->cat_name = $inputs['cat_name'];
         $category->cat_image_name = $imageName;
         $category->cat_description = $inputs['cat_description'];
@@ -72,6 +75,15 @@ class Category extends Model
     }
 
     protected function getCategoryName($id) {
+        $catParentId = Category::select('cat_parent_id')->where('id', $id)->where('status', 1)->get()->toArray();
+        if(!empty($catParentId[0])) {
+            $categoryName = Category::select('cat_name')->where('id', $catParentId[0]['cat_parent_id'])->where('status', 1)->get()->toArray();
+            return $categoryName[0]['cat_name'];
+        }
+        return '';
+    }
+
+    protected function getSubCategoryName($id) {
         $categoryName = Category::select('cat_name')->where('id', $id)->where('status', 1)->get()->toArray();
         if(!empty($categoryName[0])) {
             return $categoryName[0]['cat_name'];

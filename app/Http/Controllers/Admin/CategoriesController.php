@@ -23,7 +23,8 @@ class CategoriesController extends Controller
     public function create()
     {
         abort_if(Gate::denies('category_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-        return view('admin.categories.create');
+        $categories = Category::all()->where('cat_parent_id', 0)->where('status', 1)->pluck('cat_name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        return view('admin.categories.create', compact('categories'));
     }
 
     public function store(StoreCategoryRequest $request)
@@ -39,8 +40,9 @@ class CategoriesController extends Controller
     public function edit(Category $category)
     {
         abort_if(Gate::denies('category_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-        echo '<pre>'; print_r($category); exit;
-        return view('admin.categories.edit', compact('category'));
+        // print_r($category); exit;
+        $categories = Category::all()->where('cat_parent_id', 0)->where('status', 1)->pluck('cat_name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        return view('admin.categories.edit', compact('category','categories'));
     }
 
     public function update(UpdateCategoryRequest $request, Category $category)

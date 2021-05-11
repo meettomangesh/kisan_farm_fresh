@@ -332,6 +332,8 @@ return [
             'opening_quantity_helper'         => '',
             'category'                => 'Category',
             'category_helper'         => '',
+            'sub_category'                => 'Sub Category',
+            'sub_category_helper'         => '',
             'units'                => 'Units',
             'units_helper'         => '',
             'expiry_date'                => 'Expiry Date',

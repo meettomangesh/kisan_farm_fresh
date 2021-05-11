@@ -77,6 +77,7 @@ Route::group([
 
     // Products
     Route::delete('products/destroy', 'ProductsController@massDestroy')->name('products.massDestroy');
+    Route::get('products/getSubCategories/{cid?}', 'ProductsController@getSubCategories')->name('products.getSubCategories');
     Route::resource('products', 'ProductsController');
 
     // Categories

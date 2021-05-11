@@ -13,6 +13,26 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-group">
+                        <label class="control-label col-md-4" for="cat_parent_id">{{ trans('cruds.product.fields.category') }}</label>
+                        <div class="col-md-8 float-right">
+                            <select class="form-control select2 {{ $errors->has('category') ? 'is-invalid' : '' }}" name="cat_parent_id" id="cat_parent_id">
+                                @foreach($categories as $id => $cat)
+                                    <option value="{{ $id }}" {{ $category->cat_parent_id == $id ? 'selected' : '' }}>{{ $cat }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        @if($errors->has('category'))
+                        <div class="invalid-feedback">
+                            {{ $errors->first('category') }}
+                        </div>
+                        @endif
+                        <span class="help-block">{{ trans('cruds.product.fields.category_helper') }}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
                         <label class="control-label col-md-4 required" for="cat_name">{{ trans('cruds.category.fields.cat_name') }}</label>
                         <div class="col-md-8 float-right">
                             <input class="form-control {{ $errors->has('cat_name') ? 'is-invalid' : '' }}" type="text" name="cat_name" id="cat_name" maxlength="50" value="{{ old('cat_name', $category->cat_name) }}" required>

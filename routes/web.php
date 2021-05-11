@@ -9,6 +9,7 @@ Route::redirect('/', '/login');
 //     return redirect()->route('admin.home');
 // });
 Route::get('/home', 'HomeController@index')->name('admin.home');
+Route::get('/verify', 'EmailVerifyController@verifyEmail')->name('admin.verify');
 
 Auth::routes(['register' => false]);
 // Admin

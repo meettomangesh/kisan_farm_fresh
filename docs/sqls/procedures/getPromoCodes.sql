@@ -24,7 +24,7 @@ getPromoCodes:BEGIN
     SELECT pc.promo_code,pc.start_date,pc.end_date,pcm.title,
     CASE WHEN pcm.reward_type = 2 THEN CONCAT(pcm.reward_type_x_value,'%')
          WHEN pcm.reward_type = 3 THEN CONCAT('Rs.',pcm.reward_type_x_value)
-    ELSE "" END AS promo_code_value
+    ELSE '' END AS promo_code_value
     FROM promo_codes AS pc
     JOIN promo_code_master AS pcm ON pcm.id = pc.promo_code_master_id
     WHERE pc.user_id = userId AND pc.is_code_used = 0 AND pc.status = 1

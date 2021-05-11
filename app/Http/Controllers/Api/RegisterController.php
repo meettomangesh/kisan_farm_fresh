@@ -9,6 +9,7 @@ use App\Models\UserDetails;
 use Illuminate\Support\Facades\Auth;
 use Validator;
 use App\Helper\DataHelper;
+use App\Helper\EmailHelper;
 use App\Role;
 use Carbon\Carbon;
 
@@ -39,7 +40,10 @@ class RegisterController extends BaseController
         $input['email'] = $request->email_address;
         $input['password'] = bcrypt($input['password']);
         $input['referral_code'] = DataHelper::generateBarcodeString(9);
-        $input['email_verify_key'] = DataHelper::emailVerifyKey();
+        if (!empty($request->email_address)) {
+            $input['email_verify_key'] = DataHelper::emailVerifyKey();
+        }
+
         $input['created_by'] = 1;
         $input['roles'] = [4];
 
@@ -55,7 +59,21 @@ class RegisterController extends BaseController
         $success['id'] = $user->id;
         $success['role'] = $user->load('roles')->roles[0]->id;
         $success['role_name'] = $user->load('roles')->roles[0]->title;
-
+        $emailVerifyUrl = config('services.miscellaneous.EMAIL_VERIFY_URL');
+        if (!empty($request->email_address)) {
+            EmailHelper::sendEmail(
+                'IN_APP_EMAIL_VERIFICATION',
+                [
+                    'link' => $emailVerifyUrl . 'verify?key=' . $input['email_verify_key'],
+                    'email_to' => $request->email_address, //$request->email_address
+                    'customerName' => $user->first_name . " " . $user->last_name,
+                    'isEmailVerified' => 1
+                ],
+                [
+                    'attachment' => []
+                ]
+            );
+        }
         return $this->sendResponse($success, 'User register successfully.');
     }
 
@@ -113,6 +131,26 @@ class RegisterController extends BaseController
         //$input['referral_code'] = DataHelper::generateBarcodeString(9);
         //$input['email_verify_key'] = DataHelper::emailVerifyKey();
 
+        $isVerifyEmailRequired = 0;
+        if (isset($request->email_address) && !empty($request->email_address)) {
+            $baseCustomerEmail = $customer->checkEmailVerified($request->id);
+
+            if ($baseCustomerEmail['email'] == $request->email_address) {
+                $emailVerifyKey = $baseCustomerEmail['email_verify_key'];
+                $input['email_verify_key'] = $emailVerifyKey;
+                $input['email_verified'] = $baseCustomerEmail['email_verified'];
+                if ($baseCustomerEmail['email_verified'] == 0) {
+                    $isVerifyEmailRequired = 1;
+                }
+            } else {
+                $dataHelper = new DataHelper();
+                $emailVerifyKey = $dataHelper->emailVerifyKey();
+                $input['email_verify_key'] = DataHelper::emailVerifyKey();
+                $isVerifyEmailRequired = 1;
+            }
+        }
+
+
         if (!$customer) {
             return $this->sendError("Please try with valid details.", []);
         }
@@ -145,6 +183,23 @@ class RegisterController extends BaseController
                 $message = 'User updated successfully.';
                 break;
         }
+
+        if ($isVerifyEmailRequired) {
+            $emailVerifyUrl = config('services.miscellaneous.EMAIL_VERIFY_URL');
+            EmailHelper::sendEmail(
+                'IN_APP_EMAIL_CHANGE_VERIFICATION',
+                [
+                    'link' => $emailVerifyUrl . 'verify?key=' . $emailVerifyKey,
+                    'email_to' => $request->email_address, //$request->email_address
+                    'customerName' => $customer->first_name . " " . $customer->last_name,
+                    'isEmailVerified' => 1
+                ],
+                [
+                    'attachment' => []
+                ]
+            );
+        }
+
         return $this->sendResponse($success, $message);
     }
 
@@ -177,10 +232,10 @@ class RegisterController extends BaseController
             //$token = $user->createToken(getenv('APP_NAME'));
             $tokenResult = $user->createToken(getenv('APP_NAME'));
             $tokenResult->token->expires_at = Carbon::now()->addDays(10);
-            
+
             $success['token'] =  $tokenResult->accessToken;
             $success['expires_at'] =  $tokenResult->token->expires_at;
-            
+
             $success['name'] =  $user->first_name . " " . $user->last_name;
             $success['dob'] =  $user->date_of_birth;
             $success['marital_status'] =  $user->marital_status;
@@ -189,7 +244,7 @@ class RegisterController extends BaseController
             $success['id'] = $user->id;
             $success['role'] = (!empty($user->load('roles')->roles->toArray())) ? $user->load('roles')->roles[0]->id : 0;
             $success['role_name'] = (!empty($user->load('roles')->roles->toArray())) ? $user->load('roles')->roles[0]->title : "";
-            
+
             $userDetails = $user->details;
             unset($userDetails->id);
             unset($userDetails->user_id);
@@ -263,7 +318,7 @@ class RegisterController extends BaseController
             // Function call to get product list
             $responseDetails = $user->storeDeviceToken($params);
             $message = 'Failed to store device token.';
-            if($responseDetails) {
+            if ($responseDetails) {
                 $message = 'Device token stored successfully';
             }
             $response = $this->sendResponse([], $message);

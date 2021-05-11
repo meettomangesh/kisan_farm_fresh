@@ -153,4 +153,35 @@ class DataHelper
         return $path . $imageName;
     }
 
+    /**
+     * upload brand image
+     * @return String
+     */
+    public static function uploadInvoicePdf($fileObj, $path, $id = 0)
+    {
+        // $path = '/images/categories/';
+        if ($id != 0) {
+            $path .= $id;
+            if (!File::exists(public_path() . $path)) {
+                File::makeDirectory(public_path() . $path, 0644, true);
+            }
+            $path .= '/';
+        }
+        $var = date_create();
+        $time = date_format($var, 'YmdHis');
+        $imageName = $time . '-' . $fileObj->getClientOriginalName();
+        $fileObj->move(base_path() . '/public' . $path, $imageName);
+        return $path . $imageName;
+    }
+
+    /**
+     * check and create directory 
+     */
+    public static function checkDirectory($dirPath = '')
+    {
+        if (!File::isDirectory($dirPath)) {
+
+            File::makeDirectory($dirPath, 0777, true, true);
+        }
+    }
 }

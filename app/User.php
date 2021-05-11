@@ -137,6 +137,47 @@ class User extends Authenticatable
         }
     }
 
+
+    /**
+     * check email verified or not
+     * return success response or error response in json 
+     * return id in data params
+     */
+    public function checkEmailVerified($customerId)
+    {
+        try {
+            $stmt = DB::connection()->getPdo()->prepare("CALL checkEmailVerified(?)");
+            $stmt->execute(array($customerId));
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            return $result;
+        } catch (Exception $e) {
+            echo $e->getMessage();
+        }
+    }
+
+
+    /**
+     * check email verified or not
+     * return success response or error response in json 
+     * return id in data params
+     */
+    public function verifyEmail($emailVerifyKey)
+    {
+
+        try {
+            $emailVerified = 0;
+            $stmt = DB::connection()->getPdo()->prepare("CALL verifyEmail(?)");
+            $stmt->execute(array($emailVerifyKey));
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            if (isset($result['emailVerified'])){
+                $emailVerified = $result['emailVerified'];
+            }
+            return $emailVerified;
+        } catch (Exception $e) {
+            echo $e->getMessage();
+        }
+    }
+
     /**
      * Store device token
      * @param array $params
@@ -155,7 +196,7 @@ class User extends Authenticatable
             $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
             $stmt->closeCursor();
             $reponse = json_decode($result['response']);
-            if($reponse->status == "FAILURE" && $reponse->statusCode != 200) {
+            if ($reponse->status == "FAILURE" && $reponse->statusCode != 200) {
                 return false;
             }
             return true;

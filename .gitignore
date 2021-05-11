@@ -7,6 +7,7 @@
 /public/images/banners
 /public/images/baskets
 /public/images/documents
+/public/invoices
 /vendor
 .env
 .env.backup

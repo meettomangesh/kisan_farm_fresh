@@ -13,6 +13,9 @@ use App\Models\UserAddress;
 use App\Models\PromoCodes;
 use DB;
 use PDO;
+use App\Helper\PdfHelper;
+use App\Helper\DataHelper;
+use App\Helper\EmailHelper;
 
 class CustomerOrders extends Model
 {
@@ -26,7 +29,7 @@ class CustomerOrders extends Model
         'deleted_at',
     ];
 
-    protected $fillable = ['customer_id','delivery_boy_id','shipping_address_id','billing_address_id','delivery_date','net_amount','gross_amount','discounted_amount','payment_type','razorpay_order_id','razorpay_payment_id','razorpay_signature','total_items','total_items_quantity','reject_cancel_reason','purchased_from','is_coupon_applied','promo_code','is_basket_in_order','order_status','created_by','updated_by','created_at','updated_at'];
+    protected $fillable = ['customer_id', 'delivery_boy_id', 'shipping_address_id', 'billing_address_id', 'delivery_date', 'net_amount', 'gross_amount', 'discounted_amount', 'payment_type', 'razorpay_order_id', 'razorpay_payment_id', 'razorpay_signature', 'total_items', 'total_items_quantity', 'reject_cancel_reason', 'purchased_from', 'is_coupon_applied', 'promo_code', 'is_basket_in_order', 'order_status', 'created_by', 'updated_by', 'created_at', 'updated_at'];
 
     protected function serializeDate(DateTimeInterface $date)
     {
@@ -53,11 +56,13 @@ class CustomerOrders extends Model
         return $this->belongsTo(UserAddress::class, 'billing_address_id');
     }
 
-    public function orderDetails() {
+    public function orderDetails()
+    {
         return $this->hasMany(CustomerOrderDetails::class, 'order_id');
     }
 
-    protected function cancelOrder($orderId, $type, $reason) {
+    protected function cancelOrder($orderId, $type, $reason)
+    {
         $cancelData = array('order_id' => $orderId, 'type' => $type, 'reason' => $reason);
         $inputData = json_encode($cancelData);
         $pdo = DB::connection()->getPdo();
@@ -68,7 +73,7 @@ class CustomerOrders extends Model
         $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
         $stmt->closeCursor();
         $reponse = json_decode($result['response']);
-        if($reponse->status == "FAILURE" && $reponse->statusCode != 200) {
+        if ($reponse->status == "FAILURE" && $reponse->statusCode != 200) {
             return false;
         }
         return true;
@@ -108,40 +113,49 @@ class CustomerOrders extends Model
         return false; */
     }
 
-    public function cancelOrderAPI($params) {
+    public function cancelOrderAPI($params)
+    {
         return $this->cancelOrder($params['order_id'], 2, '');
     }
 
-    public function placeOrder($params) {
+    public function placeOrder($params)
+    {
         // validate customer
         $usersData = User::select('id')->where('id', $params['user_id'])->where('status', 1)->get()->toArray();
         $userAddressData = UserAddress::select('id')->where('id', $params['delivery_details']['address']['id'])->where('user_id', $params['user_id'])->where('status', 1)->get()->toArray();
-        if(sizeof($usersData) == 0 || sizeof($params['products']) == 0 || sizeof($userAddressData) == 0) {
-            // return false;
-            return array("status" => false, "order_id" => $orderId, "razorpay_order_id" => 0);
-        }
-        // validate delivery date
-        if($params['delivery_details']['date'] < date('Y-m-d')) {
+        // print_r($usersData); print_r($userAddressData); print_r($params['products']); 
+        //  echo sizeof($usersData) .'||'. sizeof($params['products'])  .'||'. sizeof($userAddressData) ;
+        // exit;
+
+
+        if (sizeof($usersData) == 0 || sizeof($params['products']) == 0 || sizeof($userAddressData) == 0) {
             // return false;
             return array("status" => false, "order_id" => 0, "razorpay_order_id" => 0);
         }
+        // validate delivery date
+        if ($params['delivery_details']['date'] < date('Y-m-d')) {
+            // return false;
 
-        if($params['payment_details']['promo_code'] != '') {
+            return array("status" => false, "order_id" => 0, "razorpay_order_id" => 0);
+        }
+
+        if ($params['payment_details']['promo_code'] != '') {
             $vpcData = array("promo_code" => $params['payment_details']['promo_code'], "user_id" => $params['user_id']);
             $vpcData = json_encode($vpcData);
             $promoCodes = new PromoCodes();
             $vpcResponse = $promoCodes->validatePromoCode($vpcData);
-            if(!$vpcResponse) {
+            if (!$vpcResponse) {
                 return array("status" => false, "order_id" => 0, "razorpay_order_id" => 0);
             }
         }
 
         $orderAmount = $totalItemQty = $isBasketInOrder = 0;
         // validate product
-        foreach($params['products'] as $key => $value) {
+        foreach ($params['products'] as $key => $value) {
             $orderAmount = $orderAmount + ((($value['special_price'] > 0) ? $value['special_price'] : $value['selling_price']) * $value['quantity']);
             $totalItemQty = $totalItemQty + $value['quantity'];
             $inputData = json_encode($value);
+
             // $result = DB::select('call validateProduct(?)', [$inputData]);
             $pdo = DB::connection()->getPdo();
             $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, true);
@@ -151,16 +165,17 @@ class CustomerOrders extends Model
             $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
             $stmt->closeCursor();
             $reponse = json_decode($result['response']);
-            if($reponse->status == "FAILURE" && $reponse->statusCode != 200) {
+
+            if ($reponse->status == "FAILURE" && $reponse->statusCode != 200) {
                 // return false;
                 return array("status" => false, "order_id" => 0, "razorpay_order_id" => 0);
             }
-            if($value['is_basket'] == 1) {
+            if ($value['is_basket'] == 1) {
                 $isBasketInOrder = 1;
             }
         }
 
-        if($orderAmount != $params['payment_details']['net_amount']) {
+        if ($orderAmount != $params['payment_details']['net_amount']) {
             // return false;
             return array("status" => false, "order_id" => 0, "razorpay_order_id" => 0);
         }
@@ -183,7 +198,8 @@ class CustomerOrders extends Model
             'created_by' => 1
         ));
         $orderId = $customerOrdersResponse->id;
-        foreach($params['products'] as $key => $value) {
+
+        foreach ($params['products'] as $key => $value) {
             $value['order_id'] = $orderId;
             $value['customer_id'] = $params['user_id'];
             $value['order_status'] = ($params['payment_details']['type'] == 'cod') ? 1 : 0;
@@ -198,7 +214,7 @@ class CustomerOrders extends Model
             $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
             $stmt->closeCursor();
             $reponse = json_decode($result['response']);
-            if($reponse->status == "FAILURE" && $reponse->statusCode != 200) {
+            if ($reponse->status == "FAILURE" && $reponse->statusCode != 200) {
                 $this->cancelOrder($orderId, 1);
                 // return false;
                 return array("status" => false, "order_id" => 0, "razorpay_order_id" => 0);
@@ -216,26 +232,121 @@ class CustomerOrders extends Model
         $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
         $stmt->closeCursor();
         // return true;
-
         $razorPayOrderId = 0;
-        if($params['payment_details']['type'] = 'online') {
-            $createOrderIdParams = array("order_amount" => $orderAmount,"order_id" => $orderId);
+        if ($params['payment_details']['type'] == 'online') {
+            $createOrderIdParams = array("order_amount" => $orderAmount, "order_id" => $orderId);
             $razorPayOrderId = $this->createOrderAtRazorpay($createOrderIdParams);
-            if(isset($razorPayOrderId) && !empty($razorPayOrderId)) {
+            if (isset($razorPayOrderId) && !empty($razorPayOrderId)) {
                 $updateOrder = CustomerOrders::find($orderId);
                 $updateOrder->razorpay_order_id = $razorPayOrderId;
                 $updateOrder->save();
             }
         }
-        return array("status" => true, "order_id" => $orderId, "razorpay_order_id" => $razorPayOrderId);
+        $params['order_id'] = $orderId;
+        $params['razorpay_order_id'] = $razorPayOrderId;
+        $params['invoice_template'] = 'IN_APP_INVOICE_AFTER_ORDER';
+
+        //$invoiceGenerated =  $this->generateInvoice($params);
+        $params['order_email_template'] = 'IN_APP_ORDER_PLACED_NOTIFICATION';
+        $this->sendOrderTransactionEmail($params);
+        $invoiceGenerated = 0;
+        return array("status" => true, "order_id" => $orderId, "razorpay_order_id" => $razorPayOrderId, "invoice_generated " => $invoiceGenerated);
     }
 
-    public function getOrderList($params) {
+    public function sendOrderTransactionEmail($params)
+    {
+        //$user_id = $params['user_id'];
+        $order_id = $params['order_id'];
+        $orderDetails = CustomerOrders::find($order_id);
+        $inputData = array('order_id' => $order_id, 'user_id' => $orderDetails->customer_id);
+        $inputData = json_encode($inputData);
+        EmailHelper::sendEmail(
+            $params['order_email_template'],
+            [
+                'email_to' => $orderDetails->userCustomer->email,
+                'orderId' => $params['order_id'],
+                'orderDate' => date("Y-m-d", strtotime($orderDetails->created_at)),
+                'customerName' => $orderDetails->userCustomer->first_name . ' ' . $orderDetails->userCustomer->last_name,
+                'paymentMethod' => $orderDetails->payment_type,
+                'paymentReference' => ($orderDetails->razorpay_payment_id) ? $orderDetails->razorpay_payment_id : '-',
+                'totalAmt' => $orderDetails->net_amount,
+                'deliveryDate' => $orderDetails->delivery_date,
+                'isEmailVerified' => $orderDetails->userCustomer->email_verified
+
+            ],
+            [
+                'attachment' => isset($params['attachment']) ? $params['attachment'] : []
+            ]
+
+        );
+    }
+
+    public function generateInvoice($params)
+    {
+        //$user_id = $params['user_id'];
+        $order_id = $params['order_id'];
+        $fileName = date('Y') . date('m') . PdfHelper::randomNumber(4);
+        $invoiceDate = date('d M Y'); //current date
+        $orderDetails = CustomerOrders::find($order_id);
+        $inputData = array('order_id' => $order_id, 'user_id' => $orderDetails->customer_id);
+        $inputData = json_encode($inputData);
+        $productDetails = DB::select('call getOrderDetails(?)', [$inputData]);
+        $productStr = '';
+        foreach ($productDetails as $product) {
+            $productStr .= '
+            <tr class="item">
+                <td style="text-align: center;padding: 5px;vertical-align: top;border-bottom: 1px solid #eee;">
+                ' . $product->product_name . '(' . $product->unit . ')
+                </td>
+                <td style="text-align: center;padding: 5px;vertical-align: top;border-bottom: 1px solid #eee;">
+                ' .  $product->item_quantity . '
+                </td>
+                <td style="text-align: center;padding: 5px;vertical-align: border-bottom: 1px solid #eee;">
+                ' . (($product->special_price != 0) ? $product->special_price : $product->selling_price) . '
+                </td>
+            </tr>
+            ';
+        }
+
+        $invoiceTemplate = EmailHelper::getCustomerEmailTemplate($params['invoice_template'], '', [
+            'orderId' => $params['order_id'],
+            'orderDate' => date("Y-m-d", strtotime($orderDetails->created_at)),
+            'address' => $orderDetails->customerShippingAddress->address,
+            'landmark' => $orderDetails->customerShippingAddress->landmark,
+            'area' => $orderDetails->customerShippingAddress->area,
+            'city' => $orderDetails->customerShippingAddress->city->name,
+            'state' => $orderDetails->customerShippingAddress->state->name,
+            'pinCode' => $orderDetails->customerShippingAddress->pin_code,
+            'name' => $orderDetails->customerShippingAddress->name,
+            'mobileNumber' => $orderDetails->customerShippingAddress->mobile_number,
+            'email' => '',
+            'paymentMethod' => $orderDetails->payment_type,
+            'paymentReference' => ($orderDetails->razorpay_payment_id) ? $orderDetails->razorpay_payment_id : '-',
+            'productList' => $productStr,
+            'grossAmount' => $orderDetails->gross_amount,
+            'discount' => $orderDetails->discounted_amount,
+            'total' => $orderDetails->net_amount,
+            'deliveryDate' => $orderDetails->delivery_date
+        ]);
+
+        $filePath = public_path() . '/invoices/' . $orderDetails->customer_id . '/';  //  '/var/www/html/kisan_farm_fresh/public/invoices/';
+        //$invoice_number = 'PKGINV' . PdfHelper::randomNumber(4);
+        //$fileName = date('Y') . date('m') . PdfHelper::randomNumber(4);
+        $fileName = $order_id;
+        DataHelper::checkDirectory($filePath);
+        //Generating Invoice PDF and storing on local server
+
+        $isInvoiceGenerated = PdfHelper::generatePDF($invoiceTemplate, $filePath, $fileName);
+        return $isInvoiceGenerated;
+    }
+
+    public function getOrderList($params)
+    {
         $queryResult = DB::select('call getOrderList(?)', [$params]);
         // $result = collect($queryResult);
         $orderList = [];
-        if(sizeof($queryResult) > 0) {
-            foreach($queryResult as $key => $val) {
+        if (sizeof($queryResult) > 0) {
+            foreach ($queryResult as $key => $val) {
                 $orders["order_id"] = $val->id;
                 $orders["delivery_details"] = array(
                     "date" => $val->delivery_date,
@@ -267,7 +378,7 @@ class CustomerOrders extends Model
                 $inputData = array('order_id' => $val->id, 'user_id' => $val->customer_id);
                 $inputData = json_encode($inputData);
                 $orderDetails = DB::select('call getOrderDetails(?)', [$inputData]);
-                if(sizeof($orderDetails) > 0) {
+                if (sizeof($orderDetails) > 0) {
                     $orderList[$key]["products"] = $orderDetails;
                 } else {
                     unset($orderList[$key]);
@@ -277,12 +388,13 @@ class CustomerOrders extends Model
         return $orderList;
     }
 
-    public function getOrderListForDeliveryBoy($params) {
+    public function getOrderListForDeliveryBoy($params)
+    {
         $queryResult = DB::select('call getOrderListForDeliveryBoy(?)', [$params]);
         // $result = collect($queryResult);
         $orderList = [];
-        if(sizeof($queryResult) > 0) {
-            foreach($queryResult as $key => $val) {
+        if (sizeof($queryResult) > 0) {
+            foreach ($queryResult as $key => $val) {
                 $orders["order_id"] = $val->id;
                 $orders["delivery_details"] = array(
                     "date" => $val->delivery_date,
@@ -314,7 +426,7 @@ class CustomerOrders extends Model
                 $inputData = array('order_id' => $val->id, 'user_id' => $val->customer_id);
                 $inputData = json_encode($inputData);
                 $orderDetails = DB::select('call getOrderDetails(?)', [$inputData]);
-                if(sizeof($orderDetails) > 0) {
+                if (sizeof($orderDetails) > 0) {
                     $orderList[$key]["products"] = $orderDetails;
                 } else {
                     unset($orderList[$key]);
@@ -324,8 +436,9 @@ class CustomerOrders extends Model
         return $orderList;
     }
 
-    public function changeOrderStatus($params) {
-        if($params['order_status'] == 5) {
+    public function changeOrderStatus($params)
+    {
+        if ($params['order_status'] == 5) {
             return $this->cancelOrder($params['order_id'], 2, $params['order_note']);
         }
         $inputData = json_encode($params);
@@ -337,24 +450,39 @@ class CustomerOrders extends Model
         $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
         $stmt->closeCursor();
         $reponse = json_decode($result['response']);
-        if($reponse->status == "FAILURE" && $reponse->statusCode != 200) {
+        if ($reponse->status == "FAILURE" && $reponse->statusCode != 200) {
             return false;
+        }
+        if ($params['order_status'] == 4) {
+            //$params['order_id'] = $params['order_id'];
+
+            $orderDetails = CustomerOrders::find($params['order_id']);
+            $params['invoice_template'] = 'IN_APP_INVOICE_AFTER_ORDER';
+            $invoiceGenerated =  $this->generateInvoice($params);
+
+            $params['order_email_template'] = 'IN_APP_ORDER_DELIVERED_NOTIFICATION';
+            if ($invoiceGenerated) {
+                $params['attachment'] = array(array('attachment' => 'invoices/' . $orderDetails->customer_id . '/' . $params['order_id'] . '.pdf'));
+            }
+            $this->sendOrderTransactionEmail($params);
         }
         return true;
     }
 
-    public function getOrderStatus($params) {
+    public function getOrderStatus($params)
+    {
         $orderStatus = CustomerOrders::select('order_status')->where('customer_id', $params['user_id'])->where('id', $params['order_id'])->get()->toArray();
-        if(sizeof($orderStatus) > 0) {
+        if (sizeof($orderStatus) > 0) {
             return array("status" => true, "order_status" => $orderStatus[0]['order_status']);
         }
         return array("status" => false, "order_status" => "");
     }
 
-    public function paymentCallbackUrl($params) {
-        if(!empty($params['payment_id']) && !empty($params['order_id']) && !empty($params['payment_signature'])) {
+    public function paymentCallbackUrl($params)
+    {
+        if (!empty($params['payment_id']) && !empty($params['order_id']) && !empty($params['payment_signature'])) {
             $order = CustomerOrders::select('id')->where('id', $params['order_id'])->get()->toArray();
-            if(sizeof($order) > 0) {
+            if (sizeof($order) > 0) {
                 $updateOrder = CustomerOrders::where('razorpay_order_id', $params['order_id']);
                 $updateOrder->order_status = 1;
                 $updateOrder->razorpay_payment_id = $params['razorpay_payment_id'];
@@ -362,14 +490,15 @@ class CustomerOrders extends Model
                 $updateOrder->save();
                 return true;
             }
-            return false;          
+            return false;
         }
         return false;
     }
 
-    public function createOrderAtRazorpay($params) {
+    public function createOrderAtRazorpay($params)
+    {
         try {
-            $inputData = array("amount" => number_format($params["order_amount"], 2, ".", ""), "currency" => "INR", "receipt" => "rcptid_".$params["order_id"]);
+            $inputData = array("amount" => number_format($params["order_amount"], 2, ".", ""), "currency" => "INR", "receipt" => "rcptid_" . $params["order_id"]);
             $curl = curl_init();
 
             curl_setopt_array($curl, array(
@@ -392,7 +521,7 @@ class CustomerOrders extends Model
             $response = json_decode(curl_exec($curl));
             $err = curl_error($curl);
             curl_close($curl);
-            if($err) {
+            if ($err) {
                 return 0;
             }
             return $response['id'];

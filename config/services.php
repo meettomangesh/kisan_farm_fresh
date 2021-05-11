@@ -48,6 +48,7 @@ return [
         'SMS_GATEWAY_API_BASE_URL' => env('SMS_GATEWAY_API_BASE_URL', ''),
         'SMS_GATEWAY_API_AUTH_KEY' => env('SMS_GATEWAY_API_AUTH_KEY', ''),
         'SMS_GATEWAY_API_SENDER' => env('SMS_GATEWAY_API_SENDER', ''),
+        'EMAIL_VERIFY_URL' => env('EMAIL_VERIFY_URL', ''),
 
     ]
 

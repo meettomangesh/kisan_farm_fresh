@@ -67,7 +67,9 @@
                         </div>
                     </div>
                 </div>
+            </div>
 
+            <div class="row">
                 <div class="col-md-6">
                     <div class="form-group">
                         <label class="control-label col-md-4 required" for="category_id">{{ trans('cruds.product.fields.category') }}</label>
@@ -87,6 +89,21 @@
                         </div>
                         @endif
                         <span class="help-block">{{ trans('cruds.product.fields.category_helper') }}</span>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="control-label col-md-4 required" for="sub_category">{{ trans('cruds.product.fields.sub_category') }}</label>
+                        <div class="col-md-8 float-right">
+                            <label>{{ App\Models\Category::getSubCategoryName($product->category_id) }}</label>
+                        </div>
+                        @if($errors->has('sub_category'))
+                        <div class="invalid-feedback">
+                            {{ $errors->first('sub_category') }}
+                        </div>
+                        @endif
+                        <span class="help-block">{{ trans('cruds.product.fields.sub_category_helper') }}</span>
                     </div>
                 </div>
             </div>

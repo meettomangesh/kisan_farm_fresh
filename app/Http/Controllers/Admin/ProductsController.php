@@ -35,7 +35,10 @@ class ProductsController extends Controller
     public function store(StoreProductRequest $request)
     {
         if ($request->hasFile('product_images')) {
-            $product = Product::create($request->all());
+            $productData = $request->all();
+            $productData['category_id'] = $productData['sub_category_id'];
+            // $product = Product::create($request->all());
+            $product = Product::create($productData);
             if($product->id > 0) {
                 Product::storeProductImages($request, $product->id, 1);
             }
@@ -53,7 +56,7 @@ class ProductsController extends Controller
         return view('admin.products.edit', compact('product','productImages','srNo','categories'));
     }
 
-public function update(UpdateProductRequest $request, Product $product)
+    public function update(UpdateProductRequest $request, Product $product)
     {
         $requestAll = $request->all();
         $product->update($requestAll);
@@ -83,6 +86,13 @@ public function update(UpdateProductRequest $request, Product $product)
     {
         Product::whereIn('id', request('ids'))->delete();
         return response(null, Response::HTTP_NO_CONTENT);
+    }
+
+    public function getSubCategories($id)
+    {
+        $data['sub_categories'] = DB::table("categories_master")->where("cat_parent_id", $id)->where("status", 1)->pluck("cat_name", "id");
+        $data['is_sub_category_available'] = sizeof($data['sub_categories']);
+        return json_encode($data);
     }
 
 }

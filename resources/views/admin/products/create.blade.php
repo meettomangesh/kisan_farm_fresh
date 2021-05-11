@@ -66,7 +66,9 @@
                         </div>
                     </div>
                 </div>
+            </div>
 
+            <div class="row">
                 <div class="col-md-6">
                     <div class="form-group">
                         <label class="control-label col-md-4 required" for="category_id">{{ trans('cruds.product.fields.category') }}</label>
@@ -83,6 +85,23 @@
                         </div>
                         @endif
                         <span class="help-block">{{ trans('cruds.product.fields.category_helper') }}</span>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class="control-label col-md-4 required" for="sub_category">{{ trans('cruds.product.fields.sub_category') }}</label>
+                        <div class="col-md-8 float-right">
+                            <select class="form-control select2 {{ $errors->has('sub_category') ? 'is-invalid' : '' }}" name="sub_category_id" id="sub_category_id" required>
+                                <option>Please select</option>
+                            </select>
+                            @if($errors->has('sub_category'))
+                                <div class="invalid-feedback">
+                                    {{ $errors->first('sub_category') }}
+                                </div>
+                            @endif
+                            <span class="help-block">{{ trans('cruds.product.fields.sub_category_helper') }}</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -195,6 +214,33 @@
 <script>
     jQuery(document).ready(function () {
         siteObjJs.admin.productMerchantJs.init('create-product');
+
+        $('select[name="category_id"]').on('change', function () {
+            var categoryId = $(this).val();
+            var url = '{{ route("admin.products.getSubCategories", "") }}';
+            url = url+'/'+categoryId;
+            if (categoryId) {
+                $.ajax({
+                    url: url,
+                    type: "GET",
+                    dataType: "json",
+                    success: function(data) {
+                        $("#sub_category_id").empty();
+                        if(data.is_sub_category_available > 0) {
+                            $.each(data.sub_categories, function(key, value) {
+                                $("#sub_category_id").append('<option value="' + key + '">' + value + '</option>');
+                            });
+                        } else {
+                            $("#category_id option:selected").prop("selected", false)
+                            $("#select2-category_id-container").text('');
+                            alert('No sub category is available');
+                        }
+                    }
+                });
+            } else {
+                $("#sub_category_id").empty();
+            }
+        });
     });
 </script>
 @endsection

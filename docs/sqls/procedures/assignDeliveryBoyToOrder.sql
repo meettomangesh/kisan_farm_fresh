@@ -35,7 +35,7 @@ assignDeliveryBoyToOrder:BEGIN
     END IF; */
 
     block1:BEGIN
-        DECLARE basketProductUnitsCursor CURSOR FOR
+        DECLARE assignDeliveryBoyCursor CURSOR FOR
         SELECT ru.user_id,rm.max_order_count
         FROM customer_orders AS co
         JOIN user_address AS ua ON ua.id = co.shipping_address_id
@@ -47,11 +47,11 @@ assignDeliveryBoyToOrder:BEGIN
         AND IF((SELECT status FROM users WHERE id = ru.user_id) = 1, true, false);
 
         DECLARE CONTINUE HANDLER FOR NOT FOUND SET notFound = 1;
-        OPEN basketProductUnitsCursor;
-        basketProductUnitsLoop: LOOP
-            FETCH basketProductUnitsCursor INTO userId,maxOrderCount;
+        OPEN assignDeliveryBoyCursor;
+        assignDeliveryBoyLoop: LOOP
+            FETCH assignDeliveryBoyCursor INTO userId,maxOrderCount;
             IF(notFound = 1) THEN
-                LEAVE basketProductUnitsLoop;
+                LEAVE assignDeliveryBoyLoop;
             END IF;
 
             IF userId > 0 AND maxOrderCount > 0 AND (SELECT COUNT(id) FROM customer_orders WHERE delivery_date = deliveryDate AND order_status NOT IN (4,5) AND delivery_boy_id = userId) < maxOrderCount THEN
@@ -62,8 +62,8 @@ assignDeliveryBoyToOrder:BEGIN
                 LEAVE assignDeliveryBoyToOrder;
             END IF;
 
-        END LOOP basketProductUnitsLoop;
-        CLOSE basketProductUnitsCursor;
+        END LOOP assignDeliveryBoyLoop;
+        CLOSE assignDeliveryBoyCursor;
     END block1;
 
     SELECT JSON_OBJECT('status', 'SUCCESS', 'message', 'Delivery boy assigned successfully.','data',JSON_OBJECT(),'statusCode',200) AS response;

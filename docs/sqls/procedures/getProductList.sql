@@ -2,14 +2,15 @@ DELIMITER $$
 DROP PROCEDURE IF EXISTS getProductList$$
 CREATE PROCEDURE getProductList(IN inputData JSON)
 getProductList:BEGIN
-    DECLARE searchValue,sortType,sortOn VARCHAR(100) DEFAULT '';
-    DECLARE categoryId,noOfRecords,pageNumber,basketCategoryId INTEGER(10) DEFAULT 0;
+    DECLARE searchValue,sortType,sortOn,subCategoryIds VARCHAR(100) DEFAULT '';
+    DECLARE categoryId,subCategoryId,noOfRecords,pageNumber,basketCategoryId INTEGER(10) DEFAULT 0;
 
     IF inputData IS NOT NULL AND JSON_VALID(inputData) = 0 THEN
         SELECT JSON_OBJECT('status', 'FAILURE', 'message', 'Please provide valid data.','data',JSON_OBJECT(),'statusCode',520) AS response;
         LEAVE getProductList;
     ELSE
         SET categoryId = JSON_UNQUOTE(JSON_EXTRACT(inputData,'$.category_id'));
+        SET subCategoryId = JSON_UNQUOTE(JSON_EXTRACT(inputData,'$.sub_category_id'));
         SET noOfRecords = JSON_UNQUOTE(JSON_EXTRACT(inputData,'$.no_of_records'));
         SET pageNumber = JSON_UNQUOTE(JSON_EXTRACT(inputData,'$.page_number'));
         SET searchValue = JSON_UNQUOTE(JSON_EXTRACT(inputData,'$.search_value'));
@@ -35,17 +36,18 @@ getProductList:BEGIN
     OFFSET pageNumber; */
 
     SET @whrCategory = ' 1=1 ';
-    IF categoryId > 0 AND categoryId IS NOT NULL THEN
-        
+    IF subCategoryId > 0 AND subCategoryId IS NOT NULL THEN
+        SET @whrCategory = CONCAT(' p.category_id = ', subCategoryId, ' ');
+    ELSEIF categoryId > 0 AND categoryId IS NOT NULL THEN
         SELECT id INTO basketCategoryId FROM categories_master WHERE cat_name = 'Basket';
-            IF categoryId = basketCategoryId THEN 
-                SET @whrCategory = CONCAT(' p.is_basket = 1 ');
-            ELSE 
-                SET @whrCategory = CONCAT(' p.category_id = ', categoryId, ' ');
-            END IF;
-
-        
+        IF categoryId = basketCategoryId THEN 
+            SET @whrCategory = CONCAT(' p.is_basket = 1 ');
+        ELSE
+            SELECT GROUP_CONCAT(id) INTO subCategoryIds FROM categories_master WHERE status = 1 AND cat_parent_id = categoryId;
+            SET @whrCategory = CONCAT(' p.category_id IN (', subCategoryIds, ') ');
+        END IF;
     END IF;
+
     SET @orderBy = ' p.product_name ASC ';
     /* SET @orderBy = ' p.selling_price ASC ';
     IF sortType != '' AND sortOn != '' AND sortType != 'null' AND sortOn != 'null' THEN
@@ -73,5 +75,5 @@ getProductList:BEGIN
     DEALLOCATE PREPARE stmt;
     -- SELECT JSON_OBJECT('status','SUCCESS', 'message','No record found.','data',JSON_OBJECT('statusCode',104),'statusCode',104) AS response;
     -- LEAVE getProductList;
-    END$$
+END$$
 DELIMITER ;

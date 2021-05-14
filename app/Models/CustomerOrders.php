@@ -133,9 +133,8 @@ class CustomerOrders extends Model
             return array("status" => false, "order_id" => 0, "razorpay_order_id" => 0);
         }
         // validate delivery date
-        if ($params['delivery_details']['date'] < date('Y-m-d')) {
+        if ($params['delivery_details']['date'] <= date('Y-m-d')) {
             // return false;
-
             return array("status" => false, "order_id" => 0, "razorpay_order_id" => 0);
         }
 
@@ -223,6 +222,7 @@ class CustomerOrders extends Model
 
         // Assign delivery boy
         $assignData['order_id'] = $orderId;
+        $assignData['delivery_date'] = $params['delivery_details']['date'];
         $inputData = json_encode($assignData);
         $pdo = DB::connection()->getPdo();
         $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, true);

@@ -24,6 +24,7 @@ Route::post('getOtp', 'Api\SmsController@getOtp');
 Route::post('verifyOtp', 'Api\SmsController@verifyOtp');
 // Route::post('getOtp',\Api\SmsController::class . '@getOtp');
 Route::post('categories', 'Api\CategoryController@getCategoryList');
+Route::post('subCategories', 'Api\CategoryController@getSubCategoryList');
 Route::post('products', 'Api\ProductsController@getProductList');
 Route::post('banners', 'Api\BannersController@getBannerList');
 Route::post('pinCodes', 'Api\RegisterController@getPinCodeList');

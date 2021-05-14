@@ -17,6 +17,7 @@ class ProductsController extends BaseController
         $validator = Validator::make($request->all(), [
             'platform' => 'required',
             'category_id' => 'required',
+            'sub_category_id' => 'required',
             'no_of_records' => 'required',
             'page_number' => 'required',
             // 'search_value' => 'required',
@@ -31,6 +32,7 @@ class ProductsController extends BaseController
             $params = [
                 'platform' => $request->platform,
                 'category_id' => $request->category_id,
+                'sub_category_id' => $request->sub_category_id,
                 'no_of_records' => $request->no_of_records,
                 'page_number' => $request->page_number,
                 'search_value' => $request->search_value,

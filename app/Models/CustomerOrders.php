@@ -124,8 +124,8 @@ class CustomerOrders extends Model
         $usersData = User::select('id')->where('id', $params['user_id'])->where('status', 1)->get()->toArray();
         $userAddressData = UserAddress::select('id')->where('id', $params['delivery_details']['address']['id'])->where('user_id', $params['user_id'])->where('status', 1)->get()->toArray();
         // print_r($usersData); print_r($userAddressData); print_r($params['products']); 
-        //  echo sizeof($usersData) .'||'. sizeof($params['products'])  .'||'. sizeof($userAddressData) ;
-        // exit;
+        //echo sizeof($usersData) .'||'. sizeof($params['products'])  .'||'. sizeof($userAddressData) ;
+        //exit;
 
 
         if (sizeof($usersData) == 0 || sizeof($params['products']) == 0 || sizeof($userAddressData) == 0) {
@@ -164,7 +164,7 @@ class CustomerOrders extends Model
             $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
             $stmt->closeCursor();
             $reponse = json_decode($result['response']);
-
+            
             if ($reponse->status == "FAILURE" && $reponse->statusCode != 200) {
                 // return false;
                 return array("status" => false, "order_id" => 0, "razorpay_order_id" => 0);
@@ -173,7 +173,7 @@ class CustomerOrders extends Model
                 $isBasketInOrder = 1;
             }
         }
-
+        
         if ($orderAmount != $params['payment_details']['net_amount']) {
             // return false;
             return array("status" => false, "order_id" => 0, "razorpay_order_id" => 0);

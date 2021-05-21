@@ -621,7 +621,9 @@ return [
             'deleted_at'        => 'Deleted at',
             'deleted_at_helper' => '',
             'actions'        => 'Actions',
-            'cancel_order'   => 'Cancel Order'
+            'cancel_order'   => 'Cancel Order',
+            're_assign_delivery_boy' => 'Re-assign Delivery Boy',
+            'delivery_date' => 'Delivery Date',
         ],
     ],
     'communication'           => [

@@ -34,10 +34,10 @@ class CreateSpStoreDeviceToken extends Migration
             END IF;
            
             IF EXISTS(SELECT id FROM customer_device_tokens WHERE user_id = userId) THEN
-                UPDATE customer_device_tokens SET device_id = deviceId, device_type = deviceType, device_token = deviceToken, updated_by = 1 WHERE user_id = userId AND user_role_id = userRoleId;
+                UPDATE customer_device_tokens SET device_id = deviceId, device_token = deviceToken WHERE user_id = userId AND user_role_id = userRoleId;
             ELSEIF EXISTS(SELECT id FROM users WHERE id = userId) THEN
-                INSERT INTO customer_device_tokens (user_id,user_role_id,device_id,device_token,device_type,created_by)
-                VALUES (userId,userRoleId,deviceId,deviceToken,deviceType,1);
+                INSERT INTO customer_device_tokens (user_id,user_role_id,device_id,device_token)
+                VALUES (userId,userRoleId,deviceId,deviceToken);
             ELSE
                 SELECT JSON_OBJECT('status', 'FAILURE', 'message', 'Failed to store device token.','data',JSON_OBJECT(),'statusCode',520) AS response;
                 LEAVE storeDeviceToken;

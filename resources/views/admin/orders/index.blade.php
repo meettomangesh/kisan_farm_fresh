@@ -78,11 +78,11 @@
                             </button><br>
                             @endif
                             @endcan
-                            @if($customerOrder->delivery_boy_id == 0 || !($customerOrder->order_status == 4 || $customerOrder->order_status == 5))
+                            <!-- @if($customerOrder->delivery_boy_id == 0 || !($customerOrder->order_status == 4 || $customerOrder->order_status == 5))
                             <a class="btn btn-xs btn-primary" href="{{ route('admin.orders.reAssign', $customerOrder->id) }}">
                                 {{ trans('cruds.order.fields.re_assign_delivery_boy') }}
                             </a>
-                            @endif
+                            @endif -->
                         </td>
                     </tr>
                     @endforeach

@@ -71,7 +71,7 @@ class Category extends Model
     }
 
     public function getCategoryList() {
-        return Category::select('id','cat_name','cat_image_name')->where('status', 1)->get()->toArray();
+        return Category::select('id','cat_name','cat_image_name')->where('status', 1)->where('cat_parent_id', 0)->get()->toArray();
     }
 
     public function getSubCategoryList($params) {

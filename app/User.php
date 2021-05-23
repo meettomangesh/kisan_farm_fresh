@@ -169,7 +169,7 @@ class User extends Authenticatable
             $stmt = DB::connection()->getPdo()->prepare("CALL verifyEmail(?)");
             $stmt->execute(array($emailVerifyKey));
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
-            if (isset($result['emailVerified'])){
+            if (isset($result['emailVerified'])) {
                 $emailVerified = $result['emailVerified'];
             }
             return $emailVerified;
@@ -203,5 +203,16 @@ class User extends Authenticatable
         } catch (Exception $e) {
             return $this->sendError('Error.', $$e->getMessage());
         }
+    }
+
+    /**
+     * Specifies the user's FCM token
+     *
+     * @return string|array
+     */
+    public function routeNotificationForFcm()
+    {
+        echo "Inside User Model-215";
+        return "fImEfIt7Qmmh7LxTnQ3jy8:APA91bE_bcrCZiteJvbVZv2m2HYEQniTbYCYeo-wfOYUmhJ02URjlTeOx0UO7osO2chqHkfiBKFRTPLR9RkopRdo9r_qYmjpNxGvGwPjmRSZdoCrNexp6M0b9NQKo7QuwsHIAUDl0_Zi";
     }
 }

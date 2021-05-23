@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use App\Models\CustomerLoyalty;
 use App\Region;
+use App\Helper\NotificationHelper;
 
 class CustomersController extends Controller
 {
@@ -24,6 +25,13 @@ class CustomersController extends Controller
 
         // return view('admin.customers.index', compact('customers'));
 
+        $user = new User();
+        $notifyHelper = new NotificationHelper();
+        
+        $notifyHelper->setParameters(["name"=>"Mangesh Navale","email" =>"meettomangesh@gmail.com"],'Title','Body');
+        echo "Inside User controller-29";
+        print_r($user->notify($notifyHelper));
+        exit;
         $customers = User::whereHas(
             'roles', function($q){
                 $q->where('title', 'Customer');

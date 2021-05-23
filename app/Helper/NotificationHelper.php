@@ -1,0 +1,69 @@
+<?php
+
+/**
+ * The helper library class for Data related functionality
+ *
+ *
+ * @author 
+ * @package Admin
+ * @since 1.0
+ */
+
+namespace App\Helper;
+
+use Illuminate\Notifications\Notification;
+use NotificationChannels\Fcm\FcmChannel;
+use NotificationChannels\Fcm\FcmMessage;
+use NotificationChannels\Fcm\Resources\AndroidConfig;
+use NotificationChannels\Fcm\Resources\AndroidFcmOptions;
+use NotificationChannels\Fcm\Resources\AndroidNotification;
+use NotificationChannels\Fcm\Resources\ApnsConfig;
+use NotificationChannels\Fcm\Resources\ApnsFcmOptions;
+
+class NotificationHelper extends Notification
+{
+    public $data;
+    public $title;
+    public $body;
+    public $image;
+
+    public function setParameters($data, $title, $body, $image = "")
+    {
+        $this->data = $data;
+        $this->title = $title;
+        $this->body = $body;
+        $this->image = $image;
+    }
+    public function via($notifiable)
+    {
+        echo "Inside Notificationhelper-27".FcmChannel::class;
+        return [FcmChannel::class];
+    }
+
+    public function toFcm($notifiable)
+    {
+        echo "Inside Notificationhelper-32";
+        return FcmMessage::create()
+            ->setData($this->data)
+            ->setNotification(\NotificationChannels\Fcm\Resources\Notification::create()
+                ->setTitle($this->title)
+                ->setBody($this->body)
+                ->setImage($this->image))
+            ->setAndroid(
+                AndroidConfig::create()
+                    ->setFcmOptions(AndroidFcmOptions::create()->setAnalyticsLabel('analytics'))
+                    ->setNotification(AndroidNotification::create()->setColor('#0A0A0A'))
+            )->setApns(
+                ApnsConfig::create()
+                    ->setFcmOptions(ApnsFcmOptions::create()->setAnalyticsLabel('analytics_ios'))
+            );
+    }
+
+    // optional method when using kreait/laravel-firebase:^3.0, this method can be omitted, defaults to the default project
+    public function fcmProject($notifiable, $message)
+    {
+        echo "Inside Notificationhelper-51";
+        // $message is what is returned by `toFcm`
+        return 'app'; // name of the firebase project to use
+    }
+}

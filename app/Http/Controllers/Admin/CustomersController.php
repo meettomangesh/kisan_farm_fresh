@@ -25,13 +25,14 @@ class CustomersController extends Controller
 
         // return view('admin.customers.index', compact('customers'));
 
-        $user = new User();
-        $notifyHelper = new NotificationHelper();
+        // $user = new User();
+        // $notifyHelper = new NotificationHelper();
         
-        $notifyHelper->setParameters(["name"=>"Mangesh Navale","email" =>"meettomangesh@gmail.com"],'Title','Body');
-        echo "Inside User controller-29";
-        print_r($user->notify($notifyHelper));
-        exit;
+        // $notifyHelper->setParameters(["name"=>"Mangesh Navale","email" =>"meettomangesh@gmail.com"],'Title','Body');
+        // echo "Inside User controller-29";
+        // //app(FcmChannel)
+        // print_r($user->notify($notifyHelper));
+        // exit;
         $customers = User::whereHas(
             'roles', function($q){
                 $q->where('title', 'Customer');

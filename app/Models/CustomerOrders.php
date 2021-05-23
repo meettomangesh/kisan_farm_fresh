@@ -11,15 +11,18 @@ use App\Models\CustomerOrderStatusTrack;
 use App\Models\ProductLocationInventory;
 use App\Models\UserAddress;
 use App\Models\PromoCodes;
+use App\Models\CustomerDeviceTokens;
 use DB;
 use PDO;
 use App\Helper\PdfHelper;
 use App\Helper\DataHelper;
 use App\Helper\EmailHelper;
+use App\Helper\NotificationHelper;
+use Illuminate\Notifications\Notifiable;
 
 class CustomerOrders extends Model
 {
-    use SoftDeletes;
+    use SoftDeletes, Notifiable;
 
     public $table = 'customer_orders';
 
@@ -125,7 +128,7 @@ class CustomerOrders extends Model
         $userAddressData = UserAddress::select('id')->where('id', $params['delivery_details']['address']['id'])->where('user_id', $params['user_id'])->where('status', 1)->get()->toArray();
         // print_r($usersData); print_r($userAddressData); print_r($params['products']); 
         //echo sizeof($usersData) .'||'. sizeof($params['products'])  .'||'. sizeof($userAddressData) ;
-        //exit;
+        // exit;
 
 
         if (sizeof($usersData) == 0 || sizeof($params['products']) == 0 || sizeof($userAddressData) == 0) {
@@ -164,7 +167,6 @@ class CustomerOrders extends Model
             $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
             $stmt->closeCursor();
             $reponse = json_decode($result['response']);
-            
             if ($reponse->status == "FAILURE" && $reponse->statusCode != 200) {
                 // return false;
                 return array("status" => false, "order_id" => 0, "razorpay_order_id" => 0);
@@ -173,7 +175,7 @@ class CustomerOrders extends Model
                 $isBasketInOrder = 1;
             }
         }
-        
+
         if ($orderAmount != $params['payment_details']['net_amount']) {
             // return false;
             return array("status" => false, "order_id" => 0, "razorpay_order_id" => 0);
@@ -213,12 +215,14 @@ class CustomerOrders extends Model
             $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
             $stmt->closeCursor();
             $reponse = json_decode($result['response']);
+
             if ($reponse->status == "FAILURE" && $reponse->statusCode != 200) {
                 $this->cancelOrder($orderId, 1);
                 // return false;
                 return array("status" => false, "order_id" => 0, "razorpay_order_id" => 0);
             }
         }
+
 
         // Assign delivery boy
         $assignData['order_id'] = $orderId;
@@ -249,8 +253,40 @@ class CustomerOrders extends Model
         //$invoiceGenerated =  $this->generateInvoice($params);
         $params['order_email_template'] = 'IN_APP_ORDER_PLACED_NOTIFICATION';
         $this->sendOrderTransactionEmail($params);
+        $this->sendOrderTransactionNotification($params);
         $invoiceGenerated = 0;
         return array("status" => true, "order_id" => $orderId, "razorpay_order_id" => $razorPayOrderId, "invoice_generated " => $invoiceGenerated);
+    }
+
+    public function sendOrderTransactionNotification($params)
+    {
+        $order_id = $params['order_id'];
+        $orderDetails = CustomerOrders::find($order_id);
+        $notifyHelper = new NotificationHelper();
+        $deepLinkData = DataHelper::getDeeplinkData();
+
+        $notifyHelper->setParameters(["user_id" => $orderDetails->customer_id, "deep_link" => $deepLinkData['ORDERS'], "name" => $orderDetails->userCustomer->first_name . ' ' . $orderDetails->userCustomer->last_name, "email" => $orderDetails->userCustomer->email], 'Order is placed successfully!', 'Please see the orders page.');
+
+        $orderDetails->notify($notifyHelper);
+    }
+
+    /**
+     * Specifies the user's FCM token
+     *
+     * @return string|array
+     */
+    public function routeNotificationForFcm($notification)
+    {
+
+        $data = $notification->data;
+        unset($notification->data['user_id']);
+        if (is_array($data)) {
+            //return CustomerDeviceTokens::select('device_token')->where('user_id', $data['user_id'])->first()->device_token;
+
+            return CustomerDeviceTokens::select('device_token')->where('user_id', $data['user_id'])->get()->pluck('device_token')->toArray();
+        } else {
+            return [];
+        }
     }
 
     public function sendOrderTransactionEmail($params)

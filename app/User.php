@@ -215,4 +215,5 @@ class User extends Authenticatable
         echo "Inside User Model-215";
         return "fImEfIt7Qmmh7LxTnQ3jy8:APA91bE_bcrCZiteJvbVZv2m2HYEQniTbYCYeo-wfOYUmhJ02URjlTeOx0UO7osO2chqHkfiBKFRTPLR9RkopRdo9r_qYmjpNxGvGwPjmRSZdoCrNexp6M0b9NQKo7QuwsHIAUDl0_Zi";
     }
+
 }

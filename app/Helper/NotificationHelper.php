@@ -36,13 +36,11 @@ class NotificationHelper extends Notification
     }
     public function via($notifiable)
     {
-        echo "Inside Notificationhelper-27".FcmChannel::class;
         return [FcmChannel::class];
     }
 
     public function toFcm($notifiable)
     {
-        echo "Inside Notificationhelper-32";
         return FcmMessage::create()
             ->setData($this->data)
             ->setNotification(\NotificationChannels\Fcm\Resources\Notification::create()
@@ -62,7 +60,6 @@ class NotificationHelper extends Notification
     // optional method when using kreait/laravel-firebase:^3.0, this method can be omitted, defaults to the default project
     public function fcmProject($notifiable, $message)
     {
-        echo "Inside Notificationhelper-51";
         // $message is what is returned by `toFcm`
         return 'app'; // name of the firebase project to use
     }

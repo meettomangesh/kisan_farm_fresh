@@ -184,4 +184,12 @@ class DataHelper
             File::makeDirectory($dirPath, 0777, true, true);
         }
     }
+
+    public static function getDeeplinkData()
+    {
+        return([
+            "ORDERS" => "ORDERS",
+            "OFFERS" => "OFFERS"
+        ]);
+    }
 }

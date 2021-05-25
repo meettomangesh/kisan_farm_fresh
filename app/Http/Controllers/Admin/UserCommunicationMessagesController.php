@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Helper\DataHelper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\MassDestroyUserRequest;
 use App\Http\Requests\StoreUserRequest;
@@ -174,7 +175,7 @@ class UserCommunicationMessagesController extends Controller
         $merchantListData = [];
         $deepLinkScreeningData = [];
         $deepLinkScreeningDataGolbal = [];
-        $deepLinkScreeningDataGolbalList = [];
+        $deepLinkScreeningDataGolbalList = DataHelper::getDeeplinkData();
         //$roles = Role::all()->pluck('title', 'id');
         $roles = Role::all()->whereNotIn('title', ['Delivery Boy', 'Customer'])->pluck('title', 'id');
         $regions = Region::all()->where('status', 1)->pluck('region_name', 'id');
@@ -307,7 +308,7 @@ class UserCommunicationMessagesController extends Controller
         $userCommunicationMessages->sms_notification = $sms_notification;
         $userCommunicationMessages->message_send_date = date('Y-m-d', strtotime($userCommunicationMessages->message_send_time));
         $userCommunicationMessages->message_send_time = date('g:h A', strtotime($userCommunicationMessages->message_send_time));
-
+        $deepLinkScreeningDataGolbalList = DataHelper::getDeeplinkData();
 
         $roles = Role::all()->where('title', 'Delivery Boy')->pluck('title', 'id');
         $regions = Region::all()->where('status', 1)->pluck('region_name', 'id');
@@ -315,7 +316,7 @@ class UserCommunicationMessagesController extends Controller
         $inputData = array('user_type' => $userCommunicationMessages->user_role, 'custom_region' => implode(",",$userCommunicationMessages->regions()->get()->pluck('id')->toArray()), 'region_type' => $userCommunicationMessages->region_type);
         $inputData = json_encode($inputData);
         $users = collect(DB::select('call getUserTypeRegionData(?)', [$inputData]))->pluck('name','id');
-        return view('admin.communications.edit', compact('userCommunicationMessages','regions', 'users','productMerchantCollect'));
+        return view('admin.communications.edit', compact('userCommunicationMessages','regions', 'users','productMerchantCollect','deepLinkScreeningDataGolbalList'));
     }
 
     public function update(Request $request, UserCommunicationMessages $userCommunicationMessages)

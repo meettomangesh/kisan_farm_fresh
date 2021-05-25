@@ -154,9 +154,9 @@
 
    
 
-    <div class="row">
-
-        <div class="col-md-6" id="push-text-div" style="display:none">
+ 
+    <div class="row" id="push-text-div" style="display:none">
+        <div class="col-md-6" >
             <div class="form-group">
                 <label class="control-label col-md-4">{{ trans('cruds.communication.fields.push-text') }}
                     <span class="required"> </span>
@@ -167,8 +167,19 @@
                 </div>
             </div>
         </div>
-
-
+        <div class="col-md-6">
+            <div class="form-group">
+                <label class="control-label col-md-4">{{ trans('cruds.communication.fields.deep-link-screen') }}
+                    <span class="required"> </span>
+                </label>
+                <div class="col-md-8">                                                                        
+                    {!! Form::select('deep_link_screen', [''=>'Select Deep Link Screen' ]+$deepLinkScreeningDataGolbalList, null,['class'=>'select2me form-control', 'id' => 'deep_link_screen', 'validDeepLinkScreen'=>'true', 'data-rule-required'=>'false', 'data-msg-required'=>trans('admin::messages.required-select', ['name' => trans('admin::controller/customer-communication-message.deep-link-screen')]) ]) !!}
+                    <div class="help-block"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
         <div class="col-md-6" id="sms-text-div" style="display:none">
             <div class="form-group">
                 <label class="control-label col-md-4">{{ trans('cruds.communication.fields.sms-text') }}

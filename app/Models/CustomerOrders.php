@@ -537,7 +537,7 @@ class CustomerOrders extends Model
             // $inputData = array("amount" => number_format($params["order_amount"], 2, ".", ""), "currency" => "INR", "receipt" => "rcptid_" . $params["order_id"]);
             $inputData = array("amount" => $params["order_amount"], "currency" => "INR", "receipt" => "rcptid_" . $params["order_id"]);
             $curl = curl_init();
-print_r($inputData);
+
             curl_setopt_array($curl, array(
                 CURLOPT_URL => 'https://api.razorpay.com/v1/orders',
                 CURLOPT_RETURNTRANSFER => true,

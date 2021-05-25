@@ -534,9 +534,10 @@ class CustomerOrders extends Model
     public function createOrderAtRazorpay($params)
     {
         try {
-            $inputData = array("amount" => number_format($params["order_amount"], 2, ".", ""), "currency" => "INR", "receipt" => "rcptid_" . $params["order_id"]);
+            // $inputData = array("amount" => number_format($params["order_amount"], 2, ".", ""), "currency" => "INR", "receipt" => "rcptid_" . $params["order_id"]);
+            $inputData = array("amount" => $params["order_amount"], "currency" => "INR", "receipt" => "rcptid_" . $params["order_id"]);
             $curl = curl_init();
-
+print_r($inputData);
             curl_setopt_array($curl, array(
                 CURLOPT_URL => 'https://api.razorpay.com/v1/orders',
                 CURLOPT_RETURNTRANSFER => true,
@@ -557,10 +558,10 @@ class CustomerOrders extends Model
             $response = json_decode(curl_exec($curl));
             $err = curl_error($curl);
             curl_close($curl);
-            if ($err) {
+            if ($err || isset($response->error)) {
                 return 0;
             }
-            return $response['id'];
+            return $response->id;
         } catch (Exception $e) {
             throw new Exception($e->getMessage());
         }

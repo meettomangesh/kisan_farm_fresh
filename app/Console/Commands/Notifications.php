@@ -170,7 +170,7 @@ class Notifications extends Command
             // $domain = config('services.mailgun.domain');
             $emailCount = 0;
             $emailNotificationData = DB::select('call getEmailNotificationData(' . $notificationId . ')');
-            
+            print_r($emailNotificationData); exit;
             $client = new SesClient([
                 'credentials' => new Credentials(config('services.ses.username'), config('services.ses.password')),
                 'region'      => 'ap-south-1',

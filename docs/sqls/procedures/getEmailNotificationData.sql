@@ -9,7 +9,7 @@ DROP PROCEDURE IF EXISTS getEmailNotificationData$$
                 IF userType = 1 THEN 
                     IF regionType = 1 THEN 
                         SELECT
-                            CONCAT(users.first_name,'',users.last_name) AS name,
+                            CONCAT(users.first_name,' ',users.last_name) AS name,
                             users.email
                         FROM
                             users
@@ -23,11 +23,11 @@ DROP PROCEDURE IF EXISTS getEmailNotificationData$$
                             WHERE
                                 users.id = role_user.user_id AND roles.id = userRole AND roles.deleted_at IS NULL
                         ) AND users.deleted_at IS NULL
-                        AND users.status =1;
+                        AND users.status = 1 AND users.email_verified = 1 ;
                     ELSE 
                         IF userRole = 3 THEN 
                             SELECT
-                                CONCAT(users.first_name,'',users.last_name) AS name,
+                                CONCAT(users.first_name,' ',users.last_name) AS name,
                                 users.email
                             FROM
                                 users
@@ -44,11 +44,11 @@ DROP PROCEDURE IF EXISTS getEmailNotificationData$$
                                 AND users.id IN(
                                     SELECT DISTINCT user_id FROM region_user WHERE region_id IN (SELECT region_id FROM region_user_communication_messages WHERE user_communication_messages_id = notificationId)
                                 )
-                                AND users.status =1;
+                                AND users.status =1 AND users.email_verified = 1;
                         
                         ELSE 
                             SELECT
-                                CONCAT(users.first_name,'',users.last_name) AS name,
+                                CONCAT(users.first_name,' ',users.last_name) AS name,
                                 users.email
                             FROM
                                 users
@@ -67,7 +67,7 @@ DROP PROCEDURE IF EXISTS getEmailNotificationData$$
                                         ) AS t WHERE t.pin_code_id IN 
                                         (select pin_code_id FROM pin_code_region WHERE region_id IN (SELECT region_id FROM region_user_communication_messages WHERE user_communication_messages_id = notificationId) )
                                 )
-                                AND users.status =1;
+                                AND users.status =1 AND users.email_verified = 1 ;
                         END IF;
 
 
@@ -75,7 +75,7 @@ DROP PROCEDURE IF EXISTS getEmailNotificationData$$
 
                 ELSE 
                         SELECT
-                            CONCAT(users.first_name,'',users.last_name) AS name,
+                            CONCAT(users.first_name,' ',users.last_name) AS name,
                             users.email
                         FROM
                             users
@@ -83,7 +83,7 @@ DROP PROCEDURE IF EXISTS getEmailNotificationData$$
                             (
                                 SELECT user_id FROM user_user_communication_messages WHERE user_communication_messages_id=notificationId
                         ) AND users.deleted_at IS NULL
-                        AND users.status =1;
+                        AND users.status =1 AND users.email_verified = 1 ;
                 END IF;
         END$$
 DELIMITER ;

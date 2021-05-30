@@ -7,9 +7,15 @@ use DB;
 use Aws\Credentials\Credentials;
 use Aws\Ses\SesClient;
 use App\Helper\EmailHelper;
+use App\Jobs\SendBulkEmail;
+use App\Jobs\SendBulkNotification;
+use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Support\Facades\Log;
+use App\Models\UserCommunicationMessages;
 
 class Notifications extends Command
 {
+    use Dispatchable;
     /**
      * The name and signature of the console command.
      *
@@ -170,57 +176,98 @@ class Notifications extends Command
             // $domain = config('services.mailgun.domain');
             $emailCount = 0;
             $emailNotificationData = DB::select('call getEmailNotificationData(' . $notificationId . ')');
-            print_r($emailNotificationData); exit;
+
             $client = new SesClient([
-                'credentials' => new Credentials(config('services.ses.username'), config('services.ses.password')),
-                'region'      => 'ap-south-1',
-                'version'     => 'latest',
-            ]);
-            $responseMail = EmailHelper::getCustomerEmailTemplate('IN_USER_COMMUNICATION_MESSAGES', '');
-
-            $client->createTemplate([
-                'Template' => [
-                    'TemplateName' => 'IN_USER_COMMUNICATION_MESSAGES', //unique template name
-                    'SubjectPart'  => "Hello, {{name}}!",
-                    'TextPart'     => $responseMail,
-                    'HtmlPart'     => $responseMail,
+                //'credentials' => new Credentials(config('services.ses.username'), config('services.ses.password')),
+                'credentials' => [
+                    'key' => config('services.ses.key'),
+                    'secret' => config('services.ses.secret'),
                 ],
+                // 'profile' => 'default',
+                'version' => '2010-12-01',
+                'region'  => config('services.ses.region')
             ]);
+            $responseMail = EmailHelper::getCustomerEmailTemplate('IN_USER_COMMUNICATION_MESSAGES', $notification->email_body);
 
-            print_r($client);
-            exit;
-
-
-            $emailCount = count($emailNotificationData);
-            $emailNotificationData = array_chunk($emailNotificationData, 500);
-
-            $emailData = [];
-
-            $mailgunHelper = new MailgunHelper();
-            foreach ($emailNotificationData as $key => $customerData) {
-                $customerData = json_decode(json_encode($customerData), True);
-                $emailData = [
-                    'isHtml' => true,
-                    'subject' => $notification->email_subject,
-                    'message' => $mailgunHelper->getCustomerEmailTemplate($notification->merchant_id, $notification->email_body),
-                    'to' => (array) $customerData,
-                    'from' => [
-                        "name" => $notification->email_from_name,
-                        "email" => $notification->email_from_email
+            $result = $client->listTemplates([
+                'MaxItems' => 1,
+                'NextToken' => '',
+            ]);
+            if ($result->get('TemplatesMetadata')) {
+                $result = $client->updateTemplate([
+                    'Template' => [ // REQUIRED
+                        //'HtmlPart' => $responseMail,
+                        'HtmlPart' => $responseMail,
+                        'SubjectPart' => $notification->email_subject,
+                        'TemplateName' => 'IN_USER_COMMUNICATION_MESSAGES', //unique template name
+                        'TextPart' => $responseMail,
                     ],
-                    'delay' => '20',
-                    'tags' => explode(',', $notification->email_tags),
-                    'deliveryTime' => $notification->message_send_time,
-                    'campaignId' => '',
+                ]);
+            } else {
+                $result = $client->createTemplate([
+                    'Template' => [ // REQUIRED
+                        'HtmlPart' => $responseMail,
+                        'SubjectPart' => $notification->email_subject,
+                        'TemplateName' => 'IN_USER_COMMUNICATION_MESSAGES', //unique template name
+                        'TextPart' => $responseMail,
+                    ],
+                ]);
+            }
+
+
+            // $result = $client->sendBulkTemplatedEmail(
+            //     [
+
+            //     'DefaultTemplateData' => '{}',
+            //     'Destinations' => [ // REQUIRED
+            //         [
+            //             'Destination' => [ // REQUIRED
+            //                 'ToAddresses' => ['meettomangesh@gmail.com'],
+            //             ],
+
+            //         'ReplacementTemplateData' => '{"name":"Mangesh"}',
+            //     ],
+            // ],
+            //     'Source' => config('services.ses.email'), // REQUIRED
+            //     'Template' => 'IN_USER_COMMUNICATION_MESSAGES', // REQUIRED
+
+            // ] );
+
+            $emailCount = count($emailNotificationData); // 100
+            $emailNotificationData = array_chunk($emailNotificationData, 50);
+            //  $key 0 1
+            $emailData = [];
+            $toEmailAddress = '';
+            foreach ($emailNotificationData as $key => $customerData) {
+                $toEmailAddress = implode(',', array_column($customerData, 'email'));
+                // $customerData = json_decode(json_encode($customerData), True);
+                $emailData = [
+
+                    'DefaultTemplateData' => '{}',
+                    'Destinations' => [ // REQUIRED
+                        [
+                            'Destination' => [ // REQUIRED
+                                'ToAddresses' => [$toEmailAddress],
+                            ],
+
+                            'ReplacementTemplateData' => '{}',
+                        ],
+                    ],
+                    'Source' => config('services.ses.email'), // REQUIRED
+                    'Template' => 'IN_USER_COMMUNICATION_MESSAGES', // REQUIRED
+
                 ];
                 //                TODO: Call the function to send bulk emails
                 if ($notificationId != 0) {
-                    $job = (new SendBulkEmail($emailData))->onQueue('high-bulk-emails')->delay(0);
+                    //$job = (new SendBulkEmail($client,$emailData))->onQueue('high-bulk-emails')->delay(0);
+                    SendBulkEmail::dispatch($emailData)->onQueue('high-bulk-emails')->delay(0);
                 } else {
                     $delay = (strtotime($notification->message_send_time) > time()) ? strtotime($notification->message_send_time) - time() : 0;
-                    $job = (new SendBulkEmail($emailData))->onQueue('bulk-emails')->delay($delay);
+                    // $job = (new SendBulkEmail($client,$emailData))->onQueue('bulk-emails')->delay($delay);
+                    SendBulkEmail::dispatch($emailData)->onQueue('bulk-emails')->delay($delay);
                 }
-                $this->dispatch($job);
+                //SendBulkEmail::dispatch($job);
+                //  $this->dispatch($job);
             }
         } else {
             $this->comment(PHP_EOL . "Empty Array" . PHP_EOL);
@@ -235,73 +282,117 @@ class Notifications extends Command
      */
     public function pushNotifications($notification, $notificationId)
     {
+        // echo 'inside pushNotifications';
+        // print_r($notification);
+        //         inside pushNotificationsstdClass Object
+        // (
+        //     [id] => 1
+        //     [message_type] => 2
+        //     [offer_id] => 
+        //     [push_text] => sample notification text
+        //     [deep_link_screen] => ORDERS
+        //     [sms_text] => 
+        //     [notify_users_by] => 1100
+        //     [email_tags] => 
+        //     [email_from_name] => Mangesh
+        //     [email_from_email] => meettomangesh@gmail.com
+        //     [email_subject] => subject for email
+        //     [email_body] => <p>AsdxAD</p>
+        //     [message_send_time] => 1970-01-01 16:56:00
+        //     [status] => 1
+        // )
+
         $staticSeconds = 60;
         if (!empty($notification)) {
+            $pushNotificationCount = 0;
             $pushNotificationData = DB::select('call getPushNotificationData(' . $notificationId . ')');
-
-            $pushNotificationDataGroup = array_chunk($pushNotificationData, 500);
-
+            $pushNotificationCount = count($pushNotificationData);
+            $pushNotificationDataGroup = array_chunk($pushNotificationData, 100);
+            // print_r($pushNotificationDataGroup);
+            // exit;
             $arrCustomerIds = [];
             $counter = 1;
-            $pushNotificationCount = 0;
+
             foreach ($pushNotificationDataGroup as $pushNotificationData) {
-                $customerPushNotificationData = [];
-                $iosTokensData = [];
-                $androidTokensData = [];
-                foreach ($pushNotificationData as $key => $customerData) {
-                    if ($customerData->device_type == 1) {
-                        if (!in_array($customerData->device_token, $androidTokensData)) {
-                            $androidTokensData[] = $customerData->device_token;
-                        }
-                    } else {
-                        if (!in_array($customerData->device_token, $iosTokensData)) {
-                            $iosTokensData[] = $customerData->device_token;
-                        }
-                    }
-                    if (!in_array($customerData->customer_id, $arrCustomerIds)) {
-                        $customerPushNotificationData[] = [
-                            'customer_id' => $customerData->customer_id,
-                            'merchant_id' => $notification->merchant_id,
-                            'loyalty_id' => $notification->loyalty_id,
-                            'custom_data' => $notification->offer_id,
-                            'push_text' => $notification->push_text,
-                            'communication_msg_id' => $notification->id,
-                            'deep_link_screen' => $notification->deep_link_screen,
-                            'created_by' => 1,
-                            'created_at' => date('Y-m-d H:i:s', strtotime($notification->message_send_time))
-                        ];
-                        $arrCustomerIds[] = $customerData->customer_id;
-                    }
-                }
+                $userIdArr = array_column($pushNotificationData, 'user_id');
+                // $notifyHelper = new NotificationHelper();
+                //  $notifyHelper->setParameters(["user_id" => $userIdArr, "deep_link" => $notification->deep_link_screen], '', $notification->push_text);
                 $pushData = [
-                    'message' => $notification->push_text,
-                    'iosTokens' => $iosTokensData,
-                    'androidTokens' => $androidTokensData,
-                    'deepLink' => $notification->deep_link_screen,
-                    'merchantId' => $notification->merchant_id,
-                    'notificationType' => 0,
-                    'uniqueId' => $notification->id,
-                    'id' => ($notification->offer_id != '') ? $notification->offer_id : 0
+                    "user_id" => $userIdArr,
+                    "notification_id" => $notificationId,
+                    "deep_link" => $notification->deep_link_screen,
+                    "push_title" => '',
+                    "push_text" =>  $notification->push_text
                 ];
-
-                if (count($customerPushNotificationData) > 0) {
-                    $this->saveCustomerPushNotification($customerPushNotificationData);
-                }
-
-                //                TODO: Call the function to send bulk push notification
-                if ($counter > 1) {
-                    $delay = ((strtotime($notification->message_send_time) > time()) ? strtotime($notification->message_send_time) - time() : 0) + ($staticSeconds * $counter);
+                //TODO: Call the function to send bulk emails
+                if ($notificationId != 0) {
+                    //$job = (new SendBulkEmail($client,$emailData))->onQueue('high-bulk-emails')->delay(0);
+                    SendBulkNotification::dispatch($pushData)->onQueue('high-bulk-notifications')->delay(0);
                 } else {
                     $delay = (strtotime($notification->message_send_time) > time()) ? strtotime($notification->message_send_time) - time() : 0;
+                    // $job = (new SendBulkEmail($client,$emailData))->onQueue('bulk-emails')->delay($delay);
+                    SendBulkNotification::dispatch($pushData)->onQueue('bulk-notifications')->delay($delay);
                 }
-                if ($notificationId != 0) {
-                    $job = (new SendBulkNotification($pushData))->onQueue('high-bulk-notifications')->delay($delay);
-                } else {
-                    $job = (new SendBulkNotification($pushData))->onQueue('bulk-notifications')->delay($delay);
-                }
-                $this->dispatch($job);
-                $counter++;
-                $pushNotificationCount = $pushNotificationCount + (count($androidTokensData) + count($iosTokensData));
+
+                // $orderDetails->notify($notifyHelper);s
+
+                // $customerPushNotificationData = [];
+                // $iosTokensData = [];
+                // $androidTokensData = [];
+                // foreach ($pushNotificationData as $key => $customerData) {
+                //     if ($customerData->device_type == 1) {
+                //         if (!in_array($customerData->device_token, $androidTokensData)) {
+                //             $androidTokensData[] = $customerData->device_token;
+                //         }
+                //     } else {
+                //         if (!in_array($customerData->device_token, $iosTokensData)) {
+                //             $iosTokensData[] = $customerData->device_token;
+                //         }
+                //     }
+                //     if (!in_array($customerData->customer_id, $arrCustomerIds)) {
+                //         $customerPushNotificationData[] = [
+                //             'customer_id' => $customerData->customer_id,
+                //             'merchant_id' => $notification->merchant_id,
+                //             'loyalty_id' => $notification->loyalty_id,
+                //             'custom_data' => $notification->offer_id,
+                //             'push_text' => $notification->push_text,
+                //             'communication_msg_id' => $notification->id,
+                //             'deep_link_screen' => $notification->deep_link_screen,
+                //             'created_by' => 1,
+                //             'created_at' => date('Y-m-d H:i:s', strtotime($notification->message_send_time))
+                //         ];
+                //         $arrCustomerIds[] = $customerData->customer_id;
+                //     }
+                // }
+                // $pushData = [
+                //     'message' => $notification->push_text,
+                //     'iosTokens' => $iosTokensData,
+                //     'androidTokens' => $androidTokensData,
+                //     'deepLink' => $notification->deep_link_screen,
+                //     'merchantId' => $notification->merchant_id,
+                //     'notificationType' => 0,
+                //     'uniqueId' => $notification->id,
+                //     'id' => ($notification->offer_id != '') ? $notification->offer_id : 0
+                // ];
+
+                // if (count($customerPushNotificationData) > 0) {
+                //     $this->saveCustomerPushNotification($customerPushNotificationData);
+                // }
+
+                // // TODO: Call the function to send bulk push notification
+                // if ($counter > 1) {
+                //     $delay = ((strtotime($notification->message_send_time) > time()) ? strtotime($notification->message_send_time) - time() : 0) + ($staticSeconds * $counter);
+                // } else {
+                //     $delay = (strtotime($notification->message_send_time) > time()) ? strtotime($notification->message_send_time) - time() : 0;
+                // }
+                // if ($notificationId != 0) {
+                //     $job = (new SendBulkNotification($pushData))->onQueue('high-bulk-notifications')->delay($delay);
+                // } else {
+                //     $job = (new SendBulkNotification($pushData))->onQueue('bulk-notifications')->delay($delay);
+                // }
+                // $this->dispatch($job);
+                // $counter++;
+                // $pushNotificationCount = $pushNotificationCount + (count($androidTokensData) + count($iosTokensData));
             }
         } else {
             $this->comment(PHP_EOL . "Empty Array" . PHP_EOL);
@@ -365,6 +456,6 @@ class Notifications extends Command
      */
     public function updateNotification($notificationId, $emailCount = 0, $smsCount = 0, $pushNotificationCount = 0)
     {
-        DB::table('customer_communication_messages')->where('id', $notificationId)->update(['processed' => 1, 'email_count' => $emailCount, 'sms_count' => $smsCount, 'push_notification_count' => $pushNotificationCount]);
+        DB::table('user_communication_messages')->where('id', $notificationId)->update(['processed' => 1, 'email_count' => $emailCount, 'sms_count' => $smsCount, 'push_notification_count' => $pushNotificationCount]);
     }
 }

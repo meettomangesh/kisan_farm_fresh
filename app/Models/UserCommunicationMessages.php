@@ -4,10 +4,11 @@ namespace App\Models;
 use App\Region;
 use App\User;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Notifications\Notifiable;
 
 class UserCommunicationMessages extends Model
 {
-
+    use Notifiable;
     /**
      * The database table used by the model.
      *
@@ -30,6 +31,27 @@ class UserCommunicationMessages extends Model
     public function users()
     {
         return $this->belongsToMany(User::class);
+    }
+
+        /**
+     * Specifies the user's FCM token
+     *
+     * @return string|array
+     */
+    public function routeNotificationForFcm($notification)
+    {
+        
+
+        $data = $notification->data;
+        unset($notification->data['user_id']);
+        
+        if (is_array($data)) {
+            //return CustomerDeviceTokens::select('device_token')->where('user_id', $data['user_id'])->first()->device_token;
+
+            return CustomerDeviceTokens::select('device_token')->whereIn('user_id', $data['user_id'])->get()->pluck('device_token')->toArray();
+        } else {
+            return [];
+        }
     }
 
 }

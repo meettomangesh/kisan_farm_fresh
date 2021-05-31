@@ -23,7 +23,14 @@ Route::post('login', 'API\RegisterController@login');
 Route::post('getOtp', 'Api\SmsController@getOtp');
 Route::post('verifyOtp', 'Api\SmsController@verifyOtp');
 // Route::post('getOtp',\Api\SmsController::class . '@getOtp');
-Route::post('categories', 'Api\CategoryController@getCategoryList');
+
+
+Route::middleware('auth:api')->group( function () {
+    // Route::resource('products', 'API\ProductsController');
+    // Route::post('updateCustomer', 'API\RegisterController@updateCustomer');
+    Route::post('logout', 'Api\RegisterController@logout');
+
+    Route::post('categories', 'Api\CategoryController@getCategoryList');
 Route::post('subCategories', 'Api\CategoryController@getSubCategoryList');
 Route::post('products', 'Api\ProductsController@getProductList');
 Route::post('banners', 'Api\BannersController@getBannerList');
@@ -47,9 +54,4 @@ Route::post('storeDeviceToken', 'Api\RegisterController@storeDeviceToken');
 
 Route::post('getPromoCodes', 'Api\PromoCodeController@getPromoCodes');
 Route::post('validatePromoCode', 'Api\PromoCodeController@validatePromoCode');
-
-Route::middleware('auth:api')->group( function () {
-    // Route::resource('products', 'API\ProductsController');
-    // Route::post('updateCustomer', 'API\RegisterController@updateCustomer');
-    Route::post('logout', 'Api\RegisterController@logout');
 });

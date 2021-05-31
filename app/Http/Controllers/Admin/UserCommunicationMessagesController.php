@@ -216,7 +216,7 @@ class UserCommunicationMessagesController extends Controller
             $inputs['deep_link_screen'] = '';
         }
         
-        $inputs['message_send_time'] = '';
+       // $inputs['message_send_time'] = '';
         $send_today = isset($inputs['send_today']) ? $inputs['send_today'] : 0;
         if ($send_today > 0) {
             $today_time = $inputs['today_time'];
@@ -228,7 +228,6 @@ class UserCommunicationMessagesController extends Controller
             $newDateTime = date('H:i:s', strtotime($today_time));
             $inputs['message_send_time'] = $newDate . ' ' . $newDateTime;
         }
-
         $userCommunication = UserCommunicationMessages::create($inputs);
         if ($send_today > 0) {
             $res = \Illuminate\Support\Facades\Artisan::call('send-notifications', ['--notification_id' => $userCommunication->id]);

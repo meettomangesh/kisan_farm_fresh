@@ -228,10 +228,8 @@ class RegisterController extends BaseController
             //     ], 401);
 
             $user = Auth::user();
-            //print_r($user->createToken(getenv('APP_NAME'))); exit;
-            //$token = $user->createToken(getenv('APP_NAME'));
             $tokenResult = $user->createToken(getenv('APP_NAME'));
-            $tokenResult->token->expires_at = Carbon::now()->addDays(10);
+            // $tokenResult->token->expires_at = Carbon::now()->addDays(10);
 
             $success['token'] =  $tokenResult->accessToken;
             $success['expires_at'] =  $tokenResult->token->expires_at;
@@ -322,6 +320,25 @@ class RegisterController extends BaseController
                 $message = 'Device token stored successfully';
             }
             $response = $this->sendResponse([], $message);
+        } catch (Exception $e) {
+            $response = $this->sendResponse(array(), $e->getMessage());
+        }
+        return $response;
+    }
+
+    public function logout(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'platform' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return $this->sendError(parent::VALIDATION_ERROR, $validator->errors());
+        }
+
+        try {
+            $token = $request->user()->token();
+            $token->revoke();
+            $response = $this->sendResponse("", "You have been successfully logged out!");
         } catch (Exception $e) {
             $response = $this->sendResponse(array(), $e->getMessage());
         }

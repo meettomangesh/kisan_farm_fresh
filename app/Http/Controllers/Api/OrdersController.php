@@ -253,4 +253,37 @@ class OrdersController extends BaseController
         }
         return $response;
     }
+
+    public function checkDeliveryBoyAvailability(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'platform' => 'required',
+            'user_id' => 'required|integer',
+            'address_id' => 'required|integer',
+            'delivery_date' => 'required'
+        ]);
+        if ($validator->fails()) {
+            return $this->sendError(parent::VALIDATION_ERROR, $validator->errors());
+        }
+
+        try {
+            $params = [
+                'platform' => $request->platform,
+                'user_id' => $request->user_id,
+                'address_id' => $request->address_id,
+                'delivery_date' => $request->delivery_date,
+            ];
+            //Create order object to call functions
+            $customerOrders = new CustomerOrders();
+            // Function call to check delivery boy availability by delivery date
+            $responseDetails = $customerOrders->checkDeliveryBoyAvailability($params);
+            if($responseDetails["status"] == true) {
+                return $this->sendResponse($responseDetails, $responseDetails["message"]);
+            } else {
+                return $this->sendError($responseDetails["message"], $responseDetails, 422);
+            }
+        } catch (Exception $e) {
+            return $this->sendResponse(array(), $e->getMessage());
+        }
+    }
 }

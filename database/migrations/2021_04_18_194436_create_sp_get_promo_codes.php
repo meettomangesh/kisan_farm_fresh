@@ -41,7 +41,7 @@ class CreateSpGetPromoCodes extends Migration
             ELSE '' END AS promo_code_value
             FROM promo_codes AS pc
             JOIN promo_code_master AS pcm ON pcm.id = pc.promo_code_master_id
-            WHERE pc.user_id = userId AND pc.is_code_used = 0 AND pc.status = 1
+            WHERE pc.user_id = userId AND pc.is_code_used = 0 AND pc.status = 1 AND pc.start_date <= CURDATE() AND pc.end_date >= CURDATE()
             ORDER BY pc.id DESC
             LIMIT noOfRecords
             OFFSET pageNumber;

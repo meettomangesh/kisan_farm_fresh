@@ -126,28 +126,28 @@ class CustomerOrders extends Model
         // validate customer
         $usersData = User::select('id')->where('id', $params['user_id'])->where('status', 1)->get()->toArray();
         $userAddressData = UserAddress::select('id')->where('id', $params['delivery_details']['address']['id'])->where('user_id', $params['user_id'])->where('status', 1)->get()->toArray();
-        // print_r($usersData); print_r($userAddressData); print_r($params['products']); 
-        //echo sizeof($usersData) .'||'. sizeof($params['products'])  .'||'. sizeof($userAddressData) ;
-        // exit;
 
-
-        if (sizeof($usersData) == 0 || sizeof($params['products']) == 0 || sizeof($userAddressData) == 0) {
-            // return false;
-            return array("status" => false, "order_id" => 0, "razorpay_order_id" => 0);
+        if (sizeof($usersData) == 0) {
+            return array("status" => false, "message" => "Invalid user", "order_id" => 0, "razorpay_order_id" => 0);
+        }
+        if (sizeof($params['products']) == 0) {
+            return array("status" => false, "message" => "Product(s) not present", "order_id" => 0, "razorpay_order_id" => 0);
+        }
+        if (sizeof($userAddressData) == 0) {
+            return array("status" => false, "message" => "Invalid user address", "order_id" => 0, "razorpay_order_id" => 0);
         }
         // validate delivery date
         if ($params['delivery_details']['date'] <= date('Y-m-d')) {
-            // return false;
-            return array("status" => false, "order_id" => 0, "razorpay_order_id" => 0);
+            return array("status" => false, "message" => "Invalid delivery date, must be greater than current date", "order_id" => 0, "razorpay_order_id" => 0);
         }
 
-        if ($params['payment_details']['promo_code'] != '') {
+        if (isset($params['payment_details']['promo_code']) && !empty($params['payment_details']['promo_code']) && $params['payment_details']['promo_code'] != '') {
             $vpcData = array("promo_code" => $params['payment_details']['promo_code'], "user_id" => $params['user_id']);
             $vpcData = json_encode($vpcData);
             $promoCodes = new PromoCodes();
             $vpcResponse = $promoCodes->validatePromoCode($vpcData);
             if (!$vpcResponse) {
-                return array("status" => false, "order_id" => 0, "razorpay_order_id" => 0);
+                return array("status" => false, "message" => "Promo code is incorrect", "order_id" => 0, "razorpay_order_id" => 0);
             }
         }
 
@@ -168,17 +168,15 @@ class CustomerOrders extends Model
             $stmt->closeCursor();
             $reponse = json_decode($result['response']);
             if ($reponse->status == "FAILURE" && $reponse->statusCode != 200) {
-                // return false;
-                return array("status" => false, "order_id" => 0, "razorpay_order_id" => 0);
+                return array("status" => false, "message" => "Product validation is failed", "order_id" => 0, "razorpay_order_id" => 0);
             }
             if ($value['is_basket'] == 1) {
                 $isBasketInOrder = 1;
             }
         }
 
-        if ($orderAmount != $params['payment_details']['net_amount']) {
-            // return false;
-            return array("status" => false, "order_id" => 0, "razorpay_order_id" => 0);
+        if (!isset($params['payment_details']['promo_code']) && empty($params['payment_details']['promo_code']) && $orderAmount != $params['payment_details']['net_amount']) {
+            return array("status" => false, "message" => "Amount is not matching", "order_id" => 0, "razorpay_order_id" => 0);
         }
 
         $customerOrdersResponse = CustomerOrders::create(array(
@@ -218,8 +216,7 @@ class CustomerOrders extends Model
 
             if ($reponse->status == "FAILURE" && $reponse->statusCode != 200) {
                 $this->cancelOrder($orderId, 1);
-                // return false;
-                return array("status" => false, "order_id" => 0, "razorpay_order_id" => 0);
+                return array("status" => false, "message" => "Failed to create order detail", "order_id" => 0, "razorpay_order_id" => 0);
             }
         }
 
@@ -565,5 +562,38 @@ class CustomerOrders extends Model
         } catch (Exception $e) {
             throw new Exception($e->getMessage());
         }
+    }
+
+    public function checkDeliveryBoyAvailability($params)
+    {
+        // validate customer
+        $usersData = User::select('id')->where('id', $params['user_id'])->where('status', 1)->get()->toArray();
+        if (sizeof($usersData) == 0) {
+            return array("status" => false, "message" => "Invalid user");
+        }
+        
+        // validate customer address
+        $userAddressData = UserAddress::select('id')->where('id', $params['address_id'])->where('user_id', $params['user_id'])->where('status', 1)->get()->toArray();
+        if (sizeof($userAddressData) == 0) {
+            return array("status" => false, "message" => "Invalid user address");
+        }
+
+        if ($params['delivery_details']['date'] <= date('Y-m-d')) {
+            return array("status" => false, "message" => "Invalid delivery date, must be greater than current date");
+        }
+
+        $inputData = json_encode($params);
+        $pdo = DB::connection()->getPdo();
+        $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, true);
+        $stmt = $pdo->prepare("CALL checkDeliveryBoyAvailability(?)");
+        $stmt->execute([$inputData]);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+        $stmt->closeCursor();
+        $reponse = json_decode($result['response']);
+        if ($reponse->status == "FAILURE" && $reponse->statusCode != 200) {
+            return array("status" => false, "message" => "Delivery boy is not available");
+        }
+        return array("status" => true, "message" => "Delivery boy is available");
     }
 }

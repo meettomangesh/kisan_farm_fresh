@@ -44,7 +44,8 @@ assignDeliveryBoyToOrder:BEGIN
         JOIN region_user AS ru ON ru.region_id = pcr.region_id
         JOIN region_master AS rm ON rm.id = ru.region_id
         WHERE co.id = orderId AND co.order_status NOT IN (4,5) AND ua.status = 1 AND pc.status = 1 AND pcr.status = 1 AND ru.status = 1 AND rm.status = 1
-        AND IF((SELECT status FROM users WHERE id = ru.user_id) = 1, true, false);
+        AND IF((SELECT status FROM users WHERE id = ru.user_id) = 1, true, false)
+        AND IF((SELECT status FROM user_details WHERE user_id = ru.user_id AND role_id = 3) = 2, true, false);
 
         DECLARE CONTINUE HANDLER FOR NOT FOUND SET notFound = 1;
         OPEN assignDeliveryBoyCursor;

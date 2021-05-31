@@ -36,6 +36,7 @@ Route::post('orderList', 'Api\OrdersController@getOrderListForDeliveryBoy');
 Route::post('changeOrderStatus', 'Api\OrdersController@changeOrderStatus');
 Route::post('getOrderStatus', 'Api\OrdersController@getOrderStatus');
 Route::post('paymentCallbackUrl', 'Api\OrdersController@paymentCallbackUrl');
+Route::post('checkDeliveryBoyAvailability', 'Api\OrdersController@checkDeliveryBoyAvailability');
 
 Route::post('getAllAddressByUserId', 'Api\UserAddressController@getAllAddressByUserId');
 Route::post('saveAddressByUserId', 'Api\UserAddressController@saveAddressByUserId');
@@ -50,7 +51,5 @@ Route::post('validatePromoCode', 'Api\PromoCodeController@validatePromoCode');
 Route::middleware('auth:api')->group( function () {
     // Route::resource('products', 'API\ProductsController');
     // Route::post('updateCustomer', 'API\RegisterController@updateCustomer');
-
-
-
+    Route::post('logout', 'Api\RegisterController@logout');
 });

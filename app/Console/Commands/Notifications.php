@@ -304,7 +304,7 @@ class Notifications extends Command
         //     [message_send_time] => 1970-01-01 16:56:00
         //     [status] => 1
         // )
-        Log::info('pushNotifications.', ['method' => 'pushNotifications', 'process_records' => json_encode($notification)]);
+        
         $staticSeconds = 60;
         if (!empty($notification)) {
             $pushNotificationCount = 0;
@@ -328,7 +328,6 @@ class Notifications extends Command
                     "push_title" => '',
                     "push_text" =>  $notification->push_text
                 ];
-                Log::info('pushNotifications.', ['method' => 'pushNotifications', 'process_records' => json_encode($pushData)]);
                 //TODO: Call the function to send bulk emails
                 if ($notificationId != 0) {
                     //$job = (new SendBulkEmail($client,$emailData))->onQueue('high-bulk-emails')->delay(0);
@@ -403,7 +402,7 @@ class Notifications extends Command
         } else {
             $this->comment(PHP_EOL . "Empty Array" . PHP_EOL);
         }
-        Log::info('Bulk Actions Call.', ['method' => 'pushNotifications', 'process_records' => (isset($iosTokensData) ? count($iosTokensData) : 0) + (isset($androidTokensData) ? count($androidTokensData) : 0)]);
+        Log::info('Bulk Actions Call.', ['method' => 'pushNotifications', 'process_records' => $pushNotificationCount]);
         return $pushNotificationCount;
     }
 

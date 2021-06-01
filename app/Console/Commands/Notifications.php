@@ -118,6 +118,8 @@ class Notifications extends Command
                     //         break;
                     //     }
                 case "1100": {
+                    Log::info('Notification.', $notification);
+                    Log::info('notificationId.', $notificationId);
                         $emailCount = $this->emailNotifications($notification, $notificationId);
                         $notificationCount = $this->pushNotifications($notification, $notificationId);
                         break;

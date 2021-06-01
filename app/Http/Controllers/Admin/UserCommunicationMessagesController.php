@@ -165,7 +165,7 @@ class UserCommunicationMessagesController extends Controller
             
     }
         // print_r($userCommunicationMessages); exit;
-        return view('admin.communications.index', compact('userCommunicationMessages','notifyStr'));
+        return view('admin.communications.index', compact('userCommunicationMessages'));
     }
 
     public function create()
@@ -229,9 +229,9 @@ class UserCommunicationMessagesController extends Controller
             $inputs['message_send_time'] = $newDate . ' ' . $newDateTime;
         }
         $userCommunication = UserCommunicationMessages::create($inputs);
-        if ($send_today > 0) {
-            $res = \Illuminate\Support\Facades\Artisan::call('send-notifications', ['--notification_id' => $userCommunication->id]);
-        }
+        // if ($send_today > 0) {
+        //     $res = \Illuminate\Support\Facades\Artisan::call('send-notifications', ['--notification_id' => $userCommunication->id]);
+        // }
 
         $userCommunication->regions()->sync($request->input('regions', []));
         $userCommunication->users()->sync($request->input('users', []));
@@ -315,7 +315,7 @@ class UserCommunicationMessagesController extends Controller
         $inputData = array('user_type' => $userCommunicationMessages->user_role, 'custom_region' => implode(",",$userCommunicationMessages->regions()->get()->pluck('id')->toArray()), 'region_type' => $userCommunicationMessages->region_type);
         $inputData = json_encode($inputData);
         $users = collect(DB::select('call getUserTypeRegionData(?)', [$inputData]))->pluck('name','id');
-        return view('admin.communications.edit', compact('userCommunicationMessages','regions', 'users','productMerchantCollect','deepLinkScreeningDataGolbalList'));
+        return view('admin.communications.edit', compact('userCommunicationMessages','regions', 'users','deepLinkScreeningDataGolbalList'));
     }
 
     public function update(Request $request, UserCommunicationMessages $userCommunicationMessages)
@@ -436,7 +436,7 @@ class UserCommunicationMessagesController extends Controller
         $inputData = json_encode($inputData);
         $users = collect(DB::select('call getUserTypeRegionData(?)', [$inputData]));
        
-        return view('admin.communications.show', compact('userCommunicationMessages','regions', 'users','productMerchantCollect'));
+        return view('admin.communications.show', compact('userCommunicationMessages','regions', 'users'));
 
     }
 

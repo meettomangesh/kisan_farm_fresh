@@ -262,7 +262,9 @@ class Notifications extends Command
                     //$job = (new SendBulkEmail($client,$emailData))->onQueue('high-bulk-emails')->delay(0);
                     SendBulkEmail::dispatch($emailData)->onQueue('high-bulk-emails')->delay(0);
                 } else {
-                    $delay = (strtotime($notification->message_send_time) > time()) ? strtotime($notification->message_send_time) - time() : 0;
+                   // $delay = (strtotime($notification->message_send_time) > time()) ? strtotime($notification->message_send_time) - time() : 0;
+                    $delay = 0;
+                  
                     // $job = (new SendBulkEmail($client,$emailData))->onQueue('bulk-emails')->delay($delay);
                     SendBulkEmail::dispatch($emailData)->onQueue('bulk-emails')->delay($delay);
                 }
@@ -329,7 +331,8 @@ class Notifications extends Command
                     //$job = (new SendBulkEmail($client,$emailData))->onQueue('high-bulk-emails')->delay(0);
                     SendBulkNotification::dispatch($pushData)->onQueue('high-bulk-notifications')->delay(0);
                 } else {
-                    $delay = (strtotime($notification->message_send_time) > time()) ? strtotime($notification->message_send_time) - time() : 0;
+                    //$delay = (strtotime($notification->message_send_time) > time()) ? strtotime($notification->message_send_time) - time() : 0;
+                    $delay = 0;
                     // $job = (new SendBulkEmail($client,$emailData))->onQueue('bulk-emails')->delay($delay);
                     SendBulkNotification::dispatch($pushData)->onQueue('bulk-notifications')->delay($delay);
                 }

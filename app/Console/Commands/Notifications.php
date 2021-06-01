@@ -304,7 +304,7 @@ class Notifications extends Command
         //     [message_send_time] => 1970-01-01 16:56:00
         //     [status] => 1
         // )
-
+        Log::info('pushNotifications.', ['method' => 'pushNotifications', 'process_records' => json_encode($notification)]);
         $staticSeconds = 60;
         if (!empty($notification)) {
             $pushNotificationCount = 0;

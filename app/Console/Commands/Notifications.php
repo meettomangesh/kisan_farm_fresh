@@ -459,6 +459,6 @@ class Notifications extends Command
      */
     public function updateNotification($notificationId, $emailCount = 0, $smsCount = 0, $pushNotificationCount = 0)
     {
-        DB::table('user_communication_messages')->where('id', $notificationId)->update(['processed' => 1, 'email_count' => $emailCount, 'sms_count' => $smsCount, 'push_notification_count' => $pushNotificationCount]);
+        DB::table('user_communication_messages')->where('id', $notificationId)->update(['processed' => 1, 'email_count' => $emailCount, 'sms_count' => $smsCount, 'push_notification_count' => $pushNotificationCount,'updated_at'=>now() ]);
     }
 }

@@ -1,4 +1,3 @@
-
 @extends('layouts.admin')
 @section('content')
 @can('communication_create')
@@ -24,7 +23,7 @@
 
                         </th>
                         <th> {{ trans('cruds.communication.fields.id') }} </th>
-                        
+
                         <th width='10%'>{{ trans('cruds.communication.fields.notification') }} </th>
                         <!-- <th width='15%'>{{ trans('cruds.communication.fields.message-type') }} </th> -->
                         <th width='20%'>{{ trans('cruds.communication.fields.message-title') }} </th>
@@ -32,6 +31,7 @@
                         <th width='10%'>{{ trans('cruds.communication.fields.email_count') }}</th>
                         <th width='10%'>{{ trans('cruds.communication.fields.sms_count') }} </th>
                         <th width='10%'>{{ trans('cruds.communication.fields.status') }} </th>
+                        <th width='10%'>{{ trans('cruds.communication.fields.processed') }} </th>
                         <th>
                             &nbsp;
                         </th>
@@ -65,9 +65,11 @@
                             {{ $userCommunicationMessage->sms_count ?? '' }}
                         </td>
                         <td>
-                            {{ $userCommunicationMessage->status ?? '' }}
+                            {{ ($userCommunicationMessage->status == 1?"Active":"Inactive") ?? '' }}
                         </td>
-                        
+                        <td>
+                            {{ ($userCommunicationMessage->processed == 1?"Yes":"No") ?? '' }}
+                        </td>
                         <td>
                             @can('country_show')
                             <a class="btn btn-xs btn-primary" href="{{ route('admin.communications.show', $userCommunicationMessage->id) }}">
@@ -108,7 +110,8 @@
     $(function() {
         let dtButtons = $.extend(true, [], $.fn.dataTable.defaults.buttons)
         @can('communication_delete')
-        let deleteButtonTrans = '{{ trans('global.datatables.delete ') }}'
+        let deleteButtonTrans = '{{ trans('
+        global.datatables.delete ') }}'
         let deleteButton = {
             text: deleteButtonTrans,
             url: "{{ route('admin.communications.massDestroy') }}",
@@ -121,12 +124,14 @@
                 });
 
                 if (ids.length === 0) {
-                    alert('{{ trans('global.datatables.zero_selected ') }}')
+                    alert('{{ trans('
+                        global.datatables.zero_selected ') }}')
 
                     return
                 }
 
-                if (confirm('{{ trans('global.areYouSure ') }}')) {
+                if (confirm('{{ trans('
+                        global.areYouSure ') }}')) {
                     $.ajax({
                             headers: {
                                 'x-csrf-token': _token

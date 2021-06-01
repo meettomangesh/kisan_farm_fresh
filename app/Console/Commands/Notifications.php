@@ -318,6 +318,7 @@ class Notifications extends Command
 
             foreach ($pushNotificationDataGroup as $pushNotificationData) {
                 $userIdArr = array_column($pushNotificationData, 'user_id');
+                
                 // $notifyHelper = new NotificationHelper();
                 //  $notifyHelper->setParameters(["user_id" => $userIdArr, "deep_link" => $notification->deep_link_screen], '', $notification->push_text);
                 $pushData = [
@@ -327,6 +328,7 @@ class Notifications extends Command
                     "push_title" => '',
                     "push_text" =>  $notification->push_text
                 ];
+                Log::info('pushNotifications.', ['method' => 'pushNotifications', 'process_records' => json_encode($pushData)]);
                 //TODO: Call the function to send bulk emails
                 if ($notificationId != 0) {
                     //$job = (new SendBulkEmail($client,$emailData))->onQueue('high-bulk-emails')->delay(0);

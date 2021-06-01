@@ -708,6 +708,7 @@ return [
             'deleted_at_helper' => '',
             'users_helper' => '',
             'regions_helper' => '',
+            'processed' => 'Processed',
         ],
     ],
 ];

@@ -62,6 +62,7 @@ class Notifications extends Command
             $emailCount = 0;
             $smsCount = 0;
             $notificationCount = 0;
+            $notificationId = $notification->id;
             switch ($notification->notify_users_by) {
                     // case "0001": {
                     //         $countArray = $this->pushAndSmsNotifications($notification, $notificationId);
@@ -303,7 +304,7 @@ class Notifications extends Command
         //     [message_send_time] => 1970-01-01 16:56:00
         //     [status] => 1
         // )
-
+        
         $staticSeconds = 60;
         if (!empty($notification)) {
             $pushNotificationCount = 0;
@@ -317,6 +318,7 @@ class Notifications extends Command
 
             foreach ($pushNotificationDataGroup as $pushNotificationData) {
                 $userIdArr = array_column($pushNotificationData, 'user_id');
+                
                 // $notifyHelper = new NotificationHelper();
                 //  $notifyHelper->setParameters(["user_id" => $userIdArr, "deep_link" => $notification->deep_link_screen], '', $notification->push_text);
                 $pushData = [
@@ -400,7 +402,7 @@ class Notifications extends Command
         } else {
             $this->comment(PHP_EOL . "Empty Array" . PHP_EOL);
         }
-        Log::info('Bulk Actions Call.', ['method' => 'pushNotifications', 'process_records' => (isset($iosTokensData) ? count($iosTokensData) : 0) + (isset($androidTokensData) ? count($androidTokensData) : 0)]);
+        Log::info('Bulk Actions Call.', ['method' => 'pushNotifications', 'process_records' => $pushNotificationCount]);
         return $pushNotificationCount;
     }
 
@@ -459,6 +461,6 @@ class Notifications extends Command
      */
     public function updateNotification($notificationId, $emailCount = 0, $smsCount = 0, $pushNotificationCount = 0)
     {
-        DB::table('user_communication_messages')->where('id', $notificationId)->update(['processed' => 1, 'email_count' => $emailCount, 'sms_count' => $smsCount, 'push_notification_count' => $pushNotificationCount]);
+        DB::table('user_communication_messages')->where('id', $notificationId)->update(['processed' => 1, 'email_count' => $emailCount, 'sms_count' => $smsCount, 'push_notification_count' => $pushNotificationCount,'updated_at'=>now() ]);
     }
 }

@@ -72,6 +72,10 @@ class ProductUnits extends Model
         $inventory->current_quantity = $currentQuantity;
         $inventory->save();
 
+        $productUnit = ProductUnits::find($params['product_unit_id']);
+        $productUnit->status = 1;
+        $productUnit->save();
+
         ProductInventory::create(array(
             'product_units_id' => $params['product_unit_id'],
             'quantity' => ($params['inventory_type'] == 1) ? $params['quantity'] : '-'.$params['quantity'],

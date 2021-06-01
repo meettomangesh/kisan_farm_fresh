@@ -15,6 +15,8 @@ class Kernel extends ConsoleKernel
     protected $commands = [
         //
         \App\Console\Commands\Notifications::class,
+        \App\Console\Commands\BirthdayWishes::class,
+        \App\Console\Commands\LowQuantityProduct::class,
     ];
 
     /**
@@ -27,6 +29,12 @@ class Kernel extends ConsoleKernel
     {
         // $schedule->command('inspire')->hourly();
         $schedule->command('send-notifications')->dailyAt('7:00');
+
+        // birthday wishes
+        // $schedule->command('birthdaywishes')->monthlyOn(1, '1:00');
+
+        // low quantity product
+        // $schedule->command('lowquantityproduct')->dailyAt('9:00');
     }
 
     /**

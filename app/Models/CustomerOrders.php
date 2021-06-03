@@ -363,14 +363,12 @@ class CustomerOrders extends Model
         ]);
 
         $filePath = public_path() . '/invoices/' . $orderDetails->customer_id . '/';  //  '/var/www/html/kisan_farm_fresh/public/invoices/';
-        //$invoice_number = 'PKGINV' . PdfHelper::randomNumber(4);
-        //$fileName = date('Y') . date('m') . PdfHelper::randomNumber(4);
         $fileName = $order_id;
         DataHelper::checkDirectory($filePath);
         //Generating Invoice PDF and storing on local server
 
-        $isInvoiceGenerated = PdfHelper::generatePDF($invoiceTemplate, $filePath, $fileName);
-        return $isInvoiceGenerated;
+        $invoiceGeneratedPath = PdfHelper::generatePDF($invoiceTemplate, $filePath, $fileName, array('order_id' => $order_id, 'user_id' => $orderDetails->customer_id));
+        return $invoiceGeneratedPath;
     }
 
     public function getOrderList($params)
@@ -491,10 +489,11 @@ class CustomerOrders extends Model
 
             $orderDetails = CustomerOrders::find($params['order_id']);
             $params['invoice_template'] = 'IN_APP_INVOICE_AFTER_ORDER';
-            $invoiceGenerated =  $this->generateInvoice($params);
-
+            $invoiceGeneratedPath =  $this->generateInvoice($params);
+            echo '$invoiceGeneratedPath'.$invoiceGeneratedPath;
+            exit;
             $params['order_email_template'] = 'IN_APP_ORDER_DELIVERED_NOTIFICATION';
-            if ($invoiceGenerated) {
+            if ($invoiceGeneratedPath) {
                 $params['attachment'] = array(array('attachment' => 'invoices/' . $orderDetails->customer_id . '/' . $params['order_id'] . '.pdf'));
             }
             $this->sendOrderTransactionEmail($params);
@@ -571,7 +570,7 @@ class CustomerOrders extends Model
         if (sizeof($usersData) == 0) {
             return array("status" => false, "message" => "Invalid user");
         }
-        
+
         // validate customer address
         $userAddressData = UserAddress::select('id')->where('id', $params['address_id'])->where('user_id', $params['user_id'])->where('status', 1)->get()->toArray();
         if (sizeof($userAddressData) == 0) {

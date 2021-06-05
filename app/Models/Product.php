@@ -178,6 +178,7 @@ class Product extends Model
                 }
             }
         }
+        $queryResult = array_merge($queryResult);
         return $queryResult;
     }    
 }

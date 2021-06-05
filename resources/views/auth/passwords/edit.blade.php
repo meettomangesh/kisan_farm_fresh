@@ -1,6 +1,8 @@
 @extends('layouts.admin')
 @section('content')
-
+@if($errors->any())
+<h4>{{$errors->first()}}</h4>
+@endif
 <div class="card">
     <div class="card-header">
         {{ trans('global.change_password') }}
@@ -17,6 +19,10 @@
                         {{ $errors->first('email') }}
                     </div>
                 @endif
+            </div>
+            <div class="form-group">
+                <label class="required" for="title">Old {{ trans('cruds.user.fields.password') }}</label>
+                <input class="form-control {{ $errors->has('old_password') ? 'is-invalid' : '' }}" type="password" name="old_password" id="old_password" required>
             </div>
             <div class="form-group">
                 <label class="required" for="title">New {{ trans('cruds.user.fields.password') }}</label>

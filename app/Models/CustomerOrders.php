@@ -417,6 +417,7 @@ class CustomerOrders extends Model
                     unset($orderList[$key]);
                 }
             }
+            $orderList = array_merge($orderList);
         }
         return $orderList;
     }
@@ -465,6 +466,7 @@ class CustomerOrders extends Model
                     unset($orderList[$key]);
                 }
             }
+            $orderList = array_merge($orderList);
         }
         return $orderList;
     }

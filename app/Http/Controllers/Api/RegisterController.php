@@ -346,6 +346,7 @@ class RegisterController extends BaseController
     public function changePassword(Request $request)
     {
         $validator = Validator::make($request->all(), [
+            'platform' => 'required',
             'mobile_number' => 'required',
             'old_password' => 'required',
             'new_password' => 'required',
@@ -385,6 +386,7 @@ class RegisterController extends BaseController
     public function forgotPassword(Request $request)
     {
         $validator = Validator::make($request->all(), [
+            'platform' => 'required',
             'mobile_number' => 'required',
             'new_password' => 'required',
             'confirm_password' => 'required',

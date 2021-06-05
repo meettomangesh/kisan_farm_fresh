@@ -54,6 +54,7 @@ return [
     'submit'                               => 'Submit',
     'relatedData'                          => 'Related Data',
     'change_password_success'              => 'Password changed successfully',
+    'change_password_failure'              => 'Failed to change password',
     'datatables'                           => [
         'copy'          => 'Copy',
         'csv'           => 'CSV',

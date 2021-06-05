@@ -7,6 +7,7 @@ use App\Http\Requests\UpdatePasswordRequest;
 use Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
+use App\User;
 
 class ChangePasswordController extends Controller
 {
@@ -19,8 +20,12 @@ class ChangePasswordController extends Controller
 
     public function update(UpdatePasswordRequest $request)
     {
-        auth()->user()->update($request->validated());
-
-        return redirect()->route('profile.password.edit')->with('message', __('global.change_password_success'));
+        // auth()->user()->update($request->validated());
+        $response = User::changePassword($request->all(), auth()->user());
+        if($response['status']) {
+            return redirect()->route('profile.password.edit')->with('message', __('global.change_password_success'));
+        } else {
+            return redirect()->route('profile.password.edit')->withErrors([$response['message']]);
+        }
     }
 }

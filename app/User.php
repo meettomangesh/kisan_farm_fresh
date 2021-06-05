@@ -216,4 +216,21 @@ class User extends Authenticatable
         return "fImEfIt7Qmmh7LxTnQ3jy8:APA91bE_bcrCZiteJvbVZv2m2HYEQniTbYCYeo-wfOYUmhJ02URjlTeOx0UO7osO2chqHkfiBKFRTPLR9RkopRdo9r_qYmjpNxGvGwPjmRSZdoCrNexp6M0b9NQKo7QuwsHIAUDl0_Zi";
     }
 
+    protected function changePassword($reqParams, $user) {
+        if($reqParams['password'] != $reqParams['password_confirmation']) {
+            return ["status" => false, "message" => "New and confirm password should be same"];
+        }
+
+        if($reqParams['password'] == $reqParams['old_password']) {
+            return ["status" => false, "message" => "New and old password should not be same"];
+        }
+
+        if(Hash::check($reqParams['old_password'], $user->password)) {
+            $input['password'] = bcrypt($reqParams['password']);
+            $user->update($input);
+            return ["status" => true, "message" => "Password changed successfully"];
+        }
+        return ["status" => false, "message" => "Failed to change password"];
+    }
+
 }

@@ -22,7 +22,7 @@ class CreateSpValidateBasketProduct extends Migration
                 SELECT JSON_OBJECT('status', 'FAILURE', 'message', 'Please provide valid data.','data',JSON_OBJECT(),'statusCode',520) AS response;
                 LEAVE validateBasketProducts;
             END IF;
-            SET basketId = JSON_UNQUOTE(JSON_EXTRACT(inputData,'$.id'));
+            SET basketId = JSON_UNQUOTE(JSON_EXTRACT(inputData,'$.basket_id'));
             
             IF basketId = 0 THEN
                 SELECT JSON_OBJECT('status', 'FAILURE', 'message', 'Please provide valid data.','data',JSON_OBJECT(),'statusCode',520) AS response;

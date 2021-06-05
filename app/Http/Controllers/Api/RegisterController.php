@@ -12,6 +12,7 @@ use App\Helper\DataHelper;
 use App\Helper\EmailHelper;
 use App\Role;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Hash;
 
 class RegisterController extends BaseController
 {
@@ -50,7 +51,6 @@ class RegisterController extends BaseController
         $user = User::create($input);
         $user->roles()->sync([4]);
         $tokenResult = $user->createToken(getenv('APP_NAME'));
-        $tokenResult->token->expires_at = Carbon::now()->addDays(10);
         $success['token'] =  $tokenResult->accessToken;
         $success['expires_at'] =  $tokenResult->token->expires_at;
 
@@ -229,8 +229,6 @@ class RegisterController extends BaseController
 
             $user = Auth::user();
             $tokenResult = $user->createToken(getenv('APP_NAME'));
-            // $tokenResult->token->expires_at = Carbon::now()->addDays(10);
-
             $success['token'] =  $tokenResult->accessToken;
             $success['expires_at'] =  $tokenResult->token->expires_at;
 
@@ -343,5 +341,74 @@ class RegisterController extends BaseController
             $response = $this->sendResponse(array(), $e->getMessage());
         }
         return $response;
+    }
+
+    public function changePassword(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'mobile_number' => 'required',
+            'old_password' => 'required',
+            'new_password' => 'required',
+            'confirm_password' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendError('Validation Error.', $validator->errors());
+        }
+
+        if($request->new_password != $request->confirm_password) {
+            return $this->sendError('New and confirm password are not matching.', []);
+        }
+
+        if($request->new_password == $request->old_password) {
+            return $this->sendError('Old and new password should be different.', []);
+        }
+
+        $user = User::where('mobile_number', $request->mobile_number)->first();
+        if (!$user) {
+            return $this->sendError("Please try with valid mobile_number.", []);
+        }
+        if(Hash::check($request->old_password, $user->password) && !(Hash::check($request->new_password, $user->password))) {
+            $input['password'] = bcrypt($request->new_password);
+            $input['updated_by'] = 1;
+            $user->update($input);
+
+            // Revoke token
+            $token = $request->user()->token();
+            $token->revoke();
+            return $this->sendResponse("", "Password changed successfully.");
+        } else {
+            return $this->sendError("Please try with valid old password.", []);
+        }
+    }
+
+    public function forgotPassword(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'mobile_number' => 'required',
+            'new_password' => 'required',
+            'confirm_password' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendError('Validation Error.', $validator->errors());
+        }
+
+        if($request->new_password != $request->confirm_password) {
+            return $this->sendError('Unauthorised.', ['error' => 'New and confirm password are not matching']);
+        }
+        
+        $user = User::where('mobile_number', $request->mobile_number)->first();
+        if (!$user) {
+            return $this->sendError("Please try with valid mobile number.", []);
+        }
+
+        if(Hash::check($request->new_password, $user->password)) {
+            return $this->sendError("Please try with another password.", []);
+        }
+        $input['password'] = bcrypt($request->new_password);
+        $input['updated_by'] = 1;
+        $user->update($input);
+        return $this->sendResponse("", 'Password changed successfully.');
     }
 }

@@ -24,34 +24,36 @@ Route::post('getOtp', 'Api\SmsController@getOtp');
 Route::post('verifyOtp', 'Api\SmsController@verifyOtp');
 // Route::post('getOtp',\Api\SmsController::class . '@getOtp');
 Route::post('pinCodes', 'Api\RegisterController@getPinCodeList');
+Route::post('forgotPassword', 'Api\RegisterController@forgotPassword');
 
 Route::middleware('auth:api')->group( function () {
     // Route::resource('products', 'API\ProductsController');
     // Route::post('updateCustomer', 'API\RegisterController@updateCustomer');
     Route::post('logout', 'Api\RegisterController@logout');
+    Route::post('changePassword', 'Api\RegisterController@changePassword');
 
     Route::post('categories', 'Api\CategoryController@getCategoryList');
-Route::post('subCategories', 'Api\CategoryController@getSubCategoryList');
-Route::post('products', 'Api\ProductsController@getProductList');
-Route::post('banners', 'Api\BannersController@getBannerList');
+    Route::post('subCategories', 'Api\CategoryController@getSubCategoryList');
+    Route::post('products', 'Api\ProductsController@getProductList');
+    Route::post('banners', 'Api\BannersController@getBannerList');
 
-Route::post('placeOrder', 'Api\OrdersController@placeOrder');
-Route::post('updateCustomer', 'API\RegisterController@updateCustomer');
-Route::post('orders', 'Api\OrdersController@getOrderList');
-Route::post('cancelOrder', 'Api\OrdersController@cancelOrder');
-Route::post('orderList', 'Api\OrdersController@getOrderListForDeliveryBoy');
-Route::post('changeOrderStatus', 'Api\OrdersController@changeOrderStatus');
-Route::post('getOrderStatus', 'Api\OrdersController@getOrderStatus');
-Route::post('paymentCallbackUrl', 'Api\OrdersController@paymentCallbackUrl');
-Route::post('checkDeliveryBoyAvailability', 'Api\OrdersController@checkDeliveryBoyAvailability');
+    Route::post('placeOrder', 'Api\OrdersController@placeOrder');
+    Route::post('updateCustomer', 'API\RegisterController@updateCustomer');
+    Route::post('orders', 'Api\OrdersController@getOrderList');
+    Route::post('cancelOrder', 'Api\OrdersController@cancelOrder');
+    Route::post('orderList', 'Api\OrdersController@getOrderListForDeliveryBoy');
+    Route::post('changeOrderStatus', 'Api\OrdersController@changeOrderStatus');
+    Route::post('getOrderStatus', 'Api\OrdersController@getOrderStatus');
+    Route::post('paymentCallbackUrl', 'Api\OrdersController@paymentCallbackUrl');
+    Route::post('checkDeliveryBoyAvailability', 'Api\OrdersController@checkDeliveryBoyAvailability');
 
-Route::post('getAllAddressByUserId', 'Api\UserAddressController@getAllAddressByUserId');
-Route::post('saveAddressByUserId', 'Api\UserAddressController@saveAddressByUserId');
-Route::post('updateAddressByUserId', 'Api\UserAddressController@updateAddressByUserId');
-Route::post('deleteAddressByUserId', 'Api\UserAddressController@deleteAddressByUserId');
-Route::post('uploadImage', 'Api\MiscellaneousController@uploadImage');
-Route::post('storeDeviceToken', 'Api\RegisterController@storeDeviceToken');
+    Route::post('getAllAddressByUserId', 'Api\UserAddressController@getAllAddressByUserId');
+    Route::post('saveAddressByUserId', 'Api\UserAddressController@saveAddressByUserId');
+    Route::post('updateAddressByUserId', 'Api\UserAddressController@updateAddressByUserId');
+    Route::post('deleteAddressByUserId', 'Api\UserAddressController@deleteAddressByUserId');
+    Route::post('uploadImage', 'Api\MiscellaneousController@uploadImage');
+    Route::post('storeDeviceToken', 'Api\RegisterController@storeDeviceToken');
 
-Route::post('getPromoCodes', 'Api\PromoCodeController@getPromoCodes');
-Route::post('validatePromoCode', 'Api\PromoCodeController@validatePromoCode');
+    Route::post('getPromoCodes', 'Api\PromoCodeController@getPromoCodes');
+    Route::post('validatePromoCode', 'Api\PromoCodeController@validatePromoCode');
 });

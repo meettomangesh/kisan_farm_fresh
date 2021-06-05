@@ -252,6 +252,7 @@ class Basket extends Model
                     unset($queryResult[$key]);
                 }
             }
+            $queryResult = array_merge($queryResult);
         }
         return $queryResult;
     }

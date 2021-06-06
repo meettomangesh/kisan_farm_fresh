@@ -83,6 +83,16 @@
                                 {{ trans('cruds.order.fields.re_assign_delivery_boy') }}
                             </a>
                             @endif -->
+                            @if($customerOrder->customer_invoice_url)
+                            <a class="btn btn-xs btn-primary"  target="_blank" href="{{ $customerOrder->customer_invoice_url }}">
+                                {{ trans('cruds.order.fields.customer_invoice_url') }}
+                            </a>
+                            @endif
+                            @if($customerOrder->delivery_boy_invoice_url)
+                            <a class="btn btn-xs btn-primary"  target="_blank" href="{{ $customerOrder->delivery_boy_invoice_url }}">
+                                {{ trans('cruds.order.fields.delivery_boy_invoice_url') }}
+                            </a>
+                            @endif
                         </td>
                     </tr>
                     @endforeach

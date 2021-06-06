@@ -247,7 +247,21 @@ class CustomerOrders extends Model
         $params['razorpay_order_id'] = $razorPayOrderId;
         $params['invoice_template'] = 'IN_APP_INVOICE_AFTER_ORDER';
 
-        //$invoiceGenerated =  $this->generateInvoice($params);
+        $invoiceGeneratedPath =  $this->generateInvoice($params);
+
+        $deliveryBoyInvoice = $this->generateInvoice(
+            array(
+                'invoice_template' => 'IN_APP_DELIVERY_BOY_INVOICE_AFTER_ORDER',
+                'order_id' => $orderId,
+                'file_name' => $orderId . '_delivery'
+            )
+        );
+        if ($invoiceGeneratedPath) {
+            $orderObj = CustomerOrders::find($orderId);
+            $orderObj->customer_invoice_url = $invoiceGeneratedPath;
+            $orderObj->delivery_boy_invoice_url = $deliveryBoyInvoice;
+            $orderObj->update();
+        }
         $params['order_email_template'] = 'IN_APP_ORDER_PLACED_NOTIFICATION';
         $this->sendOrderTransactionEmail($params);
         $this->sendOrderTransactionNotification($params);
@@ -318,7 +332,7 @@ class CustomerOrders extends Model
     {
         //$user_id = $params['user_id'];
         $order_id = $params['order_id'];
-        $fileName = date('Y') . date('m') . PdfHelper::randomNumber(4);
+        // $fileName = date('Y') . date('m') . PdfHelper::randomNumber(4);
         $invoiceDate = date('d M Y'); //current date
         $orderDetails = CustomerOrders::find($order_id);
         $inputData = array('order_id' => $order_id, 'user_id' => $orderDetails->customer_id);
@@ -363,11 +377,11 @@ class CustomerOrders extends Model
         ]);
 
         $filePath = public_path() . '/invoices/' . $orderDetails->customer_id . '/';  //  '/var/www/html/kisan_farm_fresh/public/invoices/';
-        $fileName = $order_id;
+        $fileName = (isset($params['file_name'])) ? $params['file_name'] : $order_id;
         DataHelper::checkDirectory($filePath);
         //Generating Invoice PDF and storing on local server
 
-        $invoiceGeneratedPath = PdfHelper::generatePDF($invoiceTemplate, $filePath, $fileName, array('order_id' => $order_id, 'user_id' => $orderDetails->customer_id));
+        $invoiceGeneratedPath = PdfHelper::generatePDF($invoiceTemplate, $filePath, $fileName, array('order_id' => $order_id, 'user_id' => $orderDetails->customer_id, 'file_name' => $fileName));
         return $invoiceGeneratedPath;
     }
 
@@ -492,8 +506,6 @@ class CustomerOrders extends Model
             $orderDetails = CustomerOrders::find($params['order_id']);
             $params['invoice_template'] = 'IN_APP_INVOICE_AFTER_ORDER';
             $invoiceGeneratedPath =  $this->generateInvoice($params);
-            echo '$invoiceGeneratedPath'.$invoiceGeneratedPath;
-            exit;
             $params['order_email_template'] = 'IN_APP_ORDER_DELIVERED_NOTIFICATION';
             if ($invoiceGeneratedPath) {
                 $params['attachment'] = array(array('attachment' => 'invoices/' . $orderDetails->customer_id . '/' . $params['order_id'] . '.pdf'));

@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\Response;
 use App\Models\CustomerOrders;
 use App\Models\CustomerOrderDetails;
 use DB;
+use App\Helper\PdfHelper;
 
 class OrdersController extends Controller
 {
@@ -17,6 +18,13 @@ class OrdersController extends Controller
     {
         abort_if(Gate::denies('order_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $customerOrders = CustomerOrders::all();
+        $temp = [];
+        foreach ($customerOrders as $key => $orders) {
+            $temp[$key] = $orders;
+            $temp[$key]->customer_invoice_url = (($temp[$key]->customer_invoice_url) ?  PdfHelper::getUplodedPath($temp[$key]->customer_invoice_url) : "");
+            $temp[$key]->delivery_boy_invoice_url = (($temp[$key]->delivery_boy_invoice_url) ?  PdfHelper::getUplodedPath($temp[$key]->delivery_boy_invoice_url) : "");
+        }
+        $customerOrders = collect($temp);
         return view('admin.orders.index', compact('customerOrders'));
     }
 

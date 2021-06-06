@@ -32,6 +32,7 @@ return [
         'key'    => env('SES_KEY', ''),
         'secret' => env('SES_KEY_SECRET', ''),
         'region' => env('SES_REGION', 'ap-south-1'),
+        'bucket_url' => env('AWS_BUCKET_URL',''),
         'host' => env('SES_EMAIL_HOST', 'email-smtp.ap-south-1.amazonaws.com'),
         'email' => env('SES_SENDER_EMAIL', ''),
         'username' => env('SES_USERNAME', ''),

@@ -78,11 +78,13 @@
                             </button><br>
                             @endif
                             @endcan
-                            <!-- @if($customerOrder->delivery_boy_id == 0 || !($customerOrder->order_status == 4 || $customerOrder->order_status == 5))
+                            @can('assign_order_delivery_boy')                      
+                            @if($customerOrder->delivery_date < date('Y-m-d') && ($customerOrder->delivery_boy_id == 0 || !($customerOrder->order_status == 4 || $customerOrder->order_status == 5)))
                             <a class="btn btn-xs btn-primary" href="{{ route('admin.orders.reAssign', $customerOrder->id) }}">
                                 {{ trans('cruds.order.fields.re_assign_delivery_boy') }}
                             </a>
-                            @endif -->
+                            @endif
+                            @endcan
                             @if($customerOrder->customer_invoice_url)
                             <a class="btn btn-xs btn-primary"  target="_blank" href="{{ $customerOrder->customer_invoice_url }}">
                                 {{ trans('cruds.order.fields.customer_invoice_url') }}

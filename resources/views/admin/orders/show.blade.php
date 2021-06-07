@@ -33,11 +33,11 @@
                     <label><b>{{ $customerOrder->userCustomer->first_name }}</b> <b>{{ $customerOrder->userCustomer->last_name ?? '' }}</b></label><br>
                     <label>{{ $customerOrder->userCustomer->mobile_number }}</label><br>
                     <label><b>{{ trans('cruds.order.fields.address') }}:</b></label><br>
-                    <label>{{ $customerOrder->customerShippingAddress->address }}</label><br>
-                    <label>{{ $customerOrder->customerShippingAddress->landmark }}</label><br>
-                    <label>{{ $customerOrder->customerShippingAddress->pin_code }}, {{ $customerOrder->customerShippingAddress->area }}</label><br>
-                    <label>{{ $customerOrder->customerShippingAddress->mobile_number }}</label><br>
-                    <label>{{ $customerOrder->customerShippingAddress->city->name }}, {{ $customerOrder->customerShippingAddress->state->name }}</label>
+                    <label>{{ $customerOrder->customerShippingAddress->address ?? '' }}</label><br>
+                    <label>{{ $customerOrder->customerShippingAddress->landmark ?? '' }}</label><br>
+                    <label>{{ $customerOrder->customerShippingAddress->pin_code ?? '' }}, {{ $customerOrder->customerShippingAddress->area ?? '' }}</label><br>
+                    <label>{{ $customerOrder->customerShippingAddress->mobile_number ?? '' }}</label><br>
+                    <label>{{ $customerOrder->customerShippingAddress->city->name ?? '' }}, {{ $customerOrder->customerShippingAddress->state->name ?? '' }}</label>
                 </div>
                 <div class="col-md-6">
                     <label><b>{{ trans('cruds.order.fields.payment_type') }}:</b> {{ $customerOrder->payment_type }}</label>

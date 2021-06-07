@@ -47,6 +47,11 @@ Route::middleware('auth:api')->group( function () {
     Route::post('paymentCallbackUrl', 'Api\OrdersController@paymentCallbackUrl');
     Route::post('checkDeliveryBoyAvailability', 'Api\OrdersController@checkDeliveryBoyAvailability');
 
+    // Wishlist
+    Route::post('storeProductInWishlist', 'Api\ProductsController@storeProductInWishlist');
+    Route::post('wishlist', 'Api\ProductsController@getWishlist');
+    Route::post('removeProductFromWishlist', 'Api\ProductsController@removeProductFromWishlist');
+
     Route::post('getAllAddressByUserId', 'Api\UserAddressController@getAllAddressByUserId');
     Route::post('saveAddressByUserId', 'Api\UserAddressController@saveAddressByUserId');
     Route::post('updateAddressByUserId', 'Api\UserAddressController@updateAddressByUserId');

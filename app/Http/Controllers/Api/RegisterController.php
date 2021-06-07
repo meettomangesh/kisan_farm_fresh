@@ -311,7 +311,7 @@ class RegisterController extends BaseController
 
             //Create user object to call functions
             $user = new User();
-            // Function call to get product list
+            // Function call to store device token
             $responseDetails = $user->storeDeviceToken($params);
             $message = 'Failed to store device token.';
             if ($responseDetails) {
@@ -347,7 +347,7 @@ class RegisterController extends BaseController
     {
         $validator = Validator::make($request->all(), [
             'platform' => 'required',
-            'mobile_number' => 'required',
+            'user_id' => 'required',
             'old_password' => 'required',
             'new_password' => 'required',
             'confirm_password' => 'required',
@@ -365,9 +365,9 @@ class RegisterController extends BaseController
             return $this->sendError('Old and new password should be different.', []);
         }
 
-        $user = User::where('mobile_number', $request->mobile_number)->first();
+        $user = User::where('id', $request->user_id)->first();
         if (!$user) {
-            return $this->sendError("Please try with valid mobile_number.", []);
+            return $this->sendError("Please try with valid user.", []);
         }
         if(Hash::check($request->old_password, $user->password) && !(Hash::check($request->new_password, $user->password))) {
             $input['password'] = bcrypt($request->new_password);

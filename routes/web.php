@@ -125,6 +125,7 @@ Route::group([
     // Route::delete('orders/destroy', 'OrdersController@massDestroy')->name('orders.massDestroy');
     Route::get('orders/cancelOrder/{cid?}', 'OrdersController@cancelOrder')->name('orders.cancelOrder');
     Route::get('orders/reAssign/{cid?}', 'OrdersController@reAssign')->name('orders.reAssign');
+    Route::post('orders/check-test-sms', 'UserCommunicationMessagesController@sendTestSms')->name('communications.sendTestSms');
     Route::resource('orders', 'OrdersController');
 });
 Route::group(['prefix' => 'profile', 'as' => 'profile.', 'namespace' => 'Auth', 'middleware' => ['auth']], function () {

@@ -43,14 +43,28 @@ class OrdersController extends Controller
         return view('admin.orders.reassign', compact('customerOrder', 'customerOrderDetails'));
     }
 
-    public function update(Request $request,$id)
-    {   
+    public function update(Request $request, $id)
+    {
         $input = $request->all();
         $customerOrder = CustomerOrders::find($id);
         $customerOrder->delivery_date = $input['delivery_date'];
         $customerOrder->update();
-
         return redirect()->route('admin.orders.index');
+    }
+
+    public function checkDeliveryBoyAvailability(Request $request)
+    {   
+        print_r($request->all()); exit;
+        $params = [
+            'platform' => $request->platform,
+            'user_id' => $request->user_id,
+            'address_id' => $request->address_id,
+            'delivery_date' => $request->delivery_date,
+        ];
+        //Create order object to call functions
+        $customerOrders = new CustomerOrders();
+        // Function call to check delivery boy availability by delivery date
+        $responseDetails = $customerOrders->checkDeliveryBoyAvailability($params);
     }
 
     public function cancelOrder($orderId)

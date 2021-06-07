@@ -6,6 +6,7 @@ use Illuminate\Console\Command;
 use DB;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Support\Facades\Log;
+use App\Helper\EmailHelper;
 
 class LowQuantityProduct extends Command
 {
@@ -44,9 +45,27 @@ class LowQuantityProduct extends Command
         $startTime = date('Y-m-d H:i:s');
         $this->comment(PHP_EOL . "lowquantityproduct started at :" . $startTime . PHP_EOL);
 
+        $productStr = "";
         $productData = $this->getLowQuantityProduct();
-        foreach($productData as $key) {
-            // $key->mobile_number;
+        foreach($productData as $product) {
+            $productStr .= '
+            <tr>
+                <td style="padding: 5px; text-align: center;">' . $product->product_name . ' (' . $product->unit . ')</td>
+                <td style="padding: 5px; text-align: center;">' .  $product->current_quantity . '</td>
+            </tr>
+            ';
+        }
+
+        if(isset($productStr) && !empty($productStr)) {
+            EmailHelper::sendEmail(
+                'IN_LOW_QTY_PRODUCT',
+                [
+                    'email_to' => "",
+                    'productStr' => $productStr,
+                    'isEmailVerified' => 1
+                ],
+                ['attachment' => []]
+            );
         }
         
         $endTime = date('Y-m-d H:i:s');
@@ -55,7 +74,7 @@ class LowQuantityProduct extends Command
     }
 
     /**
-     * This function is used to get all the customer whose birthday in current month
+     * This function is used to notify admin about low qty product
      * @return array $response
      */
     public function getLowQuantityProduct()

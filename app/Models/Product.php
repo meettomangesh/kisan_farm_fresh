@@ -11,6 +11,7 @@ use App\Models\ProductLocationInventory;
 use App\Models\Category;
 use App\Models\ProductUnits;
 use App\Models\BasketProduct;
+use App\Models\CustomerWishlist;
 use App\User;
 use DB;
 use PDO;
@@ -136,6 +137,12 @@ class Product extends Model
             // ->toArray();
     }
 
+    /**
+     * Get product list
+     * @param array $params
+     * @throws Exception  
+     * @return array of data
+     */
     public function getProductList($params) {
         $queryResult = DB::select('call getProductList(?)', [$params]);
         // $result = collect($queryResult);
@@ -180,5 +187,100 @@ class Product extends Model
         }
         $queryResult = array_merge($queryResult);
         return $queryResult;
-    }    
+    }
+    
+     /**
+     * Store product in wishlist
+     * @param array $params
+     * @throws Exception  
+     * @return array of data
+     */
+    public function storeProductInWishlist($params)
+    {
+        try {
+            $inputData = json_encode($params);
+            $pdo = DB::connection()->getPdo();
+            $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, true);
+            $stmt = $pdo->prepare("CALL storeProductInWishlist(?)");
+            $stmt->execute([$inputData]);
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+            $stmt->closeCursor();
+            $reponse = json_decode($result['response']);
+            if ($reponse->status == "FAILURE" && $reponse->statusCode != 200) {
+                return false;
+            }
+            return true;
+        } catch (Exception $e) {
+            return $this->sendError('Error.', $$e->getMessage());
+        }
+    }
+
+    /**
+     * Remove product from wishlist
+     * @param array $params
+     * @throws Exception  
+     * @return array of data
+     */
+    public function removeProductFromWishlist($params)
+    {
+        try {
+            CustomerWishlist::where('id', $params['wishlist_id'])->forceDelete();
+            return true;
+        } catch (Exception $e) {
+            return $this->sendError('Error.', $$e->getMessage());
+        }
+    }
+
+    /**
+     * Get wishlist
+     * @param array $params
+     * @throws Exception  
+     * @return array of data
+     */
+    public function getWishlist($params) {
+        $queryResult = DB::select('call getWishlist(?)', [$params]);
+        // $result = collect($queryResult);
+        if(sizeof($queryResult) > 0) {
+            foreach($queryResult as $key => $val) {
+                if($val->is_basket == 0) {
+                    $productUnits = ProductUnits::join('unit_master', 'unit_master.id', '=', 'product_units.unit_id')
+                        ->join('product_location_inventory', 'product_location_inventory.product_units_id', '=', 'product_units.id')
+                        ->where('product_units.status', 1)
+                        ->where('product_units.id', $val->product_units_id)
+                        ->where('product_units.selling_price', '>', 0)
+                        ->where('product_location_inventory.current_quantity', '>', 0)
+                        // ->get(['product_units.id','unit_master.unit','TRUNCATE(product_units.selling_price, 2) AS selling_price','product_units.special_price','product_units.min_quantity','product_units.max_quantity','product_location_inventory.current_quantity'])
+                        ->select(DB::raw('product_units.id, unit_master.unit, TRUNCATE(product_units.selling_price, 2) AS selling_price, IF(product_units.special_price > 0 AND product_units.special_price_start_date <= CURDATE() AND product_units.special_price_end_date >= CURDATE(), TRUNCATE(product_units.special_price, 2), 0.00)  AS special_price, product_units.special_price_start_date, product_units.special_price_end_date, product_units.min_quantity, product_units.max_quantity, product_location_inventory.current_quantity'))
+                        ->get()->toArray();
+                    if(sizeof($productUnits) > 0) {
+                        $queryResult[$key]->product_units = $productUnits;
+                        $queryResult[$key]->product_images = ProductImages::select('image_name')->where('products_id', $val->id)->where('status', 1)->get()->toArray();
+                    } else {
+                        unset($queryResult[$key]);
+                    }
+                } else {
+                    $basketData['basket_id'] = $val->id;
+                    $inputData = json_encode($basketData);
+                    $pdo = DB::connection()->getPdo();
+                    $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, true);
+                    $stmt = $pdo->prepare("CALL validateBasketProducts(?)");
+                    $stmt->execute([$inputData]);
+                    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+                    $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+                    $stmt->closeCursor();
+                    $reponse = json_decode($result['response']);
+                    if($reponse->status == "FAILURE" && $reponse->statusCode != 200) {
+                        unset($queryResult[$key]);
+                    } else {
+                        $pdo->setAttribute(PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, true);
+                        $queryResult[$key]->product_units = array();
+                        $queryResult[$key]->product_images = ProductImages::select('image_name')->where('products_id', $val->id)->where('status', 1)->get()->toArray();
+                    }
+                }
+            }
+        }
+        $queryResult = array_merge($queryResult);
+        return $queryResult;
+    }
 }

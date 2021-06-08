@@ -61,7 +61,7 @@ class ProductsController extends BaseController
         $validator = Validator::make($request->all(), [
             'platform' => 'required',
             'user_id' => 'required|integer',
-            'product_units_id' => 'required|integer',
+            'products_id' => 'required|integer',
             'is_basket' => 'required|integer'
         ]);
         if ($validator->fails()) {
@@ -72,7 +72,7 @@ class ProductsController extends BaseController
             $params = [
                 'platform' => $request->platform,
                 'user_id' => $request->user_id,
-                'product_units_id' => $request->product_units_id,
+                'products_id' => $request->products_id,
                 'is_basket' => $request->is_basket
             ];
 

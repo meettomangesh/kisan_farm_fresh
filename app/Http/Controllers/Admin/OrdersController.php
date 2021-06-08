@@ -11,6 +11,7 @@ use App\Models\CustomerOrders;
 use App\Models\CustomerOrderDetails;
 use DB;
 use App\Helper\PdfHelper;
+use Carbon\Carbon;
 
 class OrdersController extends Controller
 {
@@ -54,17 +55,11 @@ class OrdersController extends Controller
 
     public function checkDeliveryBoyAvailability(Request $request)
     {   
-        print_r($request->all()); exit;
-        $params = [
-            'platform' => $request->platform,
-            'user_id' => $request->user_id,
-            'address_id' => $request->address_id,
-            'delivery_date' => $request->delivery_date,
-        ];
+        $params = $request->all();
         //Create order object to call functions
         $customerOrders = new CustomerOrders();
         // Function call to check delivery boy availability by delivery date
-        $responseDetails = $customerOrders->checkDeliveryBoyAvailability($params);
+        return $customerOrders->checkDeliveryBoyAvailability($params);
     }
 
     public function cancelOrder($orderId)

@@ -16,7 +16,7 @@ class CreateCustomerWishlist extends Migration
         Schema::create('customer_wishlist', function (Blueprint $table) {
             $table->increments('id')->unsigned();
             $table->integer('user_id')->default(0)->unsigned()->index();
-            $table->integer('product_units_id')->default(0)->unsigned()->index();
+            $table->integer('products_id')->default(0)->unsigned()->index();
             $table->tinyInteger('is_basket')->default(0)->unsigned()->index()->comment = "1: Yes, 0: No";
             $table->integer('created_by')->unsigned();
             $table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP'));

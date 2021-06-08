@@ -245,10 +245,7 @@ class Product extends Model
                 if($val->is_basket == 0) {
                     $productUnits = ProductUnits::join('unit_master', 'unit_master.id', '=', 'product_units.unit_id')
                         ->join('product_location_inventory', 'product_location_inventory.product_units_id', '=', 'product_units.id')
-                        // ->where('product_units.status', 1)
-                        ->where('product_units.id', $val->product_units_id)
-                        // ->where('product_units.selling_price', '>', 0)
-                        // ->where('product_location_inventory.current_quantity', '>', 0)
+                        ->where('product_units.products_id', $val->id)
                         ->select(DB::raw('product_units.id, unit_master.unit, TRUNCATE(product_units.selling_price, 2) AS selling_price, IF(product_units.special_price > 0 AND product_units.special_price_start_date <= CURDATE() AND product_units.special_price_end_date >= CURDATE(), TRUNCATE(product_units.special_price, 2), 0.00)  AS special_price, product_units.special_price_start_date, product_units.special_price_end_date, product_units.min_quantity, product_units.max_quantity, product_location_inventory.current_quantity,
                         IF(product_units.status = 1 AND product_location_inventory.current_quantity > 0 AND product_units.selling_price > 0, 1, 0) AS is_active
                         '))
@@ -256,7 +253,11 @@ class Product extends Model
                     $queryResult[$key]->product_units = $productUnits;
                     $queryResult[$key]->product_images = ProductImages::select('image_name')->where('products_id', $val->id)->where('status', 1)->get()->toArray();
                     if($queryResult[$key]->is_active == 1) {
-                        $queryResult[$key]->is_active = $productUnits[0]['is_active'];
+                        foreach($productUnits as $puKey => $puVal) {
+                            if($puVal['is_active'] == 0) {
+                                $queryResult[$key]->is_active = $puVal['is_active'];
+                            }
+                        }
                     }
                 } else {
                     if($queryResult[$key]->is_active == 1) {
@@ -271,7 +272,6 @@ class Product extends Model
                         $stmt->closeCursor();
                         $reponse = json_decode($result['response']);
                         if($reponse->status == "FAILURE" && $reponse->statusCode != 200) {
-                            // unset($queryResult[$key]);
                             $queryResult[$key]->is_active = 0;
                         }
                     } 

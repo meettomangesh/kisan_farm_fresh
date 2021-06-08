@@ -94,7 +94,8 @@
                             @if($customerOrder->customer_invoice_url)
                             <a class=""  target="_blank" data-toggle="tooltip" data-placement="top" title="{{ trans('cruds.order.fields.customer_invoice_url') }}" href="{{ $customerOrder->customer_invoice_url }}">
                                 <!-- {{ trans('cruds.order.fields.customer_invoice_url') }} -->
-                                <i class="fa fa-file-pdf-o" aria-hidden="true"></i>
+                                <i class="fa fa-money" aria-hidden="true"></i>
+                                
                             </a>
                             @endif
                             @if($customerOrder->delivery_boy_invoice_url)

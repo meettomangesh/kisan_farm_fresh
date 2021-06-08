@@ -19,7 +19,7 @@
                         <th>{{ trans('cruds.order.fields.payment_type') }}</th>
                         <th>{{ trans('cruds.order.fields.delivery_date') }}</th>
                         <th>{{ trans('cruds.order.fields.status') }}</th>
-                        <th>{{ trans('cruds.order.fields.actions') }}</th>
+                        <th  width="30%">{{ trans('cruds.order.fields.actions') }}</th>
                     </tr>
                     <tr>
                         <th></th>
@@ -67,32 +67,40 @@
                         </td>
                         <td>
                             @can('order_show')
-                            <a class="btn btn-xs btn-primary" href="{{ route('admin.orders.show', $customerOrder->id) }}">
-                                {{ trans('global.view') }}
-                            </a><br>
+                            <a class="" data-toggle="tooltip" data-placement="top" title="{{ trans('global.view') }}" href="{{ route('admin.orders.show', $customerOrder->id) }}">
+                                <!-- {{ trans('global.view') }} -->
+                                <i class="fa fa-eye" aria-hidden="true"></i>
+                            </a>
                             @endcan
                             @can('order_cancel')
                             @if($customerOrder->order_status == 1 || $customerOrder->order_status == 2)
-                            <button class="btn btn-xs btn-primary cancel_order" data-id="{{ $customerOrder->id }}">
-                                {{ trans('cruds.order.fields.cancel_order') }}
-                            </button><br>
+                            <!-- <button class=" cancel_order"   data-toggle="tooltip" data-placement="top" title="{{ trans('cruds.order.fields.cancel_order') }}" data-id="{{ $customerOrder->id }}"> -->
+                            <a class="cancel_order" data-toggle="tooltip" data-placement="top" title="{{ trans('cruds.order.fields.cancel_order') }}" data-id="{{ $customerOrder->id }}" href="javascript:void(0);">
+                                <!-- {{ trans('cruds.order.fields.cancel_order') }} -->
+                                <i class="fa fa-times" aria-hidden="true"></i>
+                            <!-- </button> -->
+                            </a>
                             @endif
                             @endcan
-                            @can('assign_order_delivery_boy')                      
+                            @can('assign_order_delivery_boy')
+                                             
                             @if($customerOrder->delivery_date < date('Y-m-d') && ($customerOrder->delivery_boy_id == 0 || !($customerOrder->order_status == 4 || $customerOrder->order_status == 5)))
-                            <a class="btn btn-xs btn-primary" href="{{ route('admin.orders.reAssign', $customerOrder->id) }}">
-                                {{ trans('cruds.order.fields.re_assign_delivery_boy') }}
+                            <a class="" data-toggle="tooltip" data-placement="top" title="{{ trans('cruds.order.fields.re_assign_delivery_boy') }}" href="{{ route('admin.orders.reAssign', $customerOrder->id) }}">
+                                <!-- {{ trans('cruds.order.fields.re_assign_delivery_boy') }} -->
+                                <i class="fa fa-refresh" aria-hidden="true"></i>
                             </a>
                             @endif
                             @endcan
                             @if($customerOrder->customer_invoice_url)
-                            <a class="btn btn-xs btn-primary"  target="_blank" href="{{ $customerOrder->customer_invoice_url }}">
-                                {{ trans('cruds.order.fields.customer_invoice_url') }}
+                            <a class=""  target="_blank" data-toggle="tooltip" data-placement="top" title="{{ trans('cruds.order.fields.customer_invoice_url') }}" href="{{ $customerOrder->customer_invoice_url }}">
+                                <!-- {{ trans('cruds.order.fields.customer_invoice_url') }} -->
+                                <i class="fa fa-file-pdf-o" aria-hidden="true"></i>
                             </a>
                             @endif
                             @if($customerOrder->delivery_boy_invoice_url)
-                            <a class="btn btn-xs btn-primary"  target="_blank" href="{{ $customerOrder->delivery_boy_invoice_url }}">
-                                {{ trans('cruds.order.fields.delivery_boy_invoice_url') }}
+                            <a class=""  target="_blank" data-toggle="tooltip" data-placement="top" title="{{ trans('cruds.order.fields.delivery_boy_invoice_url') }}" href="{{ $customerOrder->delivery_boy_invoice_url }}">
+                                <!-- {{ trans('cruds.order.fields.delivery_boy_invoice_url') }} -->
+                                <i class="fa fa-file-pdf-o" aria-hidden="true"></i>
                             </a>
                             @endif
                         </td>

@@ -65,8 +65,10 @@
             var actionUrl = '{{ route("admin.orders.checkDeliveryBoyAvailability", "") }}';
             var formData = new FormData();
             formData.append("delivery_details[date]", deliveryDate);
+            formData.append("delivery_date", deliveryDate);
             formData.append("address_id", addressId);
             formData.append("user_id", userId);
+            formData.append("is_admin", 1);
             if (deliveryDate) {
                 $.ajax({
                     url: actionUrl,
@@ -81,6 +83,12 @@
                     },
                     success: function(data) {
                         console.log(data);
+                        if (data.status === true) {
+                            $('#form_delivery_date_error').html('<div class="alert alert-success" role="alert">'+data.message+'</div>');
+                        } else {
+                            $('#form_delivery_date_error').html('<div class="alert alert-warning" role="alert">'+data.message+'/div');
+                        }
+
                         // var $ell = $('#' + currentForm).find("#users");
                         // $ell.empty();
                         // $ell.select2("val", '');
@@ -94,6 +102,7 @@
                         // });
                     },
                     error: function(jqXhr, json, errorThrown) {
+                        $('#form_delivery_date_error').html('<div class="alert alert-warning" role="alert">'+"Please try again later."+'</div>');
                         // var errors = jqXhr.responseJSON;
                         // var errorsHtml = '';
                         // $.each(errors, function(key, value) {
@@ -108,6 +117,9 @@
                         // });
                     }
                 });
+                setTimeout(function() {
+                    $('#form_delivery_date_error').html('');
+                }, 2000);
             } else {
 
             }

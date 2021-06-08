@@ -64,7 +64,7 @@ class CustomerOrders extends Model
         return $this->hasMany(CustomerOrderDetails::class, 'order_id');
     }
 
-    protected function cancelOrder($orderId, $type, $reason)
+    protected function cancelOrder($orderId, $type="", $reason="")
     {
         $cancelData = array('order_id' => $orderId, 'type' => $type, 'reason' => $reason);
         $inputData = json_encode($cancelData);
@@ -580,6 +580,7 @@ class CustomerOrders extends Model
     public function checkDeliveryBoyAvailability($params)
     {
         // validate customer
+        $is_admin = (isset($params['is_admin']) && $params['is_admin'] == 1) ? 1 : 0;
         $usersData = User::select('id')->where('id', $params['user_id'])->where('status', 1)->get()->toArray();
         if (sizeof($usersData) == 0) {
             return array("status" => false, "message" => "Invalid user");
@@ -591,7 +592,7 @@ class CustomerOrders extends Model
             return array("status" => false, "message" => "Invalid user address");
         }
 
-        if ($params['delivery_details']['date'] <= date('Y-m-d')) {
+        if (($params['delivery_details']['date'] <= date('Y-m-d')) && $is_admin == 0) {
             return array("status" => false, "message" => "Invalid delivery date, must be greater than current date");
         }
 
@@ -606,6 +607,25 @@ class CustomerOrders extends Model
         $reponse = json_decode($result['response']);
         if ($reponse->status == "FAILURE" && $reponse->statusCode != 200) {
             return array("status" => false, "message" => "Delivery boy is not available");
+        }
+        return array("status" => true, "message" => "Delivery boy is available");
+    }
+
+    public function assignDeliveryBoyToOrder($params){
+
+        $assignData['order_id'] = $params['order_id'];
+        $assignData['delivery_date'] = $params['delivery_details']['date'];
+        $inputData = json_encode($assignData);
+        $pdo = DB::connection()->getPdo();
+        $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, true);
+        $stmt = $pdo->prepare("CALL assignDeliveryBoyToOrder(?)");
+        $stmt->execute([$inputData]);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+        $stmt->closeCursor();
+        $reponse = json_decode($result['response']);
+        if ($reponse->status == "FAILURE" && $reponse->statusCode != 200) {
+            return array("status" => false, "message" => "Delivery boy assigned successfully!");
         }
         return array("status" => true, "message" => "Delivery boy is available");
     }

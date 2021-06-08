@@ -27,7 +27,7 @@ checkDeliveryBoyAvailability:BEGIN
         JOIN pin_code_region AS pcr ON pcr.pin_code_id = pc.id
         JOIN region_user AS ru ON ru.region_id = pcr.region_id
         JOIN region_master AS rm ON rm.id = ru.region_id
-        WHERE u.id = userId AND ua.address_id = addressId AND u.status = 1 AND ua.status = 1 AND pc.status = 1 AND pcr.status = 1 AND ru.status = 1 AND rm.status = 1
+        WHERE u.id = userId AND ua.id = addressId AND u.status = 1 AND ua.status = 1 AND pc.status = 1 AND pcr.status = 1 AND ru.status = 1 AND rm.status = 1
         AND IF((SELECT status FROM user_details WHERE user_id = ru.user_id AND role_id = 3) = 2, true, false);
 
         DECLARE CONTINUE HANDLER FOR NOT FOUND SET notFound = 1;

@@ -44,6 +44,7 @@ class User extends Authenticatable
         'status',
         'password',
         'remember_token',
+        'referred_by_user_id',
         'created_at',
         'updated_at',
         'deleted_at',
@@ -133,7 +134,7 @@ class User extends Authenticatable
             }
         } catch (Exception $e) {
             //  throw new Exception($e->getMessage());
-            return $this->sendError('Error.', $$e->getMessage());
+            return $this->sendError('Error.', $e->getMessage());
         }
     }
 
@@ -201,7 +202,7 @@ class User extends Authenticatable
             }
             return true;
         } catch (Exception $e) {
-            return $this->sendError('Error.', $$e->getMessage());
+            return $this->sendError('Error.', $e->getMessage());
         }
     }
 
@@ -231,6 +232,25 @@ class User extends Authenticatable
             return ["status" => true, "message" => "Password changed successfully"];
         }
         return ["status" => false, "message" => "Failed to change password"];
+    }
+
+    /**
+     * Verify and Get referred by user
+     * @param array $params
+     * @throws Exception  
+     * @return array of data
+     */
+    public function verifyAndGetReferredByUser($referralCouponCode)
+    {
+        try {
+            $user = User::where('referral_code', $referralCouponCode)->first();
+            if(!$user) {
+                return ["status" => false];
+            }
+            return ["status" => true, "referred_by_user_id" => $user['id']];
+        } catch (Exception $e) {
+            return $this->sendError('Error.', $e->getMessage());
+        }
     }
 
 }

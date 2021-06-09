@@ -243,6 +243,12 @@ class CustomerOrders extends Model
                 $updateOrder->save();
             }
         }
+
+        if (isset($params['payment_details']['promo_code']) && !empty($params['payment_details']['promo_code']) && $params['payment_details']['promo_code'] != '') {
+            $vpcData = array("promo_code" => $params['payment_details']['promo_code'], "user_id" => $params['user_id']);
+            $promoCodes = new PromoCodes();
+            $promoCodes->markPromoCodeAsUtilized($vpcData);
+        }
         $params['order_id'] = $orderId;
         $params['razorpay_order_id'] = $razorPayOrderId;
         $params['invoice_template'] = 'IN_APP_INVOICE_AFTER_ORDER';

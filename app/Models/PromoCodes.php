@@ -58,4 +58,15 @@ class PromoCodes extends Model
         }
         return true;
     }
+
+    public function markPromoCodeAsUtilized($params) {
+        PromoCodes::where('promo_code', $params['promo_code'])->where('user_id', $params['user_id'])->update(['is_code_used'=>1]);
+        return true;
+    }
+
+    public function markPromoCodeAsExpired() {
+        $curDate = date('Y-m-d');
+        PromoCodes::where('end_date', '<', $curDate)->update(['status'=>2]);
+        return true;
+    }
 }

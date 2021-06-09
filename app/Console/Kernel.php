@@ -18,6 +18,7 @@ class Kernel extends ConsoleKernel
         \App\Console\Commands\BirthdayWishes::class,
         \App\Console\Commands\LowQuantityProduct::class,
         \App\Console\Commands\OrderDeliveryDay::class,
+        \App\Console\Commands\ExpirationOfPromoCodes::class,
     ];
 
     /**
@@ -39,6 +40,9 @@ class Kernel extends ConsoleKernel
 
         // Order delivery day
         // $schedule->command('orderdeliveryday')->dailyAt('8:00');
+
+        // Expiration of promo codes
+        $schedule->command('expirationofpromocodes')->dailyAt('1:00');
     }
 
     /**

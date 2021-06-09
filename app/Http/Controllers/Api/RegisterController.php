@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\API\BaseController as BaseController;
 use App\User;
 use App\Models\UserDetails;
+use App\Models\PromoCodes;
 use Illuminate\Support\Facades\Auth;
 use Validator;
 use App\Helper\DataHelper;
@@ -38,6 +39,16 @@ class RegisterController extends BaseController
         }
 
         $input = $request->all();
+        $input['referred_by_user_id'] = 0;
+        // Verify and Get referred by user
+        if(isset($input['referral_coupon_code']) && !empty($input['referral_coupon_code']) && $input['referral_coupon_code'] != "") {
+            $userObj = new User();
+            $response = $userObj->verifyAndGetReferredByUser($input['referral_coupon_code']);
+            if($response["status"] == false) {
+                return $this->sendError('Invalid referral code.', []);
+            }
+            $input['referred_by_user_id'] = isset($response["referred_by_user_id"]) ? $response["referred_by_user_id"] : 0;
+        }
         $input['email'] = $request->email_address;
         $input['password'] = bcrypt($input['password']);
         $input['referral_code'] = DataHelper::generateBarcodeString(9);
@@ -56,6 +67,7 @@ class RegisterController extends BaseController
 
         // $success['token'] =  $user->createToken(getenv('APP_NAME'))->accessToken;
         $success['name'] =  $user->first_name . " " . $user->last_name;
+        $success['referral_code'] = $user->referral_code;
         $success['id'] = $user->id;
         $success['role'] = $user->load('roles')->roles[0]->id;
         $success['role_name'] = $user->load('roles')->roles[0]->title;
@@ -74,6 +86,12 @@ class RegisterController extends BaseController
                 ]
             );
         }
+
+        // Check for referral registration campaign
+        /* $promoCodes = new PromoCodes();
+        $inputs['user_id'] = $user->id;
+        $inputs['referral_user_type'] = 2;
+        $promoCodes->referralCampaign($inputs); */
         return $this->sendResponse($success, 'User register successfully.');
     }
 
@@ -237,6 +255,7 @@ class RegisterController extends BaseController
             $success['marital_status'] =  $user->marital_status;
             $success['gender'] =  $user->gender;
             $success['email'] =  $user->email;
+            $success['referral_code'] = $user->referral_code;
             $success['id'] = $user->id;
             $success['role'] = (!empty($user->load('roles')->roles->toArray())) ? $user->load('roles')->roles[0]->id : 0;
             $success['role_name'] = (!empty($user->load('roles')->roles->toArray())) ? $user->load('roles')->roles[0]->title : "";

@@ -12,8 +12,7 @@ siteObjJs.admin.communicationMessageJs = function () {
             var formElement = $(this).closest("form");
             var formId = formElement.attr("id");
             $("#" + formId + " .select2me").select2("val", "");
-            //$("#" + formId).find("#merchant_id").select2("val", "");
-            //$("#" + formId).find('#merchant_id option[value="0"]').prop("selected", true);
+
             var validator = $('#' + formId).validate();
             validator.resetForm();
             formElement.find('#pos_ids').tagsinput('removeAll');
@@ -23,9 +22,6 @@ siteObjJs.admin.communicationMessageJs = function () {
             $("#" + formId).find('#today_time-error').html('');
         });
 
-        $('#customer-communication-message-table').on('click', '.filter-cancel', function (e) {
-            $("#merchant-name-search").select2('val', '');
-        });
 
     };
     // Method to fetch and place edit form with data using ajax call
@@ -77,9 +73,9 @@ siteObjJs.admin.communicationMessageJs = function () {
 
         var currentForm1 = $(form);
         if (currentForm1.find('#email').is(':checked') || currentForm1.find('#push_notification').is(':checked') || currentForm1.find('#sms').is(':checked') || currentForm1.find('#sms_notification').is(':checked')) {
-            
+
         } else {
-            
+
             var error = 'Please select atleast one Message Notify By.';
             Metronic.alert({
                 type: 'danger',
@@ -99,565 +95,9 @@ siteObjJs.admin.communicationMessageJs = function () {
         // validator.showErrors({ field: 'Validation failed'} );
         // console.log('inside handler');
     };
-    var handleAjaxRequest2 = function (obj, e) {
-
-        var formElement = $(this.currentForm); // Retrive form from DOM and convert it to jquery object
-         var actionUrl = formElement.attr("action");
-        // var actionType = formElement.attr("method");
-        // var formData = formElement.serialize();
-        // var formObj = $('#merchant_id').closest("form");
-        // var currentForm1 = formObj.attr("id");
-      
-        currentForm1 = $(obj);
-        var icon = "check";
-        var messageType = "success";
-
-        if (currentForm1.find('#email').is(':checked') || currentForm1.find('#push_notification').is(':checked') || currentForm1.find('#sms').is(':checked') || currentForm1.find('#sms_notification').is(':checked')) {
-            
-        } else {
-            
-            var error = 'Please select atleast one Message Notify By.';
-            Metronic.alert({
-                type: 'danger',
-                icon: 'times',
-                message: error,
-                container: $('#ajax-response-text'),
-                place: 'prepend',
-                closeInSeconds: siteObjJs.admin.commonJs.constants.alertCloseSec
-            });
-            return false;
-        }
-
-            var validator = currentForm1.validate();
-            validator.resetForm();
-            formElement[0].reset();
-
-        //currentForm1.submit();
-         var formData = new FormData();
-
-
-        var defaultEmail = 0;
-        if (currentForm1.find('#email').is(':checked')) {
-            defaultEmail = 1;
-            if ((currentForm1.find('#for_testing').val() == 1) && (currentForm1.find('#test_email_addresses').val() == '')) {
-                var error = 'Please enter test email.';
-                Metronic.alert({
-                    type: 'danger',
-                    icon: 'times',
-                    message: error,
-                    container: $('#ajax-response-text'),
-                    place: 'prepend',
-                    closeInSeconds: siteObjJs.admin.commonJs.constants.alertCloseSec
-                });
-                return false;
-            }
-        }
-        formData.append('email', defaultEmail);
-        
-        var defaultPushNotification = 0;
-        if (currentForm1.find('#push_notification').is(':checked')) {
-            defaultPushNotification = 1;
-        }
-        formData.append('push_notification', defaultPushNotification);
-        formData.append('deep_link_screen', currentForm1.find('#deep_link_screen').val());
-
-        var defaultSms = 0;
-        if (currentForm1.find('#sms').is(':checked')) {
-            defaultSms = 1;
-            if ((currentForm1.find('#for_testing').val() == 1) && (currentForm1.find('#test_mobile_numbers').val() == '')) {
-                var error = 'Please enter test mobile number.';
-                Metronic.alert({
-                    type: 'danger',
-                    icon: 'times',
-                    message: error,
-                    container: $('#ajax-response-text'),
-                    place: 'prepend',
-                    closeInSeconds: siteObjJs.admin.commonJs.constants.alertCloseSec
-                });
-                return false;
-            }
-        }
-        formData.append('sms', defaultSms);
-
-        var defaultSmsNotification = 0;
-        if (currentForm1.find('#sms_notification').is(':checked')) {
-            defaultSmsNotification = 1;
-            if ((currentForm1.find('#for_testing').val() == 1) && (currentForm1.find('#test_mobile_numbers').val() == '')) {
-                var error = 'Please enter test mobile number.';
-                Metronic.alert({
-                    type: 'danger',
-                    icon: 'times',
-                    message: error,
-                    container: $('#ajax-response-text'),
-                    place: 'prepend',
-                    closeInSeconds: siteObjJs.admin.commonJs.constants.alertCloseSec
-                });
-                return false;
-            }
-        }
-        formData.append('sms_notification', defaultSmsNotification);
-
-        var defaultMessageType = 0;
-        var radioMessageValue = currentForm1.find("input[name='message_type']:checked").val();
-        if (radioMessageValue == 1) {
-            defaultMessageType = 1;
-        } else if (radioMessageValue == 2) {
-            defaultMessageType = 2;
-        } else if (radioMessageValue == 3) {
-            defaultMessageType = 3;
-        }
-        formData.append('message_title', currentForm1.find('#message_title').val());
-        formData.append('message_type', defaultMessageType);
-        formData.append('offer_id', currentForm1.find('#offer_id').val());
-        formData.append('product_id', currentForm1.find('#product_id').val());
-        formData.append('push_text', currentForm1.find('#push_text').val());
-        formData.append('sms_text', currentForm1.find('#sms_text').val());
-        //formData.append('image_url', currentForm1.find('#image_url').val());
-        formData.append('email_from_name', currentForm1.find('#email_from_name').val());
-        formData.append('email_from_email', currentForm1.find('#email_from_email').val());
-        formData.append('email_subject', currentForm1.find('#email_subject').val());
-        var emailBody = CKEDITOR.instances.email_body.getData()
-        formData.append('email_body', emailBody);
-
-        formData.append('message_send_time', currentForm1.find('#message_send_time').val());
-        var defaultTodayTime = 0;
-        if (currentForm1.find('#send_today').is(':checked')) {
-            defaultTodayTime = 1;
-        }
-        formData.append('send_today', defaultTodayTime);
-        formData.append('today_time', currentForm1.find('#today_time').val());
-
-        var defaultStatus = 0;
-        var radioStatus = currentForm1.find("input[name='status']:checked").val();
-        if (radioStatus == 1) {
-            defaultStatus = 1;
-        } else if (radioStatus == 0) {
-            defaultStatus = 0;
-        }
-        formData.append('status', defaultStatus);
-
-        formData.append('for_testing', currentForm1.find('#for_testing').val());
-        formData.append('test_email_addresses', currentForm1.find('#test_email_addresses').val());
-        formData.append('test_mobile_numbers', currentForm1.find('#test_mobile_numbers').val());
-
-        var tags = currentForm1.find("input#email_tags").tagsinput('items');
-        formData.append('email_tags', tags);
-        console.log('on line 220'); 
-        //currentForm1.submit();
-        console.log('on line 222'); 
-        $.ajax(
-            {
-                url: actionUrl,
-                type: actionType,
-                data: formData,
-                cache: false,
-                processData: false,
-                contentType: false,
-                "headers": { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
-                success: function (data) {
-                    //data: return data from server
-                    if (data.status === "error") {
-                        icon = "times";
-                        messageType = "danger";
-                    }
-
-                    //Empty the form fields
-                    $("#ajax-response-text").html("");
-
-                    $('.form-group').removeClass('has-error');
-                    $('.form-group').removeClass('has-success');
-                    $('.help-block-error').remove();
-
-                    formElement.find('#push-text-div').hide();
-                    formElement.find('#sms-text-div').hide();
-                    formElement.find('#testing-mode-div').hide();
-
-                    var $el = formElement.find("#loyalty_id");
-                    $el.empty(); // remove old options
-                    $el.append($('<option>', {
-                        value: '',
-                        text: 'Select Loyalty',
-                    }));
-                    var $elt = formElement.find("#loyalty_tier_id");
-                    $elt.empty(); // remove old options
-                    $elt.append($('<option>', {
-                        value: '',
-                        text: 'Select Loyalty Tier',
-                    }));
-                    var $elo = formElement.find("#offer_id");
-                    $elo.empty(); // remove old options
-                    $elo.append($('<option>', {
-                        value: '',
-                        text: 'Select Offer',
-                    }));
-                    formElement.find("input[type=text], textarea").val("");
-                    formElement.find("#merchant_id").select2("val", "");
-                    formElement.find("#loyalty_id").select2("val", "");
-                    formElement.find("#loyalty_tier_id").select2("val", "");
-                    formElement.find("#offer_id").select2("val", "");
-
-                    formElement.find('#loyalty_id').attr('disabled', true);
-                    formElement.find('#loyalty_tier_id').attr('disabled', true);
-                    formElement.find('#offer_id').attr('disabled', true);
-                    formElement.find("input[name=message_type][value=1]").prop('checked', 'checked');
-                    formElement.find("input[name=status][value=1]").prop('checked', 'checked');
-                    $.uniform.update();
-                    //formElement.find('#offer_image_url').empty();
-                    CKEDITOR.instances.email_body.setData('');
-                    formElement.find('#merchant_id option[value="0"]').prop("selected", true);
-                    formElement.find("#merchant_id").select2("val", "0");
-
-                    formElement.find("#row-message-send-date-div").show();
-                    formElement.find("#date-picker-btn").attr('disabled', false);
-                    formElement.find("#message_send_time").prop('disabled', false);
-                    formElement.find("#send_today_message").html('');
-
-                    formElement.find('#email_tags').tagsinput('removeAll');
-                    var validator = formElement.validate();
-                    validator.resetForm();
-                    formElement[0].reset();
-                    formElement.find('#sms_notification').attr("disabled", false);
-                    formElement.find('#push_notification').attr("disabled", false);
-                    formElement.find('#sms').attr("disabled", false);
-                    //trigger cancel button click event to collapse form and show title of add page
-                    $('.edit-form-main').hide();
-                    $('.add-form-main').show();
-
-                    $('.collapse.box-expand-form').trigger('click');
-                    //reload the data in the datatable
-                    grid.getDataTable().ajax.reload();
-                    Metronic.alert({
-                        type: messageType,
-                        icon: icon,
-                        message: data.message,
-                        container: $('#ajax-response-text'),
-                        place: 'prepend',
-                        closeInSeconds: siteObjJs.admin.commonJs.constants.alertCloseSec
-                    });
-                },
-                error: function (jqXhr, json, errorThrown) {
-                    var errors = jqXhr.responseJSON;
-                    var errorsHtml = '';
-                    $.each(errors, function (key, value) {
-                        errorsHtml += value[0] + '<br />';
-                    });
-                    //alert(errorsHtml, "Error " + jqXhr.status + ': ' + errorThrown);
-                    Metronic.alert({
-                        type: 'danger',
-                        message: errorsHtml,
-                        container: $('#ajax-response-text'),
-                        place: 'prepend',
-                        closeInSeconds: siteObjJs.admin.commonJs.constants.alertCloseSec
-                    });
-                }
-            }
-        );
-    };
-
-    var handleTable = function () {
-
-        grid = new Datatable();
-        grid.init({
-            src: $('#customer-communication-message-table'),
-            loadingMessage: 'Loading...',
-            dataTable: {
-                'language': {
-                    'info': '<span class="seperator">|</span><b>Total _TOTAL_ record(s) found</b>',
-                    'infoEmpty': '',
-                },
-                "bStateSave": false,
-                "lengthMenu": siteObjJs.admin.commonJs.constants.gridLengthMenu,
-                "pageLength": siteObjJs.admin.commonJs.constants.recordsPerPage,
-                "columns": [
-                    { data: null, name: 'rownum', searchable: false, orderable: false },
-                    { data: 'id', name: 'id', visible: false },
-                    { data: 'merchant_loyalty_name', name: 'merchant_loyalty_name', searchable: false, orderable: false },
-                    { data: 'notify_type', name: 'notify_type', searchable: false, orderable: false },
-                    { data: 'message_type_name', name: 'message_type_name', searchable: false, orderable: false },
-                    { data: 'message_title', name: 'message_title', searchable: false, orderable: false },
-                    { data: 'message_send_date_time', name: 'message_send_date_time', searchable: false, orderable: false },
-                    { data: 'email_count', name: 'email_count', searchable: false, orderable: false },
-                    { data: 'sms_count', name: 'sms_count', searchable: false, orderable: false },
-                    { data: 'push_notification_count', name: 'push_notification_count', searchable: false, orderable: false },
-                    { data: 'push_notification_received_count', name: 'push_notification_received_count', searchable: false, orderable: true },
-                    { data: 'status', name: 'status', searchable: false, orderable: false },
-                    { data: 'action', name: 'action', orderable: false, searchable: false }
-                ],
-                "drawCallback": function (settings) {
-                    var api = this.api();
-                    var rows = api.rows({ page: 'current' }).nodes();
-                    var last = null;
-                    var page = api.page();
-                    var recNum = null;
-                    var displayLength = settings._iDisplayLength;
-                    api.column(0, { page: 'current' }).data().each(function (group, i) {
-                        recNum = ((page * displayLength) + i + 1);
-                        $(rows).eq(i).children('td:first-child').html(recNum);
-                    });
-
-                    api.column(10, { page: 'current' }).data().each(function (group, i) {
-                        var status = $(rows).eq(i).children('td:nth-child(11)').html();
-                        var statusBtn = '';
-                        if (status == 1) {
-                            statusBtn = '<span class="label label-sm label-success">active</span>';
-                        } else {
-                            statusBtn = '<span class="label label-sm label-danger">inactive</span>';
-                        }
-                        $(rows).eq(i).children('td:nth-child(11)').html(statusBtn);
-                    });
-                },
-                "ajax": {
-                    "url": "customer-communication-message/data",
-                    "type": "GET"
-                },
-                "order": [
-                    [1, "desc"]
-                ]// set first column as a default sort by asc
-            }
-        });
-        $('#data-search').keyup(function () {
-            grid.getDataTable().search($(this).val()).draw();
-        });
-
-        $(".form-filter-attr").keyup(function (e) {
-            var code = e.which; // recommended to use e.which, it's normalized across browsers
-            if (code == 13)
-                e.preventDefault();
-            if (code == 32 || code == 13 || code == 188 || code == 186) {
-                $('.filter-submit').click();
-            }
-        });
-        // For drop down filter
-        $(".form-filter-select-attr").change(function () {
-            $('.filter-submit').click();
-        })
-    };
-    $('body').on("change", "#loyalty_tier_id", function () {
-        var formObj = '#' + $(this).closest('form').attr('id');
-        if ($(formObj + ' #loyalty_tier_id option:selected').val() == 0) {
-            //$('#location_id').select2("val", '');
-            $(formObj + ' #loyalty_tier_id').select2("val", 0);
-
-        }
-
-    });
-    var getMerchantLoyaltyProgram = function (currentForm) {
-        $('body').on('change', '#merchant_id', function (e) {
-            var actionUrl = adminUrl + '/communications/get-loyalty-program-details/' + $(this).val();
-
-            $.ajax({
-                url: actionUrl,
-                cache: false,
-                type: "GET",
-                processData: false,
-                contentType: false,
-                dataType: "json",
-                success: function (data) {
-                    if (data.loyalty_details != '') {
-                        var $el = $('#' + currentForm).find("#loyalty_id");
-                        $el.empty();
-                        //return false;
-                        $('#' + currentForm).find('#loyalty_id').attr('disabled', false);
-                        $.each(data.loyalty_details, function (value, key) {
-                            $el.append($("<option selected='selected'></option>").attr("value", value).text(key));
-                        });
-
-                        var $ell = $('#' + currentForm).find("#loyalty_tier_id");
-                        $ell.empty();
-                        //$ell.append($("<option></option>").attr("value", '').text('Select Loyalty Tier'));
-                        $('#' + currentForm).find('#loyalty_tier_id').attr('disabled', false);
-
-                        /*$.each(data.tier_details, function (value, key) {
-                            $ell.append($("<option selected='selected'></option>").attr("value", value).text(key));
-                        });*/
-                        $ell.select2("val", '');
-                        $ell.empty(); // remove old options  
-                        $ell.append($('<option>', {
-                            value: 0,
-                            text: 'All',
-                        }));
-                        $.each(data.tier_details, function (value, key) {
-                            $ell.append($('<option>', {
-                                value: value,
-                                text: key,
-                            }));
-                        });
-
-                        //$('#' + currentForm).find("#loyalty_tier_id").select2("val", '');
-                        //                        $('#' + currentForm).find('#gender').attr('disabled', false);
-
-                        var $offer = $('#' + currentForm).find("#offer_id");
-                        $offer.empty();
-                        $offer.append($("<option></option>").attr("value", '').text('Select Offer'));
-
-                        var $product = $('#' + currentForm).find("#product_id");
-                        $product.empty();
-                        $product.append($("<option></option>").attr("value", '').text('Select Product'));
-
-                        $('#' + currentForm).find('#email_subject').val('');
-                        CKEDITOR.instances.email_body.setData('');
-                        $('#' + currentForm).find("input:radio[name='message_type']").each(function () {
-                            if ($(this).parent().hasClass('checked')) {
-                                if ($(this).attr("value") == 1) {
-                                    $('#' + currentForm).find('#offer_id').attr('disabled', false);
-                                    $.each(data.offer_list, function (value, key) {
-                                        $offer.append($("<option></option>").attr("value", value).text(key));
-                                    });
-                                    $('#' + currentForm).find("#offer_id").select2("val", '');
-                                } else if ($(this).attr("value") == 2) {
-                                    $('#' + currentForm).find("#offer_id").select2("val", '');
-                                    $('#' + currentForm).find('#offer_id').attr('disabled', true);
-                                    $('#' + currentForm).find("#product_id").select2("val", '');
-                                    $('#' + currentForm).find('#product_id').attr('disabled', true);
-                                } else if ($(this).attr("value") == 3) {
-                                    $('#' + currentForm).find('#product_id').attr('disabled', false);
-                                    $.each(data.product_list, function (value, key) {
-                                        $product.append($("<option></option>").attr("value", value).text(key));
-                                    });
-                                    $('#' + currentForm).find("#product_id").select2("val", '');
-
-                                }
-                            }
-                        });
-
-                    } else {
-
-                        var $el = $('#' + currentForm).find("#loyalty_id");
-                        $el.empty(); // remove old options
-                        $el.append($('<option>', {
-                            value: '',
-                            text: 'Select Loyalty',
-                        }));
-                        var $elt = $('#' + currentForm).find("#loyalty_tier_id");
-                        $elt.empty(); // remove old options
-                        $elt.append($('<option>', {
-                            value: '',
-                            text: 'Select Loyalty Tier',
-                        }));
-                        var $elo = $('#' + currentForm).find("#offer_id");
-                        $elo.empty(); // remove old options
-                        $elo.append($('<option>', {
-                            value: '',
-                            text: 'Select Offer',
-                        }));
-
-                        $('#' + currentForm).find("#merchant_id").select2("val", "");
-                        $('#' + currentForm).find("#loyalty_id").select2("val", "");
-                        $('#' + currentForm).find("#loyalty_tier_id").select2("val", "");
-                        $('#' + currentForm).find("#offer_id").select2("val", "");
-
-                        $('#' + currentForm).find('#loyalty_id').attr('disabled', true);
-                        $('#' + currentForm).find('#loyalty_tier_id').attr('disabled', true);
-                        $('#' + currentForm).find('#offer_id').attr('disabled', true);
-                        $('#' + currentForm).find('#merchant_id option[value="0"]').attr("selected", true);
-                        $('#' + currentForm).find("#merchant_id").select2("val", "0");
-
-                    }
-                    var $elDeep = $('#' + currentForm).find("#deep_link_screen");
-                    $elDeep.empty();
-                    $elDeep.append($("<option></option>").attr("value", '').text('Select Deep Link Screen'));
-                    $.each(data.merchant_deep_link_screen_list, function (value, key) {
-                        $elDeep.append($("<option></option>").attr("value", value).text(key));
-                    });
-
-                    //deep link screen disable for merchant offer
-                    $('#' + currentForm).find('#deep_link_screen').prop('disabled', false);
-                    $('#' + currentForm).find("input:radio[name='message_type']").each(function () {
-                        if ($(this).parent().hasClass('checked')) {
-                            if ($(this).attr("value") == 1) {
-                                if ($('#' + currentForm).find('#deep_link_screen option[value="MERCHANT_OFFERS"]').length > 0) {
-                                    $('#' + currentForm).find('#deep_link_screen').select2('val', 'MERCHANT_OFFERS');
-                                    $('#' + currentForm).find('#deep_link_screen').prop('disabled', true);
-                                }
-                                else {
-                                    $('#' + currentForm).find('#deep_link_screen').prop('disabled', false);
-                                    $('#' + currentForm).find('#deep_link_screen').select2('val', '');
-                                }
-                            } else if ($(this).attr("value") == 3) {
-                                if ($('#' + currentForm).find('#deep_link_screen option[value="MERCHANT_SHOP"]').length > 0) {
-                                    $('#' + currentForm).find('#deep_link_screen').select2('val', 'MERCHANT_SHOP');
-                                    $('#' + currentForm).find('#deep_link_screen').prop('disabled', true);
-                                } else {
-                                    $('#' + currentForm).find('#deep_link_screen').prop('disabled', false);
-                                    $('#' + currentForm).find('#deep_link_screen').select2('val', '');
-                                }
-                            } else {
-                                $('#' + currentForm).find('#deep_link_screen').prop('disabled', false);
-                                $('#' + currentForm).find('#deep_link_screen').select2('val', '');
-                            }
-                        }
-                    });
-
-                },
-                error: function (jqXhr, json, errorThrown) {
-                    var errors = jqXhr.responseJSON;
-                    var errorsHtml = '';
-                    $.each(errors, function (key, value) {
-                        errorsHtml += value[0] + '<br />';
-                    });
-                    Metronic.alert({
-                        type: 'danger',
-                        message: errorsHtml,
-                        container: $('#ajax-response-text'),
-                        place: 'prepend',
-                        closeInSeconds: siteObjJs.admin.commonJs.constants.alertCloseSec
-                    });
-                }
-            });
-        });
-    };
 
 
 
-
-    var getMerchantLoyaltyOfferData = function (currentForm) {
-
-
-        $('body').on('change', '#offer_id', function (e) {
-            if ($(this).val() > 0) {
-
-                var actionUrl = adminUrl + '/communications/get-merchant-loyalty-offer-data/' + $(this).val();
-
-                $.ajax({
-                    url: actionUrl,
-                    cache: false,
-                    type: "GET",
-                    processData: false,
-                    contentType: false,
-                    dataType: "json",
-                    success: function (data) {
-                        $('#' + currentForm).find('#email_subject').val('');
-                        //$('#'+currentForm).find('#image_url').val('');
-                        $('#' + currentForm).find('#email_body').val('');
-                        //$('#'+currentForm).find("#offer_image_url").html('');
-
-                        $('#' + currentForm).find('#email_subject').val(data.offer_title);
-                        /*if (data.image_url != '') {
-                         $('#'+currentForm).find('#image_url').val(data.image_url);
-                         $('#'+currentForm).find("#offer_image_url").html('<img class="img-thumbnail" src="' + data.image_url + '" alt="' + data.offer_title + '">');
-                         }*/
-                        CKEDITOR.instances.email_body.setData('<p><img class="img-thumbnail" src="' + data.image_url + '" alt="' + data.offer_title + '"></p>' + data.long_description);
-                        //CKEDITOR.instances['email_body'].setReadOnly(true);
-                        //currentForm.find('#email_body').val(data.long_description);
-                    },
-                    error: function (jqXhr, json, errorThrown) {
-                        var errors = jqXhr.responseJSON;
-                        var errorsHtml = '';
-                        $.each(errors, function (key, value) {
-                            errorsHtml += value[0] + '<br />';
-                        });
-                        Metronic.alert({
-                            type: 'danger',
-                            message: errorsHtml,
-                            container: $('#ajax-response-text'),
-                            place: 'prepend',
-                            closeInSeconds: siteObjJs.admin.commonJs.constants.alertCloseSec
-                        });
-                    }
-                });
-            }
-        });
-    };
 
     var enableTestingModeDiv = function (currentForm) {
         var currentForm = $('#' + currentForm);
@@ -795,31 +235,15 @@ siteObjJs.admin.communicationMessageJs = function () {
 
                 //deep link screen disable for merchant offer
                 currentForm.find('#deep_link_screen').prop('disabled', false);
-                currentForm.find("input:radio[name='message_type']").each(function () {
-                    if ($(this).parent().hasClass('checked')) {
-                        if ($(this).attr("value") == 1) {
-                            if (currentForm.find('#deep_link_screen option[value="MERCHANT_OFFERS"]').length > 0) {
-                                currentForm.find('#deep_link_screen').select2('val', 'MERCHANT_OFFERS');
-                                currentForm.find('#deep_link_screen').prop('disabled', true);
-                            } else {
-                                currentForm.find('#deep_link_screen').prop('disabled', false);
-                                currentForm.find('#deep_link_screen').select2('val', '');
-                            }
-                        } else if ($(this).attr("value") == 3) {
-                            if (currentForm.find('#deep_link_screen option[value="MERCHANT_SHOP"]').length > 0) {
-                                currentForm.find('#deep_link_screen').select2('val', 'MERCHANT_SHOP');
-                                currentForm.find('#deep_link_screen').prop('disabled', true);
-                            } else {
-                                currentForm.find('#deep_link_screen').prop('disabled', false);
-                                currentForm.find('#deep_link_screen').select2('val', '');
-                            }
-                        } else {
-                            currentForm.find('#deep_link_screen').prop('disabled', false);
-                            currentForm.find('#deep_link_screen').select2('val', '');
-                        }
+                // currentForm.find("input:radio[name='message_type']").each(function () {
+                //     if ($(this).parent().hasClass('checked')) {
 
-                    }
-                });
+                //         currentForm.find('#deep_link_screen').prop('disabled', false);
+                //         currentForm.find('#deep_link_screen').select2('val', '');
+
+
+                //     }
+                // });
 
                 currentForm.find('#sms_notification').attr("disabled", true);
             } else if (currentForm.find('#push_notification').is(":checked") || currentForm.find('#sms').is(":checked")) {
@@ -997,26 +421,10 @@ siteObjJs.admin.communicationMessageJs = function () {
                 currentForm.find('#deep_link_screen').prop('disabled', false);
                 currentForm.find("input:radio[name='message_type']").each(function () {
                     if ($(this).parent().hasClass('checked')) {
-                        if ($(this).attr("value") == 1) {
-                            if (currentForm.find('#deep_link_screen option[value="MERCHANT_OFFERS"]').length > 0) {
-                                currentForm.find('#deep_link_screen').select2('val', 'MERCHANT_OFFERS');
-                                currentForm.find('#deep_link_screen').prop('disabled', true);
-                            } else {
-                                currentForm.find('#deep_link_screen').prop('disabled', false);
-                                currentForm.find('#deep_link_screen').select2('val', '');
-                            }
-                        } else if ($(this).attr("value") == 3) {
-                            if (currentForm.find('#deep_link_screen option[value="MERCHANT_SHOP"]').length > 0) {
-                                currentForm.find('#deep_link_screen').select2('val', 'MERCHANT_SHOP');
-                                currentForm.find('#deep_link_screen').prop('disabled', true);
-                            } else {
-                                currentForm.find('#deep_link_screen').prop('disabled', false);
-                                currentForm.find('#deep_link_screen').select2('val', '');
-                            }
-                        } else {
-                            currentForm.find('#deep_link_screen').prop('disabled', false);
-                            currentForm.find('#deep_link_screen').select2('val', '');
-                        }
+
+                        currentForm.find('#deep_link_screen').prop('disabled', false);
+                        currentForm.find('#deep_link_screen').select2('val', '');
+
 
                     }
                 });
@@ -1395,135 +803,7 @@ siteObjJs.admin.communicationMessageJs = function () {
     }
 
 
-    var changeMessageType = function (currentForm) {
 
-        $('body').on('change', "input:radio[name='message_type']", function (e) {
-
-            if ($('#' + currentForm).find('#offer_id').val() == '') {
-                $('#' + currentForm).find('#email_subject').val('');
-                //CKEDITOR.instances.email_body.setData('');
-                var actionUrl = adminUrl + '/communications/get-loyalty-program-details/' + $('#' + currentForm).find('#merchant_id').val();
-
-                $.ajax({
-                    url: actionUrl,
-                    cache: false,
-                    type: "GET",
-                    processData: false,
-                    contentType: false,
-                    dataType: "json",
-                    success: function (data) {
-
-                        var $offer = $('#' + currentForm).find("#offer_id");
-                        $offer.empty();
-                        $offer.append($("<option></option>").attr("value", '').text('Select Offer'));
-
-                        var $product = $('#' + currentForm).find("#product_id");
-                        $product.empty();
-                        $product.append($("<option></option>").attr("value", '').text('Select Product'));
-
-                        $('#' + currentForm).find("input:radio[name='message_type']").each(function () {
-                            if ($(this).parent().hasClass('checked')) {
-                                if ($(this).attr("value") == 1) {
-
-                                    $('#' + currentForm).find('#offer_id').attr('disabled', false);
-                                    $.each(data.offer_list, function (value, key) {
-                                        $offer.append($("<option></option>").attr("value", value).text(key));
-                                    });
-                                    $('#' + currentForm).find("#offer_id").select2("val", '');
-
-                                    $product.empty();
-                                    $product.append($("<option></option>").attr("value", '').text('Select Product'));
-                                    $product.select2("val", '');
-                                    $product.attr('disabled', true);
-
-
-                                    if ($('#' + currentForm).find('#deep_link_screen option[value="MERCHANT_OFFERS"]').length > 0) {
-                                        $('#' + currentForm).find('#deep_link_screen').select2('val', 'MERCHANT_OFFERS');
-                                        $('#' + currentForm).find('#deep_link_screen').prop('disabled', true);
-                                    } else {
-                                        $('#' + currentForm).find('#deep_link_screen').prop('disabled', false);
-                                        $('#' + currentForm).find('#deep_link_screen').select2('val', '');
-                                    }
-
-                                } else if ($(this).attr("value") == 2) {
-
-                                    $('#' + currentForm).find('#email_subject').val('');
-                                    $('#' + currentForm).find('#email_body').html('');
-                                    CKEDITOR.instances.email_body.setData('');
-                                    $offer.empty();
-                                    $offer.append($("<option></option>").attr("value", '').text('Select Offer'));
-                                    $('#' + currentForm).find('#offer_id').attr('disabled', true);
-
-                                    $product.empty();
-                                    $product.append($("<option></option>").attr("value", '').text('Select Product'));
-                                    $product.select2("val", '');
-                                    $product.attr('disabled', true);
-
-                                    $('#' + currentForm).find('#deep_link_screen').prop('disabled', false);
-                                    $('#' + currentForm).find('#deep_link_screen').select2("val", '');
-
-                                } else if ($(this).attr("value") == 3) {
-
-                                    $('#' + currentForm).find('#email_subject').val('');
-                                    $('#' + currentForm).find('#email_body').html('');
-                                    CKEDITOR.instances.email_body.setData('');
-
-                                    $('#' + currentForm).find('#product_id').attr('disabled', false);
-                                    $.each(data.product_list, function (value, key) {
-                                        $product.append($("<option></option>").attr("value", value).text(key));
-                                    });
-                                    $('#' + currentForm).find("#product_id").select2("val", '');
-
-                                    $offer.empty();
-                                    $offer.append($("<option></option>").attr("value", '').text('Select Offer'));
-                                    $('#' + currentForm).find('#offer_id').attr('disabled', true);
-
-                                    if ($('#' + currentForm).find('#deep_link_screen option[value="MERCHANT_SHOP"]').length > 0) {
-                                        $('#' + currentForm).find('#deep_link_screen').select2('val', 'MERCHANT_SHOP');
-                                        $('#' + currentForm).find('#deep_link_screen').prop('disabled', true);
-                                    } else {
-                                        $('#' + currentForm).find('#deep_link_screen').prop('disabled', false);
-                                        $('#' + currentForm).find('#deep_link_screen').select2('val', '');
-                                    }
-
-                                }
-                            }
-                        });
-
-                    }, error: function (jqXhr, json, errorThrown) {
-                        var $elo = $('#' + currentForm).find("#offer_id");
-                        $elo.empty(); // remove old options
-                        $elo.append($('<option>', {
-                            value: '',
-                            text: 'Select Offer',
-                        }));
-                        $('#' + currentForm).find("#offer_id").select2("val", "");
-                    }
-                });
-            } else {
-                $('#' + currentForm).find("input:radio[name='message_type']").each(function () {
-                    if ($(this).parent().hasClass('checked')) {
-                        if ($(this).attr("value") == 1) {
-                            $('#' + currentForm).find('#offer_id').attr('disabled', false);
-                        } else if ($(this).attr("value") == 2) {
-                            $('#' + currentForm).find("#offer_id").select2("val", '');
-                            $('#' + currentForm).find('#offer_id').attr('disabled', true);
-                            $('#' + currentForm).find("#product_id").select2("val", '');
-                            $('#' + currentForm).find('#product_id').attr('disabled', true);
-                            $('#' + currentForm).find('#email_subject').val('');
-                            CKEDITOR.instances.email_body.setData('');
-                        } else if ($(this).attr("value") == 3) {
-                            $('#' + currentForm).find('#product_id').attr('disabled', false);
-                            $('#' + currentForm).find("#offer_id").select2("val", '');
-                            $('#' + currentForm).find('#offer_id').attr('disabled', true);
-                            $('#' + currentForm).find('#email_subject').val('');
-                            CKEDITOR.instances.email_body.setData('');
-                        }
-                    }
-                });
-            }
-        });
-    };
 
 
 
@@ -1536,8 +816,8 @@ siteObjJs.admin.communicationMessageJs = function () {
             // handleTable();
             fetchDataForEdit(obj);
             handleBootstrapMaxlength();
-            getMerchantLoyaltyProgram(obj);
-            getMerchantLoyaltyOfferData(obj);
+            //getMerchantLoyaltyProgram(obj);
+            // getMerchantLoyaltyOfferData(obj);
             handleDatePicker();
             enableTestingModeDiv(obj);
             showEmailFormDiv(obj);
@@ -1552,7 +832,7 @@ siteObjJs.admin.communicationMessageJs = function () {
             sendTestSms(obj);
             sendTestEmail(obj);
             checkPastTime(obj);
-            changeMessageType(obj);
+            // changeMessageType(obj);
             if (obj === 'create-communication') {
                 userDataCommon(obj);
             }

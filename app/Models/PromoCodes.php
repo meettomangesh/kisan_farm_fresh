@@ -71,6 +71,7 @@ class PromoCodes extends Model
     }
 
     public function referralCampaign($params) {
+        $params['campaign_category_id'] = 3;
         $params = json_encode($params);
         $this->checkAvailabilityOfCampaign($params);
         return true;

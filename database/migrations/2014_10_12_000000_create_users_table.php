@@ -48,7 +48,7 @@ class CreateUsersTable extends Migration
             $table->string('pin_code', 15)->index()->nullable();
             $table->tinyInteger('registered_from')->default(1)->unsigned()->index();
             $table->string('referral_code', 20)->default(null)->nullable();
-            $table->integer('referred_by_customer_id')->default(0)->unsigned()->index();
+            $table->integer('referred_by_user_id')->default(0)->unsigned()->index();
             $table->tinyInteger('is_app_installed')->default(0)->unsigned()->index()->comment = "1: Yes, 0: No";
             $table->date('app_installed_date')->default(null)->nullable();
             $table->string('app_installed_browser', 50)->default(null)->nullable();

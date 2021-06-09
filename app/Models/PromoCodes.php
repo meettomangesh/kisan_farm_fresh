@@ -69,4 +69,25 @@ class PromoCodes extends Model
         PromoCodes::where('end_date', '<', $curDate)->update(['status'=>2]);
         return true;
     }
+
+    public function referralCampaign($params) {
+        $params = json_encode($params);
+        $this->checkAvailabilityOfCampaign($params);
+        return true;
+    }
+
+    public function checkAvailabilityOfCampaign($params) {
+        $pdo = DB::connection()->getPdo();
+        $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, true);
+        $stmt = $pdo->prepare("CALL checkAvailabilityOfCampaign(?)");
+        $stmt->execute([$params]);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+        $stmt->closeCursor();
+        $reponse = json_decode($result['response']);
+        if($reponse->status == "FAILURE" && $reponse->statusCode != 200) {
+            return false;
+        }
+        return true;
+    }
 }

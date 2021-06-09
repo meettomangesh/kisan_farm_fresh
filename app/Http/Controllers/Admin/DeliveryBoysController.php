@@ -15,6 +15,8 @@ use Gate;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpFoundation\Response;
+use App\Helper\EmailHelper;
+use App\Helper\DataHelper;
 
 class DeliveryBoysController extends Controller
 {
@@ -23,14 +25,15 @@ class DeliveryBoysController extends Controller
         abort_if(Gate::denies('deliveryboy_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
 
         $deliveryboys = User::whereHas(
-            'roles', function($q){
+            'roles',
+            function ($q) {
                 $q->where('title', 'Delivery Boy');
             }
         )->get();
 
         $regions = Region::all()->where('status', 1)->pluck('region_name', 'id');
 
-        return view('admin.deliveryboys.index', compact('deliveryboys','regions'));
+        return view('admin.deliveryboys.index', compact('deliveryboys', 'regions'));
     }
 
     public function create()
@@ -39,16 +42,34 @@ class DeliveryBoysController extends Controller
 
         $roles = Role::all()->where('title', 'Delivery Boy')->pluck('title', 'id');
         $regions = Region::all()->where('status', 1)->pluck('region_name', 'id');
-         
-        return view('admin.deliveryboys.create', compact('roles','regions'));
+
+        return view('admin.deliveryboys.create', compact('roles', 'regions'));
     }
 
     public function store(StoreDeliveryBoyRequest $request)
     {
+        //print_r($request->all());exit;
         $user = User::create($request->all());
         $user->roles()->sync($request->input('roles', []));
         $user->regions()->sync($request->input('regions', []));
-
+        $emailVerifyUrl = config('services.miscellaneous.EMAIL_VERIFY_URL');
+        if (!empty($request->email)) {
+            $request['email_verify_key'] = DataHelper::emailVerifyKey();
+        }
+        if (!empty($request->email)) {
+            EmailHelper::sendEmail(
+                'IN_APP_EMAIL_VERIFICATION',
+                [
+                    'link' => $emailVerifyUrl . 'verify?key=' . $request['email_verify_key'],
+                    'email_to' => $request->email, //$request->email_address
+                    'customerName' => $user->first_name . " " . $user->last_name,
+                    'isEmailVerified' => 1
+                ],
+                [
+                    'attachment' => []
+                ]
+            );
+        }
 
         return redirect()->route('admin.deliveryboys.index');
     }
@@ -63,11 +84,11 @@ class DeliveryBoysController extends Controller
         $deliveryboy->load('roles');
         $deliveryboy->load('regions');
 
-        return view('admin.deliveryboys.edit', compact('roles', 'deliveryboy','regions'));
+        return view('admin.deliveryboys.edit', compact('roles', 'deliveryboy', 'regions'));
     }
 
     public function update(UpdateDeliveryBoyRequest $request, User $deliveryboy)
-    {   
+    {
 
         $deliveryboy->update($request->all());
         $deliveryboy->roles()->sync($request->input('roles', []));
@@ -105,6 +126,6 @@ class DeliveryBoysController extends Controller
     {
         $user = UserDetails::find($request->user_id)->update(['status' => $request->status]);
 
-        return response()->json(['success'=>'Status changed successfully.']);
+        return response()->json(['success' => 'Status changed successfully.']);
     }
 }

@@ -33,7 +33,7 @@
 
             <div class="form-group">
                 <label class="required" for="mobile_number">{{ trans('cruds.deliveryboy.fields.mobile_number') }}</label>
-                <input class="form-control {{ $errors->has('mobile_number') ? 'is-invalid' : '' }}" type="mobile_number" name="mobile_number" id="mobile_number" value="{{ old('mobile_number', $deliveryboy->mobile_number) }}" required>
+                <input class="form-control {{ $errors->has('mobile_number') ? 'is-invalid' : '' }}" type="mobile_number" name="mobile_number" id="mobile_number" value="{{ old('mobile_number', $deliveryboy->mobile_number) }}" readonly  required>
                 @if($errors->has('mobile_number'))
                     <div class="invalid-feedback">
                         {{ $errors->first('mobile_number') }}
@@ -44,7 +44,7 @@
 
             <div class="form-group">
                 <label class="required" for="email">{{ trans('cruds.deliveryboy.fields.email') }}</label>
-                <input class="form-control {{ $errors->has('email') ? 'is-invalid' : '' }}" type="email" name="email" id="mobile_number" value="{{ old('email', $deliveryboy->email) }}" required>
+                <input class="form-control {{ $errors->has('email') ? 'is-invalid' : '' }}" type="email" name="email" id="mobile_number" value="{{ old('email', $deliveryboy->email) }}" readonly required>
                 @if($errors->has('email'))
                     <div class="invalid-feedback">
                         {{ $errors->first('email') }}

@@ -76,11 +76,12 @@
                                 {{ trans('global.view') }}
                             </a>
                             @endcan
-
                             @can('country_edit')
+                            @if(date('Y-m-d', strtotime($userCommunicationMessage->message_send_time)) > date('Y-m-d'))
                             <a class="btn btn-xs btn-info" href="{{ route('admin.communications.edit', $userCommunicationMessage->id) }}">
                                 {{ trans('global.edit') }}
                             </a>
+                            @endif
                             @endcan
 
                             @can('country_delete')

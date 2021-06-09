@@ -101,13 +101,14 @@
                                 <span class="btn btn-info btn-xs select-all" style="border-radius: 0">{{ trans('global.select_all') }}</span>
                                 <span class="btn btn-info btn-xs deselect-all" style="border-radius: 0">{{ trans('global.deselect_all') }}</span>
                             </div>
-
                             <select class="form-control select2 {{ $errors->has('users') ? 'is-invalid' : '' }}" name="users[]" id="users" multiple data-rule-required="true" data-msg-required="Please select the target users.">
 
                                 @foreach($users as $id => $users)
 
                                 <option value="{{ $id }}" {{ (in_array($id, old('users', [])) || $userCommunicationMessages->users->contains($id)) ? 'selected' : '' }}>{{ $users }}</option>
                                 @endforeach
+
+                 
 
                             </select>
                             @if($errors->has('users'))
@@ -142,7 +143,7 @@
                         {{ trans('cruds.communication.fields.sms') }} -->
                                 <input type="checkbox" class="notification form-control" id="email" name="email" value="{{ old('email', '1') }}" {{ $userCommunicationMessages->email == '1' ? 'checked' : '' }}> {!! trans('cruds.communication.fields.email') !!}
                                 <input type="checkbox" class="notification form-control" id="push_notification" name="push_notification" value="{{ old('push_notification', '1') }}" {{ $userCommunicationMessages->push_notification == '1' ? 'checked' : '' }}> {!! trans('cruds.communication.fields.push-notification') !!}
-                                <input type="checkbox" class="notification form-control" id="sms" name="sms" value="{{ old('sms', '1') }}" {{ $userCommunicationMessages->sms == '1' ? 'checked' : '' }}> {!! trans('cruds.communication.fields.sms') !!}
+                                <input type="checkbox" class="notification form-control" id="sms" name="sms" value="{{ old('sms', '1') }}" {{ $userCommunicationMessages->sms == '1' ? 'checked' : '' }} readonly> {!! trans('cruds.communication.fields.sms') !!}
 
                                 <!-- {!! Form::checkbox('sms_notification', 4, null, ['id' => 'sms_notification',  'class' => 'notification form-control']) !!}
                         {{ trans('cruds.communication.fields.sms-notification') }} -->
@@ -292,7 +293,7 @@
 
                 </div>
                 <h3 class="block">When to Send</h3>
-
+                <?php echo "send_today-".$userCommunicationMessages->send_today; ?>
                 <div class="row">
                     <div class="col-md-6">
                         <div class="form-group">

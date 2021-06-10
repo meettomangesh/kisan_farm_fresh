@@ -740,4 +740,32 @@ return [
             'actions'        => 'Actions',
         ],
     ],
+    'report' => [
+        'title'          => 'Reports',
+        'title_singular' => 'Report',
+        'fields'         => [
+            'sales_itemwise' => 'Sales Itemwise',
+        ],
+    ],
+    'sales_itemwise' => [
+        'title'          => 'Sales Itemise',
+        'title_singular' => 'Sales Itemise',
+        'fields'         => [
+            'id' => 'ID',
+            'sr_no' => 'Sr No',
+            'order_id' => 'Order Id',
+            'product_name' => 'Product Name',
+            'item_qty' => 'Item Qty',
+            'selling_price' => 'Selling Price',
+            'special_price' => 'Special Price',
+            'order_status' => 'Order Status',
+            'order_date' => 'Order Date',
+            'pending'     => 'Pending',
+            'placed'     => 'Placed',
+            'picked'     => 'Picked',
+            'out_for_delivery'     => 'Out for delivery',
+            'delivered'     => 'Delivered',
+            'cancelled'     => 'Cancelled',
+        ],
+    ],
 ];

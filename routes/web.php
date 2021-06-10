@@ -131,6 +131,10 @@ Route::group([
     // Purchase Form
     Route::delete('purchase_form/destroy', 'PurchaseFormController@massDestroy')->name('purchase_form.massDestroy');
     Route::resource('purchase_form', 'PurchaseFormController');
+
+    // Reports
+    Route::get('reports/sales-itemwise', 'ReportsController@salesItemwise')->name('reports.salesItemwise');
+    Route::resource('reports', 'ReportsController');
 });
 Route::group(['prefix' => 'profile', 'as' => 'profile.', 'namespace' => 'Auth', 'middleware' => ['auth']], function () {
     // Change password

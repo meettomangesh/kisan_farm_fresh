@@ -190,9 +190,7 @@
             @can('order_management_access')
             <li class="nav-item nav-dropdown">
                 <a class="nav-link  nav-dropdown-toggle" href="#">
-                    <i class="fa-fw fas fa-users nav-icon">
-
-                    </i>
+                    <i class="fa-fw fas fa-users nav-icon"></i>
                     {{ trans('cruds.orderManagement.title') }}
                 </a>
                 <ul class="nav-dropdown-items">
@@ -224,6 +222,25 @@
                     {{ trans('cruds.communication.title') }}
                 </a>
             </li>
+            @endcan
+
+            @can('report_access')
+            <li class="nav-item nav-dropdown">
+                <a class="nav-link  nav-dropdown-toggle" href="#">
+                    <i class="fa-fw fas fa-users nav-icon"></i>
+                    {{ trans('cruds.report.title') }}
+                </a>
+                <ul class="nav-dropdown-items">
+                    @can('report_sales_itemwise_access')
+                    <li class="nav-item">
+                        <a href="{{ route('admin.reports.salesItemwise') }}" class="nav-link {{ request()->is('admin/reports') || request()->is('admin/reports/*') ? 'active' : '' }}">
+                            <i class="fa-fw fas fa-cogs nav-icon"></i>
+                            {{ trans('cruds.report.fields.sales_itemwise') }}
+                        </a>
+                    </li>
+                    @endcan
+                </ul>
+            <li>
             @endcan
             
             @can('purchase_form_access')

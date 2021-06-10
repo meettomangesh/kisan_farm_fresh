@@ -127,6 +127,10 @@ Route::group([
     Route::get('orders/reAssign/{cid?}', 'OrdersController@reAssign')->name('orders.reAssign');
     Route::post('orders/check-delivery-boy-availability', 'OrdersController@checkDeliveryBoyAvailability')->name('orders.checkDeliveryBoyAvailability');
     Route::resource('orders', 'OrdersController');
+
+    // Purchase Form
+    Route::delete('purchase_form/destroy', 'PurchaseFormController@massDestroy')->name('purchase_form.massDestroy');
+    Route::resource('purchase_form', 'PurchaseFormController');
 });
 Route::group(['prefix' => 'profile', 'as' => 'profile.', 'namespace' => 'Auth', 'middleware' => ['auth']], function () {
     // Change password

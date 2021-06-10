@@ -122,6 +122,9 @@ class RegisterController extends BaseController
                 'bank_name' => 'required',
                 'account_number' => 'required',
                 'ifsc_code' => 'required',
+                'gender' => 'required',
+                'date_of_birth' => 'required',
+                'marital_status' => 'required',
             ]);
         } else {
             $validator = Validator::make($request->all(), [

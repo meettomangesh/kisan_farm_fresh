@@ -44,6 +44,7 @@ class User extends Authenticatable
         'status',
         'password',
         'remember_token',
+        'referral_code',
         'referred_by_user_id',
         'created_at',
         'updated_at',

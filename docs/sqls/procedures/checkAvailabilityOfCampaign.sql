@@ -7,7 +7,7 @@ DECLARE platform,rewardType,targetCustomer,codeType,referralUserType,campaignUse
 DECLARE campaignUseValue TINYINT(3) DEFAULT 0;
 DECLARE rewardTypeYValue DECIMAL(10,4) DEFAULT 0;
 DECLARE promoCodeTitle VARCHAR(255);
-DECLARE campaignCategoryId,campaignMasterId,userId,orderId,pcmID,genPromoCodeResStatusCode,codeExpireInDays,rewardTypeXValue,LogCnt,userDateOfBirth,userMonthOfBirth,userAnnivDate,userAnnivMonth,offset  INT(10) DEFAULT 0;
+DECLARE campaignCategoryId,campaignMasterId,userId,orderId,pcmID,genPromoCodeResStatusCode,codeExpireInDays,rewardTypeXValue,LogCnt,userDateOfBirth,userMonthOfBirth,userAnnivDate,userAnnivMonth,offset,categoryId,subCategoryId  INT(10) DEFAULT 0;
 DECLARE status VARCHAR(10);
 DECLARE response VARCHAR(200);
 DECLARE expiryDate,dateToCheck,userCreatedAt,orderedDate DATE;
@@ -23,17 +23,21 @@ IF inputData IS NOT NULL AND JSON_VALID(inputData) = 0 THEN
     LEAVE campaignPriority;
 ELSE
     SET campaignCategoryId = JSON_UNQUOTE(JSON_EXTRACT(inputData,'$.campaign_category_id'));
+    SET campaignMasterId = IFNULL(JSON_UNQUOTE(JSON_EXTRACT(inputData,'$.campaign_master_id')), 0);
     SET userId = JSON_UNQUOTE(JSON_EXTRACT(inputData,'$.user_id'));
     SET orderId = IFNULL(JSON_UNQUOTE(JSON_EXTRACT(inputData,'$.order_id')), 0);
     SET orderedDate = JSON_UNQUOTE(JSON_EXTRACT(inputData,'$.ordered_date'));
     SET platform = JSON_UNQUOTE(JSON_EXTRACT(inputData,'$.platform'));
     SET referralUserType = JSON_UNQUOTE(JSON_EXTRACT(inputData,'$.referral_user_type'));
+    SET categoryId = JSON_UNQUOTE(JSON_EXTRACT(inputData,'$.category_id'));
+    SET subCategoryId = JSON_UNQUOTE(JSON_EXTRACT(inputData,'$.sub_category_id'));
 
-    IF orderId > 0 THEN
+    /* IF orderId > 0 THEN
         SET dateToCheck = orderedDate;
     ELSE
         SET dateToCheck = CURDATE();
-    END IF;
+    END IF; */
+    SET dateToCheck = CURDATE();
 
     SELECT gender,created_at,MONTH(date_of_birth),DAY(date_of_birth),MONTH(anniversary_date),DAY(anniversary_date)
     INTO userGender,userCreatedAt,userMonthOfBirth,userDateOfBirth,userAnnivMonth,userAnnivDate
@@ -41,16 +45,15 @@ ELSE
 
 	SELECT pcm.id,pcm.title,pcm.target_customer,pcm.target_customer_value,pcm.code_type,pcm.promo_code,pcm.code_expire_in_days,pcm.code_qty
     INTO
-    pcmID,targetCustomer,targetCustomerValue,codeType,promoCode,codeExpireInDays,codeQty
+    pcmID,promoCodeTitle,targetCustomer,targetCustomerValue,codeType,promoCode,codeExpireInDays,codeQty
     FROM promo_code_master AS pcm
     JOIN campaign_master AS cm ON cm.id = pcm.campaign_master_id
     WHERE pcm.campaign_category_id = campaignCategoryId AND pcm.status = 1 AND pcm.start_date <= dateToCheck AND pcm.end_date >= dateToCheck
     AND IF(pcm.platforms IS NOT NULL, FIND_IN_SET(platform, pcm.platforms), 1=1) AND IF(pcm.category_ids IS NOT NULL, FIND_IN_SET(categoryId, pcm.category_ids), 1=1) AND IF(pcm.sub_category_ids IS NOT NULL, FIND_IN_SET(subCategoryId, pcm.sub_category_ids), 1=1)
     AND pcm.referral_user_type = referralUserType AND IF(pcm.campaign_category_id = 3, pcm.campaign_master_id = campaignMasterId, 1 = 1)
     ORDER BY pcm.priority LIMIT 1 OFFSET offset;
-   
-	IF pcmID != 0  THEN
 
+	IF pcmID != 0  THEN
         -- Promo code quantity check
         IF (SELECT COUNT(id) FROM promo_codes WHERE promo_code_master_id = pcmID) >= codeQty THEN
             SELECT JSON_OBJECT('status', 'FAILURE', 'message', 'Promo code is out of stock.','data',JSON_OBJECT('promo_code_title',promoCodeTitle),'statusCode',102) AS response;
@@ -106,8 +109,13 @@ ELSE
         INSERT INTO promo_codes (promo_code_master_id,user_id,promo_code,start_date,end_date,created_by)
         VALUES (pcmID,userId,promoCode,CURDATE(),expiryDate,1);
 
-        SELECT JSON_OBJECT('status', 'SUCCESS', 'message', 'Campaign applied successfully for this user.','data',JSON_OBJECT('promo_code_title',promoCodeTitle),'statusCode',200) AS response;
-        LEAVE campaignPriority;
+        IF LAST_INSERT_ID() > 0 THEN
+            SELECT JSON_OBJECT('status', 'SUCCESS', 'message', 'Campaign applied successfully for this user.','data',JSON_OBJECT('promo_code_title',promoCodeTitle),'statusCode',200) AS response;
+            LEAVE campaignPriority;
+        ELSE
+            SELECT JSON_OBJECT('status', 'FAILURE', 'message', 'Promo code is not assigned.','data',JSON_OBJECT('promo_code_title',promoCodeTitle),'statusCode',105) AS response;
+		    LEAVE campaignPriority;
+        END IF;
 
 	ELSE
 		SELECT JSON_OBJECT('status', 'FAILURE', 'message', 'Campaign not present.','data',JSON_OBJECT('promo_code_title',promoCodeTitle),'statusCode',101) AS response;

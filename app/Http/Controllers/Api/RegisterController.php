@@ -89,22 +89,24 @@ class RegisterController extends BaseController
         }
 
         // Check for referral registration campaign
-        /* $inputs['user_id'] = $user->id;
-        $inputs['referral_user_type'] = 2;
-        $inputs['campaign_master_id'] = 8;
-        $params['category_id'] = 0;
-        $params['sub_category_id'] = 0;
-        $params['ordered_date'] = date('Y-m-d');
-        $promoCodes = new PromoCodes();
+        if(isset($input['referral_coupon_code']) && !empty($input['referral_coupon_code']) && $input['referral_coupon_code'] != "" && $input['referred_by_user_id'] > 0) {
+            /* $inputs['user_id'] = $user->id;
+            $inputs['referral_user_type'] = 2;
+            $inputs['campaign_master_id'] = 8;
+            $params['category_id'] = 0;
+            $params['sub_category_id'] = 0;
+            $params['ordered_date'] = date('Y-m-d');
+            $promoCodes = new PromoCodes();
 
-        // For referee
-        $promoCodes->referralCampaign($inputs); 
-        
-        // For referrer
-        $inputs['referral_user_type'] = 1;
-        $inputs['campaign_master_id'] = 7;
-        $promoCodes->referralCampaign($inputs);*/
-
+            // For referee
+            $promoCodes->referralCampaign($inputs); 
+            
+            // For referrer
+            $inputs['user_id'] = $input['referred_by_user_id'];
+            $inputs['referral_user_type'] = 1;
+            $inputs['campaign_master_id'] = 7;
+            $promoCodes->referralCampaign($inputs); */
+        }
         return $this->sendResponse($success, 'User register successfully.');
     }
 

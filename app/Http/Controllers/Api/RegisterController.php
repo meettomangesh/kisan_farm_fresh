@@ -52,7 +52,7 @@ class RegisterController extends BaseController
         }
         $input['email'] = $request->email_address;
         $input['password'] = bcrypt($input['password']);
-        $input['referral_code'] = DataHelper::generateBarcodeString(9);
+        $input['referral_code'] = DataHelper::generateBarcodeString(8);
         if (!empty($request->email_address)) {
             $input['email_verify_key'] = DataHelper::emailVerifyKey();
         }

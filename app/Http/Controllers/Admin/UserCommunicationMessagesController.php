@@ -315,6 +315,7 @@ class UserCommunicationMessagesController extends Controller
         $inputData = array('user_type' => $userCommunicationMessages->user_role, 'custom_region' => implode(",",$userCommunicationMessages->regions()->get()->pluck('id')->toArray()), 'region_type' => $userCommunicationMessages->region_type);
         $inputData = json_encode($inputData);
         $users = collect(DB::select('call getUserTypeRegionData(?)', [$inputData]))->pluck('name','id');
+
         return view('admin.communications.edit', compact('userCommunicationMessages','regions', 'users','deepLinkScreeningDataGolbalList'));
     }
 

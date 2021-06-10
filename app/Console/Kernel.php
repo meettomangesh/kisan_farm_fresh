@@ -30,7 +30,7 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         // $schedule->command('inspire')->hourly();
-        $schedule->command('send-notifications')->everyFiveMinutes();
+        $schedule->command('send-notifications')->everyTwoMinutes();
 
         // Birthday wishes
         // $schedule->command('birthdaywishes')->monthlyOn(1, '1:00');

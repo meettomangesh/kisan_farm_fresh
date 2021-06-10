@@ -17,7 +17,7 @@
     </div>
 
     <div class="card-body">
-        <form method="POST" id="edit-basket" action="{{ route("admin.baskets.update", [$basket->id]) }}" enctype="multipart/form-data">
+        <form method="POST" id="edit-basket" action="{{ route('admin.baskets.update', [$basket->id]) }}" enctype="multipart/form-data">
             @method('PUT')
             @csrf
 

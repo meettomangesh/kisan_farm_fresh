@@ -226,6 +226,15 @@
             </li>
             @endcan
             
+            @can('purchase_form_access')
+            <li class="nav-item">
+                <a href="{{ route("admin.purchase_form.index") }}" class="nav-link {{ request()->is('admin/purchase_form') || request()->is('admin/purchase_form/*') ? 'active' : '' }}">
+                    <i class="fa-fw fas fa-cogs nav-icon"></i>
+                    {{ trans('cruds.purchase_form.title') }}
+                </a>
+            </li>
+            @endcan
+
             @if(file_exists(app_path('Http/Controllers/Auth/ChangePasswordController.php')))
             @can('profile_password_edit')
             <li class="nav-item">

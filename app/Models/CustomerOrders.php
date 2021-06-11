@@ -64,7 +64,7 @@ class CustomerOrders extends Model
         return $this->hasMany(CustomerOrderDetails::class, 'order_id');
     }
 
-    protected function cancelOrder($orderId, $type="", $reason="")
+    protected function cancelOrder($orderId, $type = "", $reason = "")
     {
         $cancelData = array('order_id' => $orderId, 'type' => $type, 'reason' => $reason);
         $inputData = json_encode($cancelData);
@@ -79,6 +79,7 @@ class CustomerOrders extends Model
         if ($reponse->status == "FAILURE" && $reponse->statusCode != 200) {
             return false;
         }
+        $this->sendOrderTransactionNotification($cancelData);
         return true;
         /* $statusCancelled = 5;
         $statusIds = explode(',', '1');        
@@ -277,14 +278,34 @@ class CustomerOrders extends Model
 
     public function sendOrderTransactionNotification($params)
     {
-        $order_id = $params['order_id'];
-        $orderDetails = CustomerOrders::find($order_id);
         $notifyHelper = new NotificationHelper();
-        $deepLinkData = DataHelper::getDeeplinkData();
+        $orderDetails = CustomerOrders::find($params['order_id']);
 
-        $notifyHelper->setParameters(["user_id" => $orderDetails->customer_id, "deep_link" => $deepLinkData['ORDERS'], "name" => $orderDetails->userCustomer->first_name . ' ' . $orderDetails->userCustomer->last_name, "email" => $orderDetails->userCustomer->email], 'Order is placed successfully!', 'Please see the orders page.');
+        $templateName = NotificationHelper::getNotitificationTemplateName($orderDetails->order_status, 0);
+
+        $notificationContent = NotificationHelper::getPushNotificationTemplate($templateName, '', [
+            'name' => $orderDetails->userCustomer->first_name
+        ]);
+        $orderId = $params['order_id'];
+        $notifyHelper->setParameters(["user_id" => $orderDetails->customer_id, "deep_link" => $notificationContent['deeplink'], "details" => json_encode(array('orderNo' => $orderId, 'userId' => $orderDetails->customer_id))], $notificationContent['title'], $notificationContent['message']);
 
         $orderDetails->notify($notifyHelper);
+        if ($orderDetails->delivery_boy_id != 0) {
+            $templateName = NotificationHelper::getNotitificationTemplateName($orderDetails->order_status, 1);
+
+            $notificationContent = NotificationHelper::getPushNotificationTemplate($templateName, '', [
+                'name' => $orderDetails->userDeliveryBoy->first_name
+            ]);
+            $type = '';
+            if ($orderDetails->order_status == 1) {
+                $type = 'Assigned';
+            } elseif ($orderDetails->order_status == 5) {
+                $type = 'Rejected';
+            }
+            $notifyHelper->setParameters(["user_id" => $orderDetails->delivery_boy_id, "deep_link" => $notificationContent['deeplink'], "details" => json_encode(array('orderNo' => $orderId, 'userId' => $orderDetails->userDeliveryBoy, 'type' => $type))], $notificationContent['title'], $notificationContent['message']);
+
+            $orderDetails->notify($notifyHelper);
+        }
     }
 
     /**
@@ -297,6 +318,7 @@ class CustomerOrders extends Model
 
         $data = $notification->data;
         unset($notification->data['user_id']);
+
         if (is_array($data)) {
             //return CustomerDeviceTokens::select('device_token')->where('user_id', $data['user_id'])->first()->device_token;
 
@@ -506,6 +528,7 @@ class CustomerOrders extends Model
         if ($reponse->status == "FAILURE" && $reponse->statusCode != 200) {
             return false;
         }
+        $this->sendOrderTransactionNotification($params);
         if ($params['order_status'] == 4) {
             //$params['order_id'] = $params['order_id'];
 
@@ -617,7 +640,8 @@ class CustomerOrders extends Model
         return array("status" => true, "message" => "Delivery boy is available");
     }
 
-    public function assignDeliveryBoyToOrder($params){
+    public function assignDeliveryBoyToOrder($params)
+    {
 
         $assignData['order_id'] = $params['order_id'];
         $assignData['delivery_date'] = $params['delivery_details']['date'];

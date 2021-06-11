@@ -69,7 +69,7 @@ Route::group([
 
     Route::delete('deliveryboys/destroy', 'DeliveryBoysController@massDestroy')->name('deliveryboys.massDestroy');
     //Route::get('cities/getStates/{cid?}', 'RegionsController@getStates')->name('regions.getStates');
-    Route::get('deliveryboys/changeKYCStatus', 'DeliveryBoysController@changeKYCStatus')->name('deliveryboys.changeKYCStatus');
+    Route::post('deliveryboys/changeKYCStatus', 'DeliveryBoysController@changeKYCStatus')->name('deliveryboys.changeKYCStatus');
     Route::resource('deliveryboys', 'DeliveryBoysController');
 
     // Trips

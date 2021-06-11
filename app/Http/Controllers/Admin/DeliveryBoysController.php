@@ -17,6 +17,8 @@ use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpFoundation\Response;
 use App\Helper\EmailHelper;
 use App\Helper\DataHelper;
+use App\Helper\NotificationHelper;
+use App\Models\UserCommunicationMessages;
 
 class DeliveryBoysController extends Controller
 {
@@ -124,8 +126,18 @@ class DeliveryBoysController extends Controller
 
     public function changeKYCStatus(Request $request)
     {
-        $user = UserDetails::find($request->user_id)->update(['status' => $request->status]);
-
+         $userDetails = UserDetails::find($request->id)->update(['status' => $request->status]);
+        $user =  User::find($request->user_id); 
+        if ($request->status == 2) {
+            $notifyHelper = new NotificationHelper();
+            //print_r($user);exit;
+            $notificationContent = NotificationHelper::getPushNotificationTemplate('IN_APP_ACCOUNT_ACTIVATED_DELIVERY_BOY', '', [
+                'name' => $user->first_name
+            ]);
+            
+            $notifyHelper->setParameters(["user_id" => array($request->user_id), "deep_link" => $notificationContent['deeplink'], "details" => json_encode(array('orderNo' => 0, 'userId' => $request->user_id, 'type' => 'Activated'))], $notificationContent['title'], $notificationContent['message']);
+            $user->notify($notifyHelper);
+        }
         return response()->json(['success' => 'Status changed successfully.']);
     }
 }

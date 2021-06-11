@@ -3,7 +3,7 @@ DROP PROCEDURE IF EXISTS generatePromoCode$$
 CREATE PROCEDURE `generatePromoCode`(IN inputData JSON, OUT response JSON)
 generatePromoCode:BEGIN
 
-DECLARE promoCode,codePrefix,codeSuffix VARCHAR (20) Default NULL;
+DECLARE promoCode,codePrefix,codeSuffix VARCHAR (20) DEFAULT NULL;
 DECLARE userId,pcmID,codeLength,codeQty,quantity,couponLengthTemp INTEGER;
 DECLARE codeFormat TINYINT(1) DEFAULT 0;
 
@@ -18,14 +18,16 @@ DECLARE codeFormat TINYINT(1) DEFAULT 0;
         SELECT code_format,code_prefix,code_suffix,code_length INTO codeFormat,codePrefix,codeSuffix,codeLength
         FROM promo_code_format_master WHERE promo_code_master_id = pcmID;
 
-        IF (SELECT COUNT(id) FROM promo_codes WHERE promo_code_master_id = pcmID) >= codeQty THEN
+        IF (SELECT COUNT(id) FROM promo_codes WHERE promo_code_master_id = pcmID) < codeQty THEN
             SET couponLengthTemp = codeLength - IFNULL(LENGTH(codePrefix), 0) - IFNULL(LENGTH(codeSuffix), 0);
             SET quantity = 1;
             do_this:LOOP
                 IF codeFormat = 1 THEN
-                    SELECT CONCAT_WS('', IFNULL(codePrefix, ''), LPAD(FLOOR(RAND() * 10000000000), couponLengthTemp, '1'), IFNULL(codeSuffix, '')) INTO promoCode;
+                    -- SELECT CONCAT_WS('', IFNULL(codePrefix, ''), LPAD(FLOOR(RAND() * 10000000000), couponLengthTemp, '1'), IFNULL(codeSuffix, '')) INTO promoCode;
+                    SELECT CONCAT_WS('', IFNULL(CAST(codePrefix AS CHAR CHARACTER SET utf8), ''), LPAD(FLOOR(RAND() * 10000000000), couponLengthTemp, '1'), IFNULL(CAST(codeSuffix AS CHAR CHARACTER SET utf8), '')) INTO promoCode;
                 ELSE
-                    SELECT CONCAT_WS('', IFNULL(codePrefix, ''), LPAD(CONV(FLOOR(RAND()*POW(36,8)), 10, 36), couponLengthTemp, 0), IFNULL(codeSuffix, '')) INTO promoCode;
+                    -- SELECT CONCAT_WS('', IFNULL(codePrefix, ''), LPAD(CONV(FLOOR(RAND()*POW(36,8)), 10, 36), couponLengthTemp, 0), IFNULL(codeSuffix, '')) INTO promoCode;
+                    SELECT CONCAT_WS('', IFNULL(CAST(codePrefix AS CHAR CHARACTER SET utf8), ''), LPAD(CONV(FLOOR(RAND()*POW(36,8)), 10, 36), couponLengthTemp, 0), IFNULL(CAST(codeSuffix AS CHAR CHARACTER SET utf8), '')) INTO promoCode;
                 END IF;
 
                 IF (SELECT COUNT(id) FROM promo_codes WHERE promo_code = promoCode) = 0 THEN

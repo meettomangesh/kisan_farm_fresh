@@ -60,8 +60,6 @@ class DataHelper
             $key .= $keys[array_rand($keys)];
         }
 
-
-
         // call the same function if the barcode exists already
         if (self::barcodeStringExists($key)) {
             return self::generateBarcodeString($length);

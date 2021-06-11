@@ -17,7 +17,7 @@
     </div>
 
     <div class="card-body">
-        <form method="POST" id="create-basket" action="{{ route("admin.baskets.store") }}" enctype="multipart/form-data">
+        <form method="POST" id="create-basket" action="{{ route('admin.baskets.store') }}" enctype="multipart/form-data">
             @csrf
             <div class="row">
                 <div class="col-md-6">

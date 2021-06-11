@@ -25,11 +25,12 @@ class RegisterController extends BaseController
     public function register(Request $request)
     {
         $validator = Validator::make($request->all(), [
+            'platform' => 'required',
             'first_name' => 'required',
-           // 'email_address' => 'unique:users,email',
+            // 'email_address' => 'unique:users,email',
             'mobile_number' => 'required|unique:users,mobile_number',
             'password' => 'required',
-            //  'confirm_password' => 'required|same:password',
+            // 'confirm_password' => 'required|same:password',
             'otp_verified' => 'required',
             'pin_code' => 'required',
         ]);
@@ -51,7 +52,7 @@ class RegisterController extends BaseController
         }
         $input['email'] = $request->email_address;
         $input['password'] = bcrypt($input['password']);
-        $input['referral_code'] = DataHelper::generateBarcodeString(9);
+        $input['referral_code'] = DataHelper::generateBarcodeString(8);
         if (!empty($request->email_address)) {
             $input['email_verify_key'] = DataHelper::emailVerifyKey();
         }
@@ -88,10 +89,24 @@ class RegisterController extends BaseController
         }
 
         // Check for referral registration campaign
-        /* $promoCodes = new PromoCodes();
-        $inputs['user_id'] = $user->id;
-        $inputs['referral_user_type'] = 2;
-        $promoCodes->referralCampaign($inputs); */
+        if(isset($input['referral_coupon_code']) && !empty($input['referral_coupon_code']) && $input['referral_coupon_code'] != "" && $input['referred_by_user_id'] > 0) {
+            /* $inputs['user_id'] = $user->id;
+            $inputs['referral_user_type'] = 2;
+            $inputs['campaign_master_id'] = 8;
+            $params['category_id'] = 0;
+            $params['sub_category_id'] = 0;
+            $params['ordered_date'] = date('Y-m-d');
+            $promoCodes = new PromoCodes();
+
+            // For referee
+            $promoCodes->referralCampaign($inputs); 
+            
+            // For referrer
+            $inputs['user_id'] = $input['referred_by_user_id'];
+            $inputs['referral_user_type'] = 1;
+            $inputs['campaign_master_id'] = 7;
+            $promoCodes->referralCampaign($inputs); */
+        }
         return $this->sendResponse($success, 'User register successfully.');
     }
 
@@ -122,6 +137,9 @@ class RegisterController extends BaseController
                 'bank_name' => 'required',
                 'account_number' => 'required',
                 'ifsc_code' => 'required',
+                'gender' => 'required',
+                'date_of_birth' => 'required',
+                'marital_status' => 'required',
             ]);
         } else {
             $validator = Validator::make($request->all(), [

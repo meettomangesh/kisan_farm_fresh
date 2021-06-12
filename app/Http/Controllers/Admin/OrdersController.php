@@ -57,6 +57,7 @@ class OrdersController extends Controller
         $input = $request->all();
         $customerOrder = CustomerOrders::find($id);
         $customerOrder->delivery_date = $input['delivery_date'];
+        $customerOrder->order_status = 1;
         $customerOrder->update();
         $customerOrder->assignDeliveryBoyToOrder(array(
             'order_id' => $id,

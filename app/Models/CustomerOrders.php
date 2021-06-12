@@ -645,7 +645,7 @@ class CustomerOrders extends Model
 
         $assignData['order_id'] = $params['order_id'];
         $assignData['delivery_date'] = $params['delivery_details']['date'];
-        $assignData['order_status'] = 1;
+       // $assignData['order_status'] = 1;
         $inputData = json_encode($assignData);
         $pdo = DB::connection()->getPdo();
         $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, true);

@@ -86,7 +86,7 @@
                         if (data.status === true) {
                             $('#form_delivery_date_error').html('<div class="alert alert-success" role="alert">'+data.message+'</div>');
                         } else {
-                            $('#form_delivery_date_error').html('<div class="alert alert-warning" role="alert">'+data.message+'/div');
+                            $('#form_delivery_date_error').html('<div class="alert alert-warning" role="alert">'+data.message+'</div');
                         }
 
                         // var $ell = $('#' + currentForm).find("#users");
@@ -119,7 +119,7 @@
                 });
                 setTimeout(function() {
                     $('#form_delivery_date_error').html('');
-                }, 2000);
+                }, 5000);
             } else {
 
             }

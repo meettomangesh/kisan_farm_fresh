@@ -54,6 +54,8 @@ class DeliveryBoysController extends Controller
         $user = User::create($request->all());
         $user->roles()->sync($request->input('roles', []));
         $user->regions()->sync($request->input('regions', []));
+        $user->details()->updateOrCreate([], ['role_id' => 3]);
+
         $emailVerifyUrl = config('services.miscellaneous.EMAIL_VERIFY_URL');
         if (!empty($request->email)) {
             $request['email_verify_key'] = DataHelper::emailVerifyKey();
@@ -91,6 +93,22 @@ class DeliveryBoysController extends Controller
 
     public function update(UpdateDeliveryBoyRequest $request, User $deliveryboy)
     {
+        if ($request->hasfile('pan_card_photo')) {
+            $deliveryboy->details->pan_card_photo =  DataHelper::uploadImage($request->file('pan_card_photo'), '/images/documents/', $deliveryboy->id);
+        }
+        if ($request->hasfile('rc_book_photo')) {
+            $deliveryboy->details->rc_book_photo =  DataHelper::uploadImage($request->file('rc_book_photo'), '/images/documents/', $deliveryboy->id);
+        }
+        if ($request->hasfile('license_card_photo')) {
+            $deliveryboy->details->license_card_photo =  DataHelper::uploadImage($request->file('license_card_photo'), '/images/documents/', $deliveryboy->id);
+        }
+        if ($request->hasfile('aadhar_card_photo')) {
+            $deliveryboy->details->aadhar_card_photo =  DataHelper::uploadImage($request->file('aadhar_card_photo'), '/images/documents/', $deliveryboy->id);
+        }
+        if ($request->hasfile('user_photo')) {
+            $deliveryboy->details->user_photo =  DataHelper::uploadImage($request->file('user_photo'), '/images/documents/', $deliveryboy->id);
+        }
+        $deliveryboy->details->update();
 
         $deliveryboy->update($request->all());
         $deliveryboy->roles()->sync($request->input('roles', []));
@@ -126,15 +144,15 @@ class DeliveryBoysController extends Controller
 
     public function changeKYCStatus(Request $request)
     {
-         $userDetails = UserDetails::find($request->id)->update(['status' => $request->status]);
-        $user =  User::find($request->user_id); 
+        $userDetails = UserDetails::find($request->id)->update(['status' => $request->status]);
+        $user =  User::find($request->user_id);
         if ($request->status == 2) {
             $notifyHelper = new NotificationHelper();
             //print_r($user);exit;
             $notificationContent = NotificationHelper::getPushNotificationTemplate('IN_APP_ACCOUNT_ACTIVATED_DELIVERY_BOY', '', [
                 'name' => $user->first_name
             ]);
-            
+
             $notifyHelper->setParameters(["user_id" => array($request->user_id), "deep_link" => $notificationContent['deeplink'], "details" => json_encode(array('orderNo' => 0, 'userId' => $request->user_id, 'type' => 'Activated'))], $notificationContent['title'], $notificationContent['message']);
             $user->notify($notifyHelper);
         }

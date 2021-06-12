@@ -8,6 +8,12 @@ FOLDER PERMISSIONS
     sudo chmod -R 777 storage/*
     sudo chmod -R 777 bootstrap/cache/*
 
+inside public 
+
+mkdir -m 777 images/baskets
+mkdir -m 777 invoices
+mkdir -m 777 images/documents
+
 FOR DEVELOPER (User development branch)
 	git checkout -b development origin/development (development of release branch for staging)
 	git pull origin development

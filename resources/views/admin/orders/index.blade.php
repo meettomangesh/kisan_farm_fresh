@@ -76,7 +76,7 @@
                             </a>
                             @endcan
                             @can('order_cancel')
-                            @if($customerOrder->order_status == 1 || $customerOrder->order_status == 2)
+                            @if($customerOrder->order_status == 1 || $customerOrder->order_status == 2 || $customerOrder->needAttention == 1)
                             <!-- <button class=" cancel_order"   data-toggle="tooltip" data-placement="top" title="{{ trans('cruds.order.fields.cancel_order') }}" data-id="{{ $customerOrder->id }}"> -->
                             <a class="cancel_order" data-toggle="tooltip" data-placement="top" title="{{ trans('cruds.order.fields.cancel_order') }}" data-id="{{ $customerOrder->id }}" href="javascript:void(0);">
                                 <!-- {{ trans('cruds.order.fields.cancel_order') }} -->
@@ -127,7 +127,7 @@
         $.extend(true, $.fn.dataTable.defaults, {
             orderCellsTop: true,
             order: [
-                [9, 'desc']
+                [9, 'desc'],[7,'asc']
             ],
             pageLength: 50,
         });

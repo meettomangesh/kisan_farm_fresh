@@ -13,6 +13,7 @@ namespace App\Helper;
 
 use Illuminate\Support\Facades\File;
 use App\Models\CustomerLoyalty;
+use App\PushNotificationsTemplates;
 
 class DataHelper
 {
@@ -185,9 +186,11 @@ class DataHelper
 
     public static function getDeeplinkData()
     {
-        return([
-            "ORDERS" => "ORDERS",
-            "OFFERS" => "OFFERS"
-        ]);
+        return PushNotificationsTemplates::all()->pluck('deeplink', 'deeplink')->toArray();
+
+        // return([
+        //     "ORDERS" => "ORDERS",
+        //     "OFFERS" => "OFFERS"
+        // ]);
     }
 }

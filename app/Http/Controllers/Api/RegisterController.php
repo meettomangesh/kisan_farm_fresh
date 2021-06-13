@@ -120,7 +120,7 @@ class RegisterController extends BaseController
             $validator = Validator::make($request->all(), [
                 'first_name' => 'required',
                 'last_name' => 'required',
-                'email_address' => 'email|unique:users,email,' . $request->id,
+                 'email_address' => 'required',
                 'id' => 'required',
                 'role_id' => 'required',
                 'platform' => 'required',
@@ -148,7 +148,7 @@ class RegisterController extends BaseController
                 'gender' => 'required',
                 'date_of_birth' => 'required',
                 'marital_status' => 'required',
-                'email_address' => 'email|unique:users,email,' . $request->id,
+                'email_address' => 'required',
                 'id' => 'required',
                 'role_id' => 'required',
                 'platform' => 'required'

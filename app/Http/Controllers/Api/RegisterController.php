@@ -42,10 +42,10 @@ class RegisterController extends BaseController
         $input = $request->all();
         $input['referred_by_user_id'] = 0;
         // Verify and Get referred by user
-        if(isset($input['referral_coupon_code']) && !empty($input['referral_coupon_code']) && $input['referral_coupon_code'] != "") {
+        if (isset($input['referral_coupon_code']) && !empty($input['referral_coupon_code']) && $input['referral_coupon_code'] != "") {
             $userObj = new User();
             $response = $userObj->verifyAndGetReferredByUser($input['referral_coupon_code']);
-            if($response["status"] == false) {
+            if ($response["status"] == false) {
                 return $this->sendError('Invalid referral code.', []);
             }
             $input['referred_by_user_id'] = isset($response["referred_by_user_id"]) ? $response["referred_by_user_id"] : 0;
@@ -89,7 +89,7 @@ class RegisterController extends BaseController
         }
 
         // Check for referral registration campaign
-        if(isset($input['referral_coupon_code']) && !empty($input['referral_coupon_code']) && $input['referral_coupon_code'] != "" && $input['referred_by_user_id'] > 0) {
+        if (isset($input['referral_coupon_code']) && !empty($input['referral_coupon_code']) && $input['referral_coupon_code'] != "" && $input['referred_by_user_id'] > 0) {
             /* $inputs['user_id'] = $user->id;
             $inputs['referral_user_type'] = 2;
             $inputs['campaign_master_id'] = 8;
@@ -120,7 +120,7 @@ class RegisterController extends BaseController
             $validator = Validator::make($request->all(), [
                 'first_name' => 'required',
                 'last_name' => 'required',
-                 'email_address' => 'required',
+                'email_address' => 'required',
                 'id' => 'required',
                 'role_id' => 'required',
                 'platform' => 'required',
@@ -163,6 +163,7 @@ class RegisterController extends BaseController
         $input = $request->all();
         $customer = User::where('id', $request->id)->first();
         $input['email'] = $request->email_address;
+        $input['date_of_birth'] = ($input['date_of_birth']) ? date("Y-m-d", strtotime($input['date_of_birth'])) : "";
         //  $input['password'] = bcrypt($input['password']);
         //$input['referral_code'] = DataHelper::generateBarcodeString(9);
         //$input['email_verify_key'] = DataHelper::emailVerifyKey();
@@ -193,7 +194,7 @@ class RegisterController extends BaseController
 
         $input['updated_by'] = 1;
         $customer->update($input);
-        print_r($input);
+       // print_r($input);
         if ($request->role_id == 3) {
             $userDetails =  UserDetails::updateOrCreate(
                 ['user_id' => $request->id, 'role_id' => $request->role_id],
@@ -394,11 +395,11 @@ class RegisterController extends BaseController
             return $this->sendError('Validation Error.', $validator->errors());
         }
 
-        if($request->new_password != $request->confirm_password) {
+        if ($request->new_password != $request->confirm_password) {
             return $this->sendError('New and confirm password are not matching.', []);
         }
 
-        if($request->new_password == $request->old_password) {
+        if ($request->new_password == $request->old_password) {
             return $this->sendError('Old and new password should be different.', []);
         }
 
@@ -406,7 +407,7 @@ class RegisterController extends BaseController
         if (!$user) {
             return $this->sendError("Please try with valid user.", []);
         }
-        if(Hash::check($request->old_password, $user->password) && !(Hash::check($request->new_password, $user->password))) {
+        if (Hash::check($request->old_password, $user->password) && !(Hash::check($request->new_password, $user->password))) {
             $input['password'] = bcrypt($request->new_password);
             $input['updated_by'] = 1;
             $user->update($input);
@@ -433,16 +434,16 @@ class RegisterController extends BaseController
             return $this->sendError('Validation Error.', $validator->errors());
         }
 
-        if($request->new_password != $request->confirm_password) {
+        if ($request->new_password != $request->confirm_password) {
             return $this->sendError('Unauthorised.', ['error' => 'New and confirm password are not matching']);
         }
-        
+
         $user = User::where('mobile_number', $request->mobile_number)->first();
         if (!$user) {
             return $this->sendError("Please try with valid mobile number.", []);
         }
 
-        if(Hash::check($request->new_password, $user->password)) {
+        if (Hash::check($request->new_password, $user->password)) {
             return $this->sendError("Please try with another password.", []);
         }
         $input['password'] = bcrypt($request->new_password);

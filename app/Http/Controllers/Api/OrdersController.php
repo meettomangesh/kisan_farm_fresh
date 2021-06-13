@@ -54,6 +54,7 @@ class OrdersController extends BaseController
             $customerOrders = new CustomerOrders();
             // Function call to get place order
             $responseDetails = $customerOrders->placeOrder($params);
+            Log::info('inside controller placeOrder.', ['method' => 'placeOrder', 'responseDetails' => json_encode($responseDetails)]);
             if ($responseDetails["status"] == true) {
                 $message = 'Order placed successully!.';
             } else {

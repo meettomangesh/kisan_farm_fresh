@@ -194,7 +194,7 @@ class RegisterController extends BaseController
 
         $input['updated_by'] = 1;
         $customer->update($input);
-       // print_r($input);
+        // print_r($input);
         if ($request->role_id == 3) {
             $userDetails =  UserDetails::updateOrCreate(
                 ['user_id' => $request->id, 'role_id' => $request->role_id],
@@ -274,6 +274,8 @@ class RegisterController extends BaseController
             $success['marital_status'] =  $user->marital_status;
             $success['gender'] =  $user->gender;
             $success['email'] =  $user->email;
+            $success['mobile_number'] =  $user->mobile_number;
+
             $success['referral_code'] = $user->referral_code;
             $success['id'] = $user->id;
             $success['role'] = (!empty($user->load('roles')->roles->toArray())) ? $user->load('roles')->roles[0]->id : 0;
@@ -289,7 +291,43 @@ class RegisterController extends BaseController
             return $this->sendError('Unauthorised.', ['error' => 'Unauthorised']);
         }
     }
+    public function getUserDetails(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'platform' => 'required',
+            'user_id' => 'required',
 
+        ]);
+        if ($validator->fails()) {
+            return $this->sendError(parent::VALIDATION_ERROR, $validator->errors());
+        }
+        $user = User::where('id', $request->user_id)->first();
+        if (!$user) {
+            return $this->sendError('User details are not available.', []);
+        }
+        $success['name'] =  $user->first_name . " " . $user->last_name;
+        $success['dob'] =  $user->date_of_birth;
+        $success['marital_status'] =  $user->marital_status;
+        $success['gender'] =  $user->gender;
+        $success['email'] =  $user->email;
+        $success['mobile_number'] =  $user->mobile_number;
+
+        $success['referral_code'] = $user->referral_code;
+        $success['id'] = $user->id;
+        $success['role'] = (!empty($user->load('roles')->roles->toArray())) ? $user->load('roles')->roles[0]->id : 0;
+        $success['role_name'] = (!empty($user->load('roles')->roles->toArray())) ? $user->load('roles')->roles[0]->title : "";
+
+        $userDetails = $user->details;
+        unset($userDetails->id);
+        unset($userDetails->user_id);
+        unset($userDetails->role_id);
+        $success['details'] = ($user->details) ? $user->details : (object)[];
+        if ($user) {
+            return $this->sendResponse($success, 'User details fetched successfully.');
+        } else {
+            return $this->sendError('User details are not available.', []);
+        }
+    }
     public function getPinCodeList(Request $request)
     {
         $validator = Validator::make($request->all(), [

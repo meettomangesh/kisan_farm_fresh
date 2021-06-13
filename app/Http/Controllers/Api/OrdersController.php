@@ -235,19 +235,23 @@ class OrdersController extends BaseController
         try {
             $input=$request->all();
             Log::info('inside controller paymentCallbackUrl.', $input);
-            if (!isset($request->razorpay_payment_id) || !isset($request->razorpay_order_id) || !isset($request->razorpay_signature)) {
+            $razorpay_order_id = $request->payload->payment->entity->order_id;
+            $razorpay_payment_id = $request->payload->payment->entity->id;
+            $razorpay_signature = $request->payload->payment->entity->status;
+            Log::info('inside controller paymentCallbackUrl.', ['razorpay_order_id'=>$razorpay_order_id,'razorpay_payment_id'=>$razorpay_payment_id,'razorpay_signature'=>$razorpay_signature]);
+            if (!isset($razorpay_payment_id) || !isset($razorpay_order_id) || !isset($razorpay_signature)) {
                 return false;
             }
             $params = [
-                'razorpay_payment_id' => $request->razorpay_payment_id,
-                'razorpay_order_id' => $request->razorpay_order_id,
-                'razorpay_signature' => $request->razorpay_signature
+                'razorpay_payment_id' => $razorpay_payment_id,
+                'razorpay_order_id' => $razorpay_order_id,
+                'razorpay_signature' => $razorpay_signature
             ];
             //Create order object to call functions
             $customerOrders = new CustomerOrders();
             // Function call to update order status using payment response
             $responseDetails = $customerOrders->paymentCallbackUrl($params);
-            Log::info('inside controller paymentCallbackUrl.', ['method' => 'paymentCallbackUrl', 'responseDetails' => $responseDetails]);
+            Log::info('inside controller response  paymentCallbackUrl.', ['method' => 'paymentCallbackUrl', 'responseDetails' => $responseDetails]);
             $message = 'Success.';
             if ($responseDetails == false) {
                 $message = 'Failure.';

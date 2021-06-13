@@ -270,8 +270,8 @@ class CustomerOrders extends Model
             $orderObj->update();
         }
         $params['order_email_template'] = 'IN_APP_ORDER_PLACED_NOTIFICATION';
-        $emailResult = $this->sendOrderTransactionEmail($params);
-        $notificationResult = $this->sendOrderTransactionNotification($params);
+        //$emailResult = $this->sendOrderTransactionEmail($params);
+        //$notificationResult = $this->sendOrderTransactionNotification($params);
         $invoiceGenerated = 0;
         return array("status" => true, "order_id" => $orderId, "razorpay_order_id" => $razorPayOrderId, "invoice_generated " => $invoiceGenerated);
     }

@@ -163,7 +163,7 @@ class RegisterController extends BaseController
         $input = $request->all();
         $customer = User::where('id', $request->id)->first();
         $input['email'] = $request->email_address;
-        $input['date_of_birth'] = ($input['date_of_birth']) ? date("Y-m-d", strtotime($input['date_of_birth'])) : "";
+        $input['date_of_birth'] = ($input['date_of_birth']) ? date("Y-m-d", strtotime(str_replace("'", "", $input['date_of_birth']))) : "";
         //  $input['password'] = bcrypt($input['password']);
         //$input['referral_code'] = DataHelper::generateBarcodeString(9);
         //$input['email_verify_key'] = DataHelper::emailVerifyKey();

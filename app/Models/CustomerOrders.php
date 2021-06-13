@@ -20,6 +20,7 @@ use App\Helper\EmailHelper;
 use App\Helper\NotificationHelper;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Log;
+
 class CustomerOrders extends Model
 {
     use SoftDeletes, Notifiable;
@@ -270,8 +271,10 @@ class CustomerOrders extends Model
             $orderObj->update();
         }
         $params['order_email_template'] = 'IN_APP_ORDER_PLACED_NOTIFICATION';
-        //$emailResult = $this->sendOrderTransactionEmail($params);
-        //$notificationResult = $this->sendOrderTransactionNotification($params);
+        if ($params['payment_details']['type'] == 'online') {
+            $emailResult = $this->sendOrderTransactionEmail($params);
+            $notificationResult = $this->sendOrderTransactionNotification($params);
+        }
         $invoiceGenerated = 0;
         return array("status" => true, "order_id" => $orderId, "razorpay_order_id" => $razorPayOrderId, "invoice_generated " => $invoiceGenerated);
     }
@@ -556,18 +559,26 @@ class CustomerOrders extends Model
     }
 
     public function paymentCallbackUrl($params)
-    {   
-        Log::info('inside model paymentCallbackUrl.', ['razorpay_order_id'=>$params['razorpay_order_id'],'razorpay_payment_id'=>$params['razorpay_payment_id'],'razorpay_signature'=>$params['razorpay_signature']]);
+    {
+        //Log::info('inside model paymentCallbackUrl.', ['razorpay_order_id' => $params['razorpay_order_id'], 'razorpay_payment_id' => $params['razorpay_payment_id'], 'razorpay_signature' => $params['razorpay_signature']]);
         if (!empty($params['razorpay_payment_id']) && !empty($params['razorpay_order_id']) && !empty($params['razorpay_signature'])) {
             $order = CustomerOrders::select('id')->where('razorpay_order_id', $params['razorpay_order_id'])->get()->toArray();
-           // if (sizeof($order) > 0) {
-                $updateOrder = CustomerOrders::where('razorpay_order_id', $params['razorpay_order_id']);
+
+            if (sizeof($order) > 0) {
+                $updateOrder = CustomerOrders::where('razorpay_order_id', $params['razorpay_order_id'])->first();
                 $updateOrder->order_status = 1;
                 $updateOrder->razorpay_payment_id = $params['razorpay_payment_id'];
                 $updateOrder->razorpay_signature = $params['razorpay_signature'];
                 $updateOrder->update();
+                $params['order_id'] = $updateOrder->id;
+                $params['order_email_template'] = 'IN_APP_ORDER_PLACED_NOTIFICATION';
+                
+                $emailResult = $this->sendOrderTransactionEmail($params);
+                $notificationResult = $this->sendOrderTransactionNotification($params);
+               
+
                 return true;
-            //}
+            }
             return false;
         }
         return false;
@@ -598,7 +609,7 @@ class CustomerOrders extends Model
             ));
 
             $response = json_decode(curl_exec($curl));
-            
+
             $err = curl_error($curl);
             curl_close($curl);
             if ($err || isset($response->error)) {
@@ -649,7 +660,7 @@ class CustomerOrders extends Model
 
         $assignData['order_id'] = $params['order_id'];
         $assignData['delivery_date'] = $params['delivery_details']['date'];
-       // $assignData['order_status'] = 1;
+        // $assignData['order_status'] = 1;
         $inputData = json_encode($assignData);
         $pdo = DB::connection()->getPdo();
         $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, true);

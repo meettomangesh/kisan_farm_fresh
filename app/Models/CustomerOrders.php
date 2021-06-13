@@ -19,7 +19,7 @@ use App\Helper\DataHelper;
 use App\Helper\EmailHelper;
 use App\Helper\NotificationHelper;
 use Illuminate\Notifications\Notifiable;
-
+use Illuminate\Support\Facades\Log;
 class CustomerOrders extends Model
 {
     use SoftDeletes, Notifiable;
@@ -595,6 +595,7 @@ class CustomerOrders extends Model
             ));
 
             $response = json_decode(curl_exec($curl));
+            Log::info('inside model createOrderAtRazorpay.', ['method' => 'createOrderAtRazorpay', 'razorpay_payment_id' => json_encode($response)]);
             $err = curl_error($curl);
             curl_close($curl);
             if ($err || isset($response->error)) {

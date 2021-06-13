@@ -235,7 +235,7 @@ class OrdersController extends BaseController
         try {
             $input=$request->all();
             $input = json_decode($input);
-            Log::info('inside controller paymentCallbackUrl.', $input);
+            Log::info('inside controller paymentCallbackUrl.', $input->payload);
             $razorpay_order_id = $request->payload->payment->entity->order_id;
             $razorpay_payment_id = $request->payload->payment->entity->id;
             $razorpay_signature = $request->payload->payment->entity->status;

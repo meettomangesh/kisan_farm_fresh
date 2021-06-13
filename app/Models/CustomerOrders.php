@@ -565,7 +565,7 @@ class CustomerOrders extends Model
                 $updateOrder->order_status = 1;
                 $updateOrder->razorpay_payment_id = $params['razorpay_payment_id'];
                 $updateOrder->razorpay_signature = $params['razorpay_signature'];
-                $updateOrder->save();
+                $updateOrder->update();
                 return true;
             //}
             return false;

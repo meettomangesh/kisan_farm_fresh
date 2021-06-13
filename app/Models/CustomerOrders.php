@@ -556,7 +556,8 @@ class CustomerOrders extends Model
     }
 
     public function paymentCallbackUrl($params)
-    {
+    {   
+        Log::info('inside model paymentCallbackUrl.', ['razorpay_order_id'=>$params['razorpay_order_id'],'razorpay_payment_id'=>$params['razorpay_payment_id'],'razorpay_signature'=>$params['razorpay_signature']]);
         if (!empty($params['razorpay_payment_id']) && !empty($params['razorpay_order_id']) && !empty($params['razorpay_signature'])) {
             $order = CustomerOrders::select('id')->where('razorpay_order_id', $params['razorpay_order_id'])->get()->toArray();
             if (sizeof($order) > 0) {

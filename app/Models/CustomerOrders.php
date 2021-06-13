@@ -271,7 +271,7 @@ class CustomerOrders extends Model
             $orderObj->update();
         }
         $params['order_email_template'] = 'IN_APP_ORDER_PLACED_NOTIFICATION';
-        if ($params['payment_details']['type'] == 'online') {
+        if ($params['payment_details']['type'] != 'online') {
             $emailResult = $this->sendOrderTransactionEmail($params);
             $notificationResult = $this->sendOrderTransactionNotification($params);
         }

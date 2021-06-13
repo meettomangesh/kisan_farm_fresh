@@ -54,7 +54,7 @@ class OrdersController extends BaseController
             $customerOrders = new CustomerOrders();
             // Function call to get place order
             $responseDetails = $customerOrders->placeOrder($params);
-            Log::info('inside controller placeOrder.', ['method' => 'placeOrder', 'responseDetails' => json_encode($responseDetails)]);
+            
             if ($responseDetails["status"] == true) {
                 $message = 'Order placed successully!.';
             } else {
@@ -234,6 +234,7 @@ class OrdersController extends BaseController
     {
         try {
             $input=$request->all();
+            $input = json_decode($input);
             Log::info('inside controller paymentCallbackUrl.', $input);
             $razorpay_order_id = $request->payload->payment->entity->order_id;
             $razorpay_payment_id = $request->payload->payment->entity->id;
@@ -251,7 +252,7 @@ class OrdersController extends BaseController
             $customerOrders = new CustomerOrders();
             // Function call to update order status using payment response
             $responseDetails = $customerOrders->paymentCallbackUrl($params);
-            Log::info('inside controller response  paymentCallbackUrl.', ['method' => 'paymentCallbackUrl', 'responseDetails' => $responseDetails]);
+            
             $message = 'Success.';
             if ($responseDetails == false) {
                 $message = 'Failure.';

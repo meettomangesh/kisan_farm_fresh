@@ -10,7 +10,7 @@ use Illuminate\Queue\SerializesModels;
 use App\Helper\NotificationHelper;
 use App\Models\UserCommunicationMessages;
 
-class 1SendBulkNotification implements ShouldQueue
+class SendBulkNotification implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 

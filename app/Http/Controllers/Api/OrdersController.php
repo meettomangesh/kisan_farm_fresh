@@ -234,7 +234,7 @@ class OrdersController extends BaseController
     {
         try {
             $input=$request->all();
-            Log::info('inside controller paymentCallbackUrl.', ['method' => 'paymentCallbackUrl', 'razorpay_payment_id' => $request->razorpay_payment_id, 'razorpay_order_id' => $request->razorpay_order_id, 'razorpay_signature' => $request->razorpay_signature,'input'=>json_encode($input)]);
+            Log::info('inside controller paymentCallbackUrl.', $input);
             if (!isset($request->razorpay_payment_id) || !isset($request->razorpay_order_id) || !isset($request->razorpay_signature)) {
                 return false;
             }

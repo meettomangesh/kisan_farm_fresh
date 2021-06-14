@@ -8,6 +8,7 @@ use App\Models\CustomerOrders;
 use Exception;
 use Validator;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class OrdersController extends BaseController
 {
@@ -53,7 +54,8 @@ class OrdersController extends BaseController
             $customerOrders = new CustomerOrders();
             // Function call to get place order
             $responseDetails = $customerOrders->placeOrder($params);
-            if($responseDetails["status"] == true) {
+            
+            if ($responseDetails["status"] == true) {
                 $message = 'Order placed successully!.';
             } else {
                 return $this->sendError('Failed to place order.', $responseDetails, 422);
@@ -91,7 +93,7 @@ class OrdersController extends BaseController
             // Function call to get order list
             $responseDetails = $customerOrders->getOrderList($params);
             $message = 'Order list.';
-            if(sizeof($responseDetails) == 0) {
+            if (sizeof($responseDetails) == 0) {
                 $message = 'No record found.';
             }
             $response = $this->sendResponse($responseDetails, $message);
@@ -121,7 +123,7 @@ class OrdersController extends BaseController
             // Function call to cancel order
             $responseDetails = $customerOrders->cancelOrderAPI($params);
             $message = 'Failed to order cancel.';
-            if($responseDetails) {
+            if ($responseDetails) {
                 $message = 'Order cancelled successfully';
             }
             $response = $this->sendResponse([], $message);
@@ -156,7 +158,7 @@ class OrdersController extends BaseController
             // Function call to get order list
             $responseDetails = $customerOrders->getOrderListForDeliveryBoy($params);
             $message = 'Order list.';
-            if(sizeof($responseDetails) == 0) {
+            if (sizeof($responseDetails) == 0) {
                 $message = 'No record found.';
             }
             $response = $this->sendResponse($responseDetails, $message);
@@ -190,7 +192,7 @@ class OrdersController extends BaseController
             // Function call to cancel order
             $responseDetails = $customerOrders->changeOrderStatus($params);
             $message = 'Failed to change order status.';
-            if($responseDetails) {
+            if ($responseDetails) {
                 $message = 'Order status changed successfully';
             }
             $response = $this->sendResponse([], $message);
@@ -231,20 +233,30 @@ class OrdersController extends BaseController
     public function paymentCallbackUrl(Request $request)
     {
         try {
-            if(!isset($request->razorpay_payment_id) || !isset($request->razorpay_order_id) || !isset($request->razorpay_signature)) {
+            $input=$request->all();
+           // print_r($input['payload']['payment']['entity']['order_id']); 
+
+            //Log::info('inside controller paymentCallbackUrl.', $input);
+            $razorpay_order_id = $input['payload']['payment']['entity']['order_id'];
+            $razorpay_payment_id = $input['payload']['payment']['entity']['id'];
+            $razorpay_signature = $input['payload']['payment']['entity']['status'];
+            // echo $razorpay_order_id.'-'.$razorpay_payment_id.'-'.$razorpay_signature; exit;
+            //Log::info('inside controller paymentCallbackUrl.', ['razorpay_order_id'=>$razorpay_order_id,'razorpay_payment_id'=>$razorpay_payment_id,'razorpay_signature'=>$razorpay_signature]);
+            if (!isset($razorpay_payment_id) || !isset($razorpay_order_id) || !isset($razorpay_signature)) {
                 return false;
             }
             $params = [
-                'razorpay_payment_id' => $request->razorpay_payment_id,
-                'razorpay_order_id' => $request->razorpay_order_id,
-                'razorpay_signature' => $request->razorpay_signature
+                'razorpay_payment_id' => $razorpay_payment_id,
+                'razorpay_order_id' => $razorpay_order_id,
+                'razorpay_signature' => $razorpay_signature
             ];
             //Create order object to call functions
             $customerOrders = new CustomerOrders();
             // Function call to update order status using payment response
             $responseDetails = $customerOrders->paymentCallbackUrl($params);
+            
             $message = 'Success.';
-            if(sizeof($responseDetails) == 0) {
+            if ($responseDetails == false) {
                 $message = 'Failure.';
             }
             $response = $this->sendResponse($responseDetails, $message);
@@ -277,7 +289,7 @@ class OrdersController extends BaseController
             $customerOrders = new CustomerOrders();
             // Function call to check delivery boy availability by delivery date
             $responseDetails = $customerOrders->checkDeliveryBoyAvailability($params);
-            if($responseDetails["status"] == true) {
+            if ($responseDetails["status"] == true) {
                 return $this->sendResponse($responseDetails, $responseDetails["message"]);
             } else {
                 return $this->sendError($responseDetails["message"], $responseDetails, 422);

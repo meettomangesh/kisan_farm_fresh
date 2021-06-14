@@ -14,6 +14,7 @@ use \DateTimeInterface;
 use DB;
 use PDO;
 use App\Helper\DataHelper;
+use App\Models\CustomerDeviceTokens;
 
 class User extends Authenticatable
 {
@@ -49,6 +50,10 @@ class User extends Authenticatable
         'created_at',
         'updated_at',
         'deleted_at',
+        'gender',
+        'marital_status',
+        'date_of_birth',
+        
     ];
 
     protected function serializeDate(DateTimeInterface $date)
@@ -207,15 +212,25 @@ class User extends Authenticatable
         }
     }
 
-    /**
+        /**
      * Specifies the user's FCM token
      *
      * @return string|array
      */
-    public function routeNotificationForFcm()
+    public function routeNotificationForFcm($notification)
     {
-        echo "Inside User Model-215";
-        return "fImEfIt7Qmmh7LxTnQ3jy8:APA91bE_bcrCZiteJvbVZv2m2HYEQniTbYCYeo-wfOYUmhJ02URjlTeOx0UO7osO2chqHkfiBKFRTPLR9RkopRdo9r_qYmjpNxGvGwPjmRSZdoCrNexp6M0b9NQKo7QuwsHIAUDl0_Zi";
+        
+
+        $data = $notification->data;
+       // print_r($data['user_id']); exit;
+        unset($notification->data['user_id']);
+        if (is_array($data)) {
+            //return CustomerDeviceTokens::select('device_token')->where('user_id', $data['user_id'])->first()->device_token;
+
+            return CustomerDeviceTokens::select('device_token')->whereIn('user_id', $data['user_id'])->get()->pluck('device_token')->toArray();
+        } else {
+            return [];
+        }
     }
 
     protected function changePassword($reqParams, $user) {

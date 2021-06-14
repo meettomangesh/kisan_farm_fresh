@@ -27,7 +27,7 @@ class StoreDeliveryBoyRequest extends FormRequest
             ],
             'email'    => [
                 'required',
-                'unique:users',
+                //'unique:users',
             ],
             'mobile_number' => [
                 'required',

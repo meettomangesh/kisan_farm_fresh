@@ -19,6 +19,7 @@
                         <th>{{ trans('cruds.order.fields.payment_type') }}</th>
                         <th>{{ trans('cruds.order.fields.delivery_date') }}</th>
                         <th>{{ trans('cruds.order.fields.status') }}</th>
+                        <th>Needs Attention</th>
                         <th  width="30%">{{ trans('cruds.order.fields.actions') }}</th>
                     </tr>
                     <tr>
@@ -31,6 +32,7 @@
                         <th><input type="text" placeholder="Search" /></th>
                         <th></th>
                         <th><input type="text" placeholder="Search" /></th>
+                        <th></th>
                         <th></th>
                     </tr>
                 </thead>
@@ -45,7 +47,7 @@
                         <td>{{ round($customerOrder->gross_amount, 2) ?? '' }}</td>
                         <td>{{ $customerOrder->payment_type ?? '' }}</td>
                         <td>
-                        @if($customerOrder->delivery_date < date('Y-m-d') && !($customerOrder->order_status == 4 || $customerOrder->order_status == 5))
+                        @if($customerOrder->needAttention == 1)
                         <p style="color:red">{{ $customerOrder->delivery_date ?? '' }}</p>
                         @else
                         {{ $customerOrder->delivery_date ?? '' }}
@@ -65,6 +67,7 @@
                             {{ trans('cruds.order.fields.cancelled') }}
                             @endif
                         </td>
+                        <td>{{ $customerOrder->needAttention ?? 0 }}</td>
                         <td>
                             @can('order_show')
                             <a class="" data-toggle="tooltip" data-placement="top" title="{{ trans('global.view') }}" href="{{ route('admin.orders.show', $customerOrder->id) }}">
@@ -73,7 +76,7 @@
                             </a>
                             @endcan
                             @can('order_cancel')
-                            @if($customerOrder->order_status == 1 || $customerOrder->order_status == 2)
+                            @if($customerOrder->order_status == 1 || $customerOrder->order_status == 2 || $customerOrder->needAttention == 1)
                             <!-- <button class=" cancel_order"   data-toggle="tooltip" data-placement="top" title="{{ trans('cruds.order.fields.cancel_order') }}" data-id="{{ $customerOrder->id }}"> -->
                             <a class="cancel_order" data-toggle="tooltip" data-placement="top" title="{{ trans('cruds.order.fields.cancel_order') }}" data-id="{{ $customerOrder->id }}" href="javascript:void(0);">
                                 <!-- {{ trans('cruds.order.fields.cancel_order') }} -->
@@ -81,10 +84,9 @@
                             <!-- </button> -->
                             </a>
                             @endif
-                            @endcan
-                            @can('assign_order_delivery_boy')
-                                             
-                            @if($customerOrder->delivery_date < date('Y-m-d') && ($customerOrder->delivery_boy_id == 0 || !($customerOrder->order_status == 4 || $customerOrder->order_status == 5)))
+                            @endcan  
+                            @can('assign_order_delivery_boy')         
+                            @if($customerOrder->needAttention == 1)
                             <a class="" data-toggle="tooltip" data-placement="top" title="{{ trans('cruds.order.fields.re_assign_delivery_boy') }}" href="{{ route('admin.orders.reAssign', $customerOrder->id) }}">
                                 <!-- {{ trans('cruds.order.fields.re_assign_delivery_boy') }} -->
                                 <i class="fa fa-refresh" aria-hidden="true"></i>
@@ -94,7 +96,8 @@
                             @if($customerOrder->customer_invoice_url)
                             <a class=""  target="_blank" data-toggle="tooltip" data-placement="top" title="{{ trans('cruds.order.fields.customer_invoice_url') }}" href="{{ $customerOrder->customer_invoice_url }}">
                                 <!-- {{ trans('cruds.order.fields.customer_invoice_url') }} -->
-                                <i class="fa fa-file-pdf-o" aria-hidden="true"></i>
+                                <i class="fa fa-money" aria-hidden="true"></i>
+                                
                             </a>
                             @endif
                             @if($customerOrder->delivery_boy_invoice_url)
@@ -124,9 +127,9 @@
         $.extend(true, $.fn.dataTable.defaults, {
             orderCellsTop: true,
             order: [
-                [1, 'desc']
+                [9, 'desc'],[7,'asc']
             ],
-            pageLength: 10,
+            pageLength: 50,
         });
         $('.datatable-Order:not(.ajaxTable) thead tr:eq(1) th').each(function(i) {
             $('input', this).on('keyup change', function() {
@@ -141,7 +144,13 @@
 
 
         let table = $('.datatable-Order:not(.ajaxTable)').DataTable({
-            buttons: dtButtons
+            buttons: dtButtons,
+            "columnDefs": [
+                {
+                "targets": [ 9 ],
+                "visible": false
+            }
+            ]
         })
         $('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
             $($.fn.dataTable.tables(true)).DataTable()

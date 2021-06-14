@@ -27,7 +27,7 @@ class UpdateDeliveryBoyRequest extends FormRequest
             ],
             'email'   => [
                 'required',
-                'unique:users,email,' . request()->route('deliveryboy')->id,
+                //'unique:users,email,' . request()->route('deliveryboy')->id,
             ],
             'mobile_number'   => [
                 'required',

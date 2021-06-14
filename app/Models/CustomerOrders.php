@@ -19,6 +19,7 @@ use App\Helper\DataHelper;
 use App\Helper\EmailHelper;
 use App\Helper\NotificationHelper;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Log;
 
 class CustomerOrders extends Model
 {
@@ -64,7 +65,7 @@ class CustomerOrders extends Model
         return $this->hasMany(CustomerOrderDetails::class, 'order_id');
     }
 
-    protected function cancelOrder($orderId, $type="", $reason="")
+    protected function cancelOrder($orderId, $type = "", $reason = "")
     {
         $cancelData = array('order_id' => $orderId, 'type' => $type, 'reason' => $reason);
         $inputData = json_encode($cancelData);
@@ -79,6 +80,7 @@ class CustomerOrders extends Model
         if ($reponse->status == "FAILURE" && $reponse->statusCode != 200) {
             return false;
         }
+        $this->sendOrderTransactionNotification($cancelData);
         return true;
         /* $statusCancelled = 5;
         $statusIds = explode(',', '1');        
@@ -269,22 +271,45 @@ class CustomerOrders extends Model
             $orderObj->update();
         }
         $params['order_email_template'] = 'IN_APP_ORDER_PLACED_NOTIFICATION';
-        $this->sendOrderTransactionEmail($params);
-        $this->sendOrderTransactionNotification($params);
+        if ($params['payment_details']['type'] != 'online') {
+            $emailResult = $this->sendOrderTransactionEmail($params);
+            $notificationResult = $this->sendOrderTransactionNotification($params);
+        }
         $invoiceGenerated = 0;
         return array("status" => true, "order_id" => $orderId, "razorpay_order_id" => $razorPayOrderId, "invoice_generated " => $invoiceGenerated);
     }
 
     public function sendOrderTransactionNotification($params)
     {
-        $order_id = $params['order_id'];
-        $orderDetails = CustomerOrders::find($order_id);
         $notifyHelper = new NotificationHelper();
-        $deepLinkData = DataHelper::getDeeplinkData();
+        $orderDetails = CustomerOrders::find($params['order_id']);
 
-        $notifyHelper->setParameters(["user_id" => $orderDetails->customer_id, "deep_link" => $deepLinkData['ORDERS'], "name" => $orderDetails->userCustomer->first_name . ' ' . $orderDetails->userCustomer->last_name, "email" => $orderDetails->userCustomer->email], 'Order is placed successfully!', 'Please see the orders page.');
+        $templateName = NotificationHelper::getNotitificationTemplateName($orderDetails->order_status, 0);
+
+        $notificationContent = NotificationHelper::getPushNotificationTemplate($templateName, '', [
+            'name' => $orderDetails->userCustomer->first_name
+        ]);
+        $orderId = $params['order_id'];
+        $notifyHelper->setParameters(["user_id" => $orderDetails->customer_id, "deep_link" => $notificationContent['deeplink'], "details" => json_encode(array('orderNo' => $orderId, 'userId' => $orderDetails->customer_id))], $notificationContent['title'], $notificationContent['message']);
 
         $orderDetails->notify($notifyHelper);
+        if ($orderDetails->delivery_boy_id != 0) {
+            $templateName = NotificationHelper::getNotitificationTemplateName($orderDetails->order_status, 1);
+
+            $notificationContent = NotificationHelper::getPushNotificationTemplate($templateName, '', [
+                'name' => $orderDetails->userDeliveryBoy->first_name
+            ]);
+            $type = '';
+            if ($orderDetails->order_status == 1) {
+                $type = 'Assigned';
+            } elseif ($orderDetails->order_status == 5) {
+                $type = 'Rejected';
+            }
+            $notifyHelper->setParameters(["user_id" => $orderDetails->delivery_boy_id, "deep_link" => $notificationContent['deeplink'], "details" => json_encode(array('orderNo' => $orderId, 'userId' => $orderDetails->userDeliveryBoy, 'type' => $type))], $notificationContent['title'], $notificationContent['message']);
+
+            $orderDetails->notify($notifyHelper);
+        }
+        return 1;
     }
 
     /**
@@ -297,6 +322,7 @@ class CustomerOrders extends Model
 
         $data = $notification->data;
         unset($notification->data['user_id']);
+
         if (is_array($data)) {
             //return CustomerDeviceTokens::select('device_token')->where('user_id', $data['user_id'])->first()->device_token;
 
@@ -332,6 +358,7 @@ class CustomerOrders extends Model
             ]
 
         );
+        return 1;
     }
 
     public function generateInvoice($params)
@@ -506,6 +533,7 @@ class CustomerOrders extends Model
         if ($reponse->status == "FAILURE" && $reponse->statusCode != 200) {
             return false;
         }
+        $this->sendOrderTransactionNotification($params);
         if ($params['order_status'] == 4) {
             //$params['order_id'] = $params['order_id'];
 
@@ -532,14 +560,23 @@ class CustomerOrders extends Model
 
     public function paymentCallbackUrl($params)
     {
-        if (!empty($params['payment_id']) && !empty($params['order_id']) && !empty($params['payment_signature'])) {
-            $order = CustomerOrders::select('id')->where('id', $params['order_id'])->get()->toArray();
+        //Log::info('inside model paymentCallbackUrl.', ['razorpay_order_id' => $params['razorpay_order_id'], 'razorpay_payment_id' => $params['razorpay_payment_id'], 'razorpay_signature' => $params['razorpay_signature']]);
+        if (!empty($params['razorpay_payment_id']) && !empty($params['razorpay_order_id']) && !empty($params['razorpay_signature'])) {
+            $order = CustomerOrders::select('id')->where('razorpay_order_id', $params['razorpay_order_id'])->get()->toArray();
+
             if (sizeof($order) > 0) {
-                $updateOrder = CustomerOrders::where('razorpay_order_id', $params['order_id']);
+                $updateOrder = CustomerOrders::where('razorpay_order_id', $params['razorpay_order_id'])->first();
                 $updateOrder->order_status = 1;
                 $updateOrder->razorpay_payment_id = $params['razorpay_payment_id'];
                 $updateOrder->razorpay_signature = $params['razorpay_signature'];
-                $updateOrder->save();
+                $updateOrder->update();
+                $params['order_id'] = $updateOrder->id;
+                $params['order_email_template'] = 'IN_APP_ORDER_PLACED_NOTIFICATION';
+                
+                $emailResult = $this->sendOrderTransactionEmail($params);
+                $notificationResult = $this->sendOrderTransactionNotification($params);
+               
+
                 return true;
             }
             return false;
@@ -572,6 +609,7 @@ class CustomerOrders extends Model
             ));
 
             $response = json_decode(curl_exec($curl));
+
             $err = curl_error($curl);
             curl_close($curl);
             if ($err || isset($response->error)) {
@@ -617,10 +655,12 @@ class CustomerOrders extends Model
         return array("status" => true, "message" => "Delivery boy is available");
     }
 
-    public function assignDeliveryBoyToOrder($params){
+    public function assignDeliveryBoyToOrder($params)
+    {
 
         $assignData['order_id'] = $params['order_id'];
         $assignData['delivery_date'] = $params['delivery_details']['date'];
+        // $assignData['order_status'] = 1;
         $inputData = json_encode($assignData);
         $pdo = DB::connection()->getPdo();
         $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, true);

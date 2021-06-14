@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreatePurchaseFormTable extends Migration
+class CreatePushNotificationsTemplatesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,16 +13,13 @@ class CreatePurchaseFormTable extends Migration
      */
     public function up()
     {
-        Schema::create('purchase_form', function (Blueprint $table) {
-            $table->increments('id')->unsigned();
-            $table->string('product_name', 250)->index();
-            $table->string('unit', 20)->index();
-            $table->string('category', 50)->index();
-            $table->decimal('price', 14, 4);
-            $table->date('order_date')->index();
-            $table->string('total_in_kg', 10)->index();
-            $table->string('total_units', 10)->index();
-            $table->string('image_name', 1000);
+        Schema::create('push_notifications_templates', function (Blueprint $table) {
+            $table->id();
+            $table->string('name', 255)->index();
+            $table->string('title', 100)->index();
+            $table->string('message', 1000);
+            $table->string('deeplink', 255)->index();
+            $table->tinyInteger('status')->default(1)->unsigned()->index()->comment = "1: Active, 0: Inactive";
             $table->integer('created_by')->unsigned();
             $table->integer('updated_by')->default(0)->unsigned();
             $table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP'));
@@ -38,6 +35,6 @@ class CreatePurchaseFormTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('purchase_form');
+        Schema::dropIfExists('push_notifications_templates');
     }
 }

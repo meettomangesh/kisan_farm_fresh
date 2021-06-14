@@ -42,10 +42,10 @@ class RegisterController extends BaseController
         $input = $request->all();
         $input['referred_by_user_id'] = 0;
         // Verify and Get referred by user
-        if(isset($input['referral_coupon_code']) && !empty($input['referral_coupon_code']) && $input['referral_coupon_code'] != "") {
+        if (isset($input['referral_coupon_code']) && !empty($input['referral_coupon_code']) && $input['referral_coupon_code'] != "") {
             $userObj = new User();
             $response = $userObj->verifyAndGetReferredByUser($input['referral_coupon_code']);
-            if($response["status"] == false) {
+            if ($response["status"] == false) {
                 return $this->sendError('Invalid referral code.', []);
             }
             $input['referred_by_user_id'] = isset($response["referred_by_user_id"]) ? $response["referred_by_user_id"] : 0;
@@ -89,7 +89,7 @@ class RegisterController extends BaseController
         }
 
         // Check for referral registration campaign
-        if(isset($input['referral_coupon_code']) && !empty($input['referral_coupon_code']) && $input['referral_coupon_code'] != "" && $input['referred_by_user_id'] > 0) {
+        if (isset($input['referral_coupon_code']) && !empty($input['referral_coupon_code']) && $input['referral_coupon_code'] != "" && $input['referred_by_user_id'] > 0) {
             /* $inputs['user_id'] = $user->id;
             $inputs['referral_user_type'] = 2;
             $inputs['campaign_master_id'] = 8;
@@ -120,7 +120,7 @@ class RegisterController extends BaseController
             $validator = Validator::make($request->all(), [
                 'first_name' => 'required',
                 'last_name' => 'required',
-                'email_address' => 'email|unique:users,email,' . $request->id,
+                'email_address' => 'required',
                 'id' => 'required',
                 'role_id' => 'required',
                 'platform' => 'required',
@@ -137,6 +137,9 @@ class RegisterController extends BaseController
                 'bank_name' => 'required',
                 'account_number' => 'required',
                 'ifsc_code' => 'required',
+                'gender' => 'required',
+                'date_of_birth' => 'required',
+                'marital_status' => 'required',
             ]);
         } else {
             $validator = Validator::make($request->all(), [
@@ -145,7 +148,7 @@ class RegisterController extends BaseController
                 'gender' => 'required',
                 'date_of_birth' => 'required',
                 'marital_status' => 'required',
-                'email_address' => 'email|unique:users,email,' . $request->id,
+                'email_address' => 'required',
                 'id' => 'required',
                 'role_id' => 'required',
                 'platform' => 'required'
@@ -160,6 +163,7 @@ class RegisterController extends BaseController
         $input = $request->all();
         $customer = User::where('id', $request->id)->first();
         $input['email'] = $request->email_address;
+        $input['date_of_birth'] = ($input['date_of_birth']) ? date("Y-m-d", strtotime(str_replace("'", "", $input['date_of_birth']))) : "";
         //  $input['password'] = bcrypt($input['password']);
         //$input['referral_code'] = DataHelper::generateBarcodeString(9);
         //$input['email_verify_key'] = DataHelper::emailVerifyKey();
@@ -190,7 +194,7 @@ class RegisterController extends BaseController
 
         $input['updated_by'] = 1;
         $customer->update($input);
-
+        // print_r($input);
         if ($request->role_id == 3) {
             $userDetails =  UserDetails::updateOrCreate(
                 ['user_id' => $request->id, 'role_id' => $request->role_id],
@@ -270,6 +274,8 @@ class RegisterController extends BaseController
             $success['marital_status'] =  $user->marital_status;
             $success['gender'] =  $user->gender;
             $success['email'] =  $user->email;
+            $success['mobile_number'] =  $user->mobile_number;
+
             $success['referral_code'] = $user->referral_code;
             $success['id'] = $user->id;
             $success['role'] = (!empty($user->load('roles')->roles->toArray())) ? $user->load('roles')->roles[0]->id : 0;
@@ -285,7 +291,43 @@ class RegisterController extends BaseController
             return $this->sendError('Unauthorised.', ['error' => 'Unauthorised']);
         }
     }
+    public function getUserDetails(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'platform' => 'required',
+            'user_id' => 'required',
 
+        ]);
+        if ($validator->fails()) {
+            return $this->sendError(parent::VALIDATION_ERROR, $validator->errors());
+        }
+        $user = User::where('id', $request->user_id)->first();
+        if (!$user) {
+            return $this->sendError('User details are not available.', []);
+        }
+        $success['name'] =  $user->first_name . " " . $user->last_name;
+        $success['dob'] =  $user->date_of_birth;
+        $success['marital_status'] =  $user->marital_status;
+        $success['gender'] =  $user->gender;
+        $success['email'] =  $user->email;
+        $success['mobile_number'] =  $user->mobile_number;
+
+        $success['referral_code'] = $user->referral_code;
+        $success['id'] = $user->id;
+        $success['role'] = (!empty($user->load('roles')->roles->toArray())) ? $user->load('roles')->roles[0]->id : 0;
+        $success['role_name'] = (!empty($user->load('roles')->roles->toArray())) ? $user->load('roles')->roles[0]->title : "";
+
+        $userDetails = $user->details;
+        unset($userDetails->id);
+        unset($userDetails->user_id);
+        unset($userDetails->role_id);
+        $success['details'] = ($user->details) ? $user->details : (object)[];
+        if ($user) {
+            return $this->sendResponse($success, 'User details fetched successfully.');
+        } else {
+            return $this->sendError('User details are not available.', []);
+        }
+    }
     public function getPinCodeList(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -391,11 +433,11 @@ class RegisterController extends BaseController
             return $this->sendError('Validation Error.', $validator->errors());
         }
 
-        if($request->new_password != $request->confirm_password) {
+        if ($request->new_password != $request->confirm_password) {
             return $this->sendError('New and confirm password are not matching.', []);
         }
 
-        if($request->new_password == $request->old_password) {
+        if ($request->new_password == $request->old_password) {
             return $this->sendError('Old and new password should be different.', []);
         }
 
@@ -403,7 +445,7 @@ class RegisterController extends BaseController
         if (!$user) {
             return $this->sendError("Please try with valid user.", []);
         }
-        if(Hash::check($request->old_password, $user->password) && !(Hash::check($request->new_password, $user->password))) {
+        if (Hash::check($request->old_password, $user->password) && !(Hash::check($request->new_password, $user->password))) {
             $input['password'] = bcrypt($request->new_password);
             $input['updated_by'] = 1;
             $user->update($input);
@@ -430,16 +472,16 @@ class RegisterController extends BaseController
             return $this->sendError('Validation Error.', $validator->errors());
         }
 
-        if($request->new_password != $request->confirm_password) {
+        if ($request->new_password != $request->confirm_password) {
             return $this->sendError('Unauthorised.', ['error' => 'New and confirm password are not matching']);
         }
-        
+
         $user = User::where('mobile_number', $request->mobile_number)->first();
         if (!$user) {
             return $this->sendError("Please try with valid mobile number.", []);
         }
 
-        if(Hash::check($request->new_password, $user->password)) {
+        if (Hash::check($request->new_password, $user->password)) {
             return $this->sendError("Please try with another password.", []);
         }
         $input['password'] = bcrypt($request->new_password);

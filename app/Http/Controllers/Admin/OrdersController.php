@@ -24,6 +24,13 @@ class OrdersController extends Controller
             $temp[$key] = $orders;
             $temp[$key]->customer_invoice_url = (($temp[$key]->customer_invoice_url) ?  PdfHelper::getUplodedPath($temp[$key]->customer_invoice_url) : "");
             $temp[$key]->delivery_boy_invoice_url = (($temp[$key]->delivery_boy_invoice_url) ?  PdfHelper::getUplodedPath($temp[$key]->delivery_boy_invoice_url) : "");
+            $temp[$key]->needAttention = 0;
+            if ((!in_array($temp[$key]->order_status, array(4, 5))) and (($temp[$key]->delivery_boy_id == 0)
+                    or
+                    ($temp[$key]->delivery_date < date('Y-m-d')))
+            ) {
+                $temp[$key]->needAttention = 1;
+            }
         }
         $customerOrders = collect($temp);
         return view('admin.orders.index', compact('customerOrders'));
@@ -36,11 +43,12 @@ class OrdersController extends Controller
         $customerOrderDetails = CustomerOrderDetails::where('order_id', $orderId)->get();
         return view('admin.orders.show', compact('customerOrder', 'customerOrderDetails'));
     }
-    public function reAssign($orderId)
+    public function reAssign(Request $request, $orderId)
     {
         abort_if(Gate::denies('assign_order_delivery_boy'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $customerOrder = CustomerOrders::find($orderId);
         $customerOrderDetails = CustomerOrderDetails::where('order_id', $orderId)->get();
+        // assignDeliveryBoyToOrder
         return view('admin.orders.reassign', compact('customerOrder', 'customerOrderDetails'));
     }
 
@@ -49,12 +57,17 @@ class OrdersController extends Controller
         $input = $request->all();
         $customerOrder = CustomerOrders::find($id);
         $customerOrder->delivery_date = $input['delivery_date'];
+        $customerOrder->order_status = 1;
         $customerOrder->update();
+        $customerOrder->assignDeliveryBoyToOrder(array(
+            'order_id' => $id,
+            'delivery_details' => array('date' => $input['delivery_date']),
+        ));
         return redirect()->route('admin.orders.index');
     }
 
     public function checkDeliveryBoyAvailability(Request $request)
-    {   
+    {
         $params = $request->all();
         //Create order object to call functions
         $customerOrders = new CustomerOrders();

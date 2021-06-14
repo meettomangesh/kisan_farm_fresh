@@ -41,7 +41,7 @@ class SendBulkNotification implements ShouldQueue
            $userCommunicationMessages = UserCommunicationMessages::find($this->notificationData['notification_id']);
             $notifyHelper = new NotificationHelper();
 
-            $notifyHelper->setParameters(["user_id" => $this->notificationData['user_id'], "deep_link" => $this->notificationData['deep_link']], $this->notificationData['push_title'], $this->notificationData['push_text']);
+            $notifyHelper->setParameters(["user_id" => $this->notificationData['user_id'], "deep_link" => $this->notificationData['deep_link'],"details"=>""], $this->notificationData['push_title'], $this->notificationData['push_text']);
 
             $userCommunicationMessages->notify($notifyHelper);
             // $result = $client->sendBulkTemplatedEmail($this->emailData);

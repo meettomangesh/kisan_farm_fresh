@@ -84,6 +84,8 @@
                     {{ trans('global.back_to_list') }}
                 </a>
             </div>
+            @csrf
+            <input type="hidden" value="{{$deliveryboy->id}}" name="user_id" id="user_id" >
             <table class="table table-bordered table-striped">
                 <tbody>
                     <tr>
@@ -174,17 +176,17 @@
                     <tr>
                         <th>{{ trans('cruds.deliveryboy.fields.kyc_verified') }}</th>
                         <td>
-                            <?php 
-                                if($deliveryboy->details){
+                            <?php
+                            if ($deliveryboy->details) {
                             ?>
-                            <div class="switch-field">
-                                <input data-id="{{$deliveryboy->details->id}}" data-status="1" class="toggle-class" type="radio" id="radio-three" name="switch-two" value="1" {{ $deliveryboy->details->status == 1 ? 'checked': '' }} />
-                                <label class="" for="radio-three">{{ trans('cruds.deliveryboy.fields.submitted') }}</label>
-                                <input data-id="{{$deliveryboy->details->id}}" data-status="2" class="toggle-class" type="radio" id="radio-four" name="switch-two" value="2" {{ $deliveryboy->details->status == 2 ? 'checked': '' }} />
-                                <label class="approved" for="radio-four">{{ trans('cruds.deliveryboy.fields.approved') }}</label>
-                                <input data-id="{{$deliveryboy->details->id}}" data-status="3" class="toggle-class" type="radio" id="radio-five" name="switch-two" value="3" {{ $deliveryboy->details->status == 3 ? 'checked': '' }} />
-                                <label class="rejected" for="radio-five">{{ trans('cruds.deliveryboy.fields.rejected') }}</label>
-                            </div>
+                                <div class="switch-field">
+                                    <input date-user="{{$deliveryboy->id}}" data-id="{{$deliveryboy->details->id}}" data-status="1" class="toggle-class" type="radio" id="radio-three" name="switch-two" value="1" {{ $deliveryboy->details->status == 1 ? 'checked': '' }} />
+                                    <label class="" for="radio-three">{{ trans('cruds.deliveryboy.fields.submitted') }}</label>
+                                    <input date-user="{{$deliveryboy->id}}" data-id="{{$deliveryboy->details->id}}" data-status="2" class="toggle-class" type="radio" id="radio-four" name="switch-two" value="2" {{ $deliveryboy->details->status == 2 ? 'checked': '' }} />
+                                    <label class="approved" for="radio-four">{{ trans('cruds.deliveryboy.fields.approved') }}</label>
+                                    <input date-user="{{$deliveryboy->id}}" data-id="{{$deliveryboy->details->id}}" data-status="3" class="toggle-class" type="radio" id="radio-five" name="switch-two" value="3" {{ $deliveryboy->details->status == 3 ? 'checked': '' }} />
+                                    <label class="rejected" for="radio-five">{{ trans('cruds.deliveryboy.fields.rejected') }}</label>
+                                </div>
                             <?php } ?>
                         </td>
                         <!-- <td><span class="{{ $deliveryboy->status == 1 ? 'btn btn-success':'btn btn-danger' }}"> {{ ($deliveryboy->status == 1 ?trans('cruds.deliveryboy.fields.active'):trans('cruds.deliveryboy.fields.inactive')) ?? '' }}</span></td> -->
@@ -297,15 +299,24 @@
 
         $('.toggle-class').change(function() {
             //var status = $(this).prop('checked') == true ? 1 : 0;
-            var user_id = $(this).data('id');
+            var user_id = $('#user_id').val();
+            var id = $(this).data('id');
             var status = $(this).data('status');
+            var formData = new FormData();
+            formData.append("user_id", user_id);
+            formData.append("id", id);
+            formData.append("status", status);
+
+
             $.ajax({
-                type: "GET",
-                dataType: "json",
+                type: "POST",
+                data: formData,
                 url: "{{ route('admin.deliveryboys.changeKYCStatus') }}",
-                data: {
-                    'status': status,
-                    'user_id': user_id
+                dataType: "json",
+                processData: false,
+                contentType: false,
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
                 success: function(data) {
                     //console.log(data)

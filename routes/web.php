@@ -134,6 +134,7 @@ Route::group([
 
     // Reports
     Route::get('reports/sales-itemwise', 'ReportsController@salesItemwise')->name('reports.salesItemwise');
+    Route::post('reports/sales-itemwise/data', 'ReportsController@getSalesItemwiseData')->name('reports.getSalesItemwiseData');
     Route::resource('reports', 'ReportsController');
 });
 Route::group(['prefix' => 'profile', 'as' => 'profile.', 'namespace' => 'Auth', 'middleware' => ['auth']], function () {

@@ -16,7 +16,7 @@ class CreateSpStoreProductInWishlist extends Migration
         DB::unprepared("DROP PROCEDURE IF EXISTS storeProductInWishlist;
         CREATE PROCEDURE storeProductInWishlist(IN inputData JSON)
         storeProductInWishlist:BEGIN
-            DECLARE userId,productsId INTEGER(10) DEFAULT 0;
+            DECLARE userId,productsId,wishlistId INTEGER(10) DEFAULT 0;
             DECLARE isBasket TINYINT(1) DEFAULT 0;
             DECLARE EXIT HANDLER FOR 1062
             BEGIN
@@ -51,9 +51,10 @@ class CreateSpStoreProductInWishlist extends Migration
             ELSE
                 INSERT INTO customer_wishlist (user_id,products_id,is_basket,created_by)
                 VALUES (userId,productsId,isBasket,userId);
+                SET wishlistId = LAST_INSERT_ID();
             END IF;
         
-            SELECT JSON_OBJECT('status', 'SUCCESS', 'message', 'Product/Basket stored successfully.','data',JSON_OBJECT(),'statusCode',200) AS response;
+            SELECT JSON_OBJECT('status', 'SUCCESS', 'message', 'Product/Basket stored successfully.','data',JSON_OBJECT('wishlist_id', wishlistId),'statusCode',200) AS response;
             LEAVE storeProductInWishlist;
         END;");
     }

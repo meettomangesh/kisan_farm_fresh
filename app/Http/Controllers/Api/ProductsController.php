@@ -80,15 +80,14 @@ class ProductsController extends BaseController
             $product = new Product();
             // Function call to store product in wishlist
             $responseDetails = $product->storeProductInWishlist($params);
-            $message = 'Failed to store product.';
-            if ($responseDetails) {
-                $message = 'Product stored successfully';
+            if ($responseDetails["status"] == true) {
+                return $this->sendResponse($responseDetails, $responseDetails["message"]);
+            } else {
+                return $this->sendError($responseDetails["message"], $responseDetails, 422);
             }
-            $response = $this->sendResponse([], $message);
         } catch (Exception $e) {
-            $response = $this->sendResponse(array(), $e->getMessage());
+            return $this->sendResponse(array(), $e->getMessage());
         }
-        return $response;
     }
 
     public function removeProductFromWishlist(Request $request)

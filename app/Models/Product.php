@@ -208,9 +208,9 @@ class Product extends Model
             $stmt->closeCursor();
             $reponse = json_decode($result['response']);
             if ($reponse->status == "FAILURE" && $reponse->statusCode != 200) {
-                return false;
+                return ["status" => false, "message" => $reponse->message];
             }
-            return true;
+            return ["status" => true, "message" => $reponse->message, "wishlist_id" => $reponse->data->wishlist_id];
         } catch (Exception $e) {
             return $this->sendError('Error.', $$e->getMessage());
         }

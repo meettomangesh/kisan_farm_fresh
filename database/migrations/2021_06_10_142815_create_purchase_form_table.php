@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreatePromoCodesTable extends Migration
+class CreatePurchaseFormTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,21 +13,23 @@ class CreatePromoCodesTable extends Migration
      */
     public function up()
     {
-        Schema::create('promo_codes', function (Blueprint $table) {
+        Schema::create('purchase_form', function (Blueprint $table) {
             $table->increments('id')->unsigned();
-            $table->integer('promo_code_master_id')->unsigned()->index();
-            $table->integer('user_id')->unsigned()->index();
-            $table->string('promo_code', 20)->default(null)->index()->nullable();
-            $table->date('start_date')->default(null)->nullable();
-            $table->date('end_date')->default(null)->nullable();
-            $table->tinyInteger('is_code_used')->default(0)->unsigned()->index()->comment = "1: Yes, 0: No";
-            $table->tinyInteger('status')->default(1)->unsigned()->index()->comment = "1: Active, 0: Inactive, 2: Expired";
+            $table->string('supplier_name', 250)->index();
+            $table->string('product_name', 250)->index();
+            $table->string('unit', 20)->index();
+            $table->string('category', 50)->index();
+            $table->decimal('price', 14, 4);
+            $table->date('order_date')->index();
+            $table->string('total_in_kg', 10)->index();
+            $table->string('total_units', 10)->index();
+            $table->string('image_name', 1000);
             $table->integer('created_by')->unsigned();
             $table->integer('updated_by')->default(0)->unsigned();
             $table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP'));
             $table->timestamp('updated_at')->default(DB::raw('null ON UPDATE CURRENT_TIMESTAMP'))->nullable();
             $table->softDeletes();
-          });
+        });
     }
 
     /**
@@ -37,6 +39,6 @@ class CreatePromoCodesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('promo_codes');
+        Schema::dropIfExists('purchase_form');
     }
 }

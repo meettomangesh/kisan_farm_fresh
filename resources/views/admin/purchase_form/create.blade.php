@@ -12,6 +12,23 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-group">
+                        <label class="control-label col-md-4 required" for="supplier_name">{{ trans('cruds.purchase_form.fields.supplier_name') }}</label>
+                        <div class="col-md-8 float-right">
+                            <input class="form-control {{ $errors->has('supplier_name') ? 'is-invalid' : '' }}" type="text" name="supplier_name" id="supplier_name" maxlength="250" value="{{ old('supplier_name', '') }}" required>
+                            @if($errors->has('supplier_name'))
+                                <div class="invalid-feedback">
+                                    {{ $errors->first('supplier_name') }}
+                                </div>
+                            @endif
+                            <span class="help-block">{{ trans('cruds.purchase_form.fields.supplier_name_helper') }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
                         <label class="control-label col-md-4 required" for="product_name">{{ trans('cruds.purchase_form.fields.product_name') }}</label>
                         <div class="col-md-8 float-right">
                             <input class="form-control {{ $errors->has('product_name') ? 'is-invalid' : '' }}" type="text" name="product_name" id="product_name" maxlength="250" value="{{ old('product_name', '') }}" required>

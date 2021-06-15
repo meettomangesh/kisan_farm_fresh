@@ -636,7 +636,7 @@ class CustomerOrders extends Model
             return array("status" => false, "message" => "Invalid user address");
         }
 
-        if (($params['delivery_details']['date'] <= date('Y-m-d')) && $is_admin == 0) {
+        if (($params['delivery_date'] <= date('Y-m-d')) && $is_admin == 0) {
             return array("status" => false, "message" => "Invalid delivery date, must be greater than current date");
         }
 

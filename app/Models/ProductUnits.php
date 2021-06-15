@@ -32,17 +32,17 @@ class ProductUnits extends Model
 
     public function unit()
     {
-        return $this->belongsTo(Unit::class, 'unit_id');
+        return $this->belongsTo(Unit::class, 'unit_id')->where('deleted_at', NULL);
     }
     
     public function baskets()
     {
-        return $this->belongsToMany(Basket::class);
+        return $this->belongsToMany(Basket::class)->where('deleted_at', NULL);
     }
 
     public function product()
     {
-        return $this->belongsTo(Product::class, 'products_id');
+        return $this->belongsTo(Product::class, 'products_id')->where('deleted_at', NULL);
     }
 
     protected function getCurrentQuantity($productUnitsId) {

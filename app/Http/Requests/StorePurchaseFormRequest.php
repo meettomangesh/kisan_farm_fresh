@@ -8,7 +8,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Support\Facades\Auth;
 
-class StorePurchaseRequestRequest extends FormRequest
+class StorePurchaseFormRequest extends FormRequest
 {
     public function authorize()
     {
@@ -20,7 +20,8 @@ class StorePurchaseRequestRequest extends FormRequest
     {
         $this->sanitize();
         return [
-            'product_name' => ['required','max:250'], //alphaSpaces
+            'supplier_name' => ['required','max:250'],
+            'product_name' => ['required','max:250'],
             'unit' => ['required','max:20'],
             'category' => ['required','max:50'],
             'total_in_kg' => ['required','max:10'],
@@ -33,6 +34,7 @@ class StorePurchaseRequestRequest extends FormRequest
     public function sanitize()
     {
         $input = $this->all();
+        $input['supplier_name'] = filter_var($input['supplier_name'], FILTER_SANITIZE_STRING);
         $input['product_name'] = filter_var($input['product_name'], FILTER_SANITIZE_STRING);
         $input['unit'] = filter_var($input['unit'], FILTER_SANITIZE_STRING);
         $input['category'] = filter_var($input['category'], FILTER_SANITIZE_STRING);

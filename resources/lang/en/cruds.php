@@ -722,6 +722,8 @@ return [
         'fields'         => [
             'id'                => 'ID',
             'id_helper'         => '',
+            'supplier_name'          => 'Supplier Name',
+            'supplier_name_helper'       => '',
             'product_name'          => 'Product Name',
             'product_name_helper'       => '',
             'unit'        => 'Unit',

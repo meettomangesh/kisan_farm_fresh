@@ -22,6 +22,7 @@
                     <tr>
                         <th width="10"></th>
                         <th>{{ trans('cruds.purchase_form.fields.id') }}</th>
+                        <th>{{ trans('cruds.purchase_form.fields.supplier_name') }}</th>
                         <th>{{ trans('cruds.purchase_form.fields.product_name') }}</th>
                         <th>{{ trans('cruds.purchase_form.fields.unit') }}</th>
                         <th>{{ trans('cruds.purchase_form.fields.category') }}</th>
@@ -37,6 +38,7 @@
                         <tr data-entry-id="{{ $purchaseForm->id }}">
                             <td></td>
                             <td>{{ $purchaseForm->id ?? '' }}</td>
+                            <td>{{ $purchaseForm->supplier_name ?? '' }}</td>
                             <td>{{ $purchaseForm->product_name ?? '' }}</td>
                             <td>{{ $purchaseForm->unit ?? '' }}</td>
                             <td>{{ $purchaseForm->category ?? '' }}</td>

@@ -31,7 +31,7 @@ class CreateUserDetailsTable extends Migration
             $table->tinyInteger('vehicle_type')->default(4)->unsigned()->index()->comment = "1:Two wheeler,2:Three wheeler,3:Four wheeler,4:Other";
             $table->string('vehicle_number', 250)->nullable();
 
-            $table->tinyInteger('status')->default(1)->unsigned()->index()->comment = "1:Submitted, 2: Approve, 3: Rejected";
+            $table->tinyInteger('status')->default(0)->unsigned()->index()->comment = "0:New, 1:Submitted, 2: Approve, 3: Rejected";
             $table->integer('created_by')->default(0)->unsigned();
             $table->integer('updated_by')->default(0)->unsigned();
             // $table->timestamps();

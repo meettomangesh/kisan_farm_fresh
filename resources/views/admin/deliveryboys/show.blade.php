@@ -180,6 +180,8 @@
                             if ($deliveryboy->details) {
                             ?>
                                 <div class="switch-field">
+                                    <input date-user="{{$deliveryboy->id}}" data-id="{{$deliveryboy->details->id}}" data-status="0" class="toggle-class" type="radio" id="radio-two" name="switch-two" value="0" {{ $deliveryboy->details->status == 0 ? 'checked': '' }} />
+                                    <label class="" for="radio-two">{{ trans('cruds.deliveryboy.fields.new') }}</label>
                                     <input date-user="{{$deliveryboy->id}}" data-id="{{$deliveryboy->details->id}}" data-status="1" class="toggle-class" type="radio" id="radio-three" name="switch-two" value="1" {{ $deliveryboy->details->status == 1 ? 'checked': '' }} />
                                     <label class="" for="radio-three">{{ trans('cruds.deliveryboy.fields.submitted') }}</label>
                                     <input date-user="{{$deliveryboy->id}}" data-id="{{$deliveryboy->details->id}}" data-status="2" class="toggle-class" type="radio" id="radio-four" name="switch-two" value="2" {{ $deliveryboy->details->status == 2 ? 'checked': '' }} />
@@ -206,7 +208,7 @@
                         <th style="width:33%">{{ ($deliveryboy->details)?$deliveryboy->details->aadhar_number:'' }}</th>
 
                         <th rowspan="2"><a href="#" class="pop">
-
+                                
                                 <img src="{{ asset(($deliveryboy->details)?$deliveryboy->details->aadhar_card_photo:'') }}" width="150" height="150">
                             </a></td>
                         </th>

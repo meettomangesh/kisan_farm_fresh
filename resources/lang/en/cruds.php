@@ -139,6 +139,7 @@ return [
             'submitted' => 'Submitted',
             'approved' => 'Approved',
             'rejected' => 'Rejected',
+            'new' => 'New',
             'status_helper'         => '',
             'active'                => 'Active',
             'inactive'                => 'InActive',

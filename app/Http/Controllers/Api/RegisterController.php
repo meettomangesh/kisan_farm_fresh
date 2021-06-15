@@ -193,9 +193,11 @@ class RegisterController extends BaseController
         }
 
         $input['updated_by'] = 1;
+       
         $customer->update($input);
         // print_r($input);
         if ($request->role_id == 3) {
+            $input['status'] = 1;
             $userDetails =  UserDetails::updateOrCreate(
                 ['user_id' => $request->id, 'role_id' => $request->role_id],
                 $input

@@ -78,6 +78,10 @@ class Category extends Model
         return Category::select('id','cat_name','cat_image_name')->where('status', 1)->where('cat_parent_id', $params['category_id'])->get()->toArray();
     }
 
+    public static function getParentCategory($params) {
+        return Category::select('cat_parent_id')->where('status', 1)->where('id', $params['category_id'])->first();
+    }
+
     protected function getCategoryName($id) {
         $catParentId = Category::select('cat_parent_id')->where('id', $id)->where('status', 1)->get()->toArray();
         if(!empty($catParentId[0])) {

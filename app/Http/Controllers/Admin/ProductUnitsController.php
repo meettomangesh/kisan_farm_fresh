@@ -37,7 +37,7 @@ class ProductUnitsController extends Controller
     public function store(StoreProductUnitRequest $request)
     {
         $productUnit = ProductUnits::create($request->all());
-        if($productUnit->id > 0) {
+        if ($productUnit->id > 0) {
             ProductInventory::storeProductInventory($request, $productUnit->id);
             ProductLocationInventory::storeProductLocationInventory($request, $productUnit->id);
         }
@@ -75,17 +75,42 @@ class ProductUnitsController extends Controller
         return response(null, Response::HTTP_NO_CONTENT);
     }
 
+    // public function getUnits($id)
+    // {
+    //     $productData = Product::getProductById($id);
+    //     $categoryName = Category::getCategoryName($productData['category_id']);
+    //     $unitIds = ProductUnits::getProductUnitIds($id);
+    //     $unitIds = explode(',', $unitIds);
+    //     $data['category'] = $categoryName;
+    //     $data['units'] = DB::table("unit_master")->whereNotIn("id", $unitIds)->where("status", 1)->where("cat_id", $productData['category_id'])->pluck("unit", "id");
+    //     $data['is_unit_available'] = sizeof($data['units']);
+    //     return json_encode($data);
+    // }
+
     public function getUnits($id)
     {
         $productData = Product::getProductById($id);
         $categoryName = Category::getCategoryName($productData['category_id']);
+        $categoryArr = [];
+        array_push($categoryArr, $productData['category_id']);
+        $parentCatgory = Category::getSubCategory(array('category_id' => $productData['category_id']));
+        array_push($categoryArr, $parentCatgory);
         $unitIds = ProductUnits::getProductUnitIds($id);
-        $unitIds = explode(',', $unitIds);
+        echo $unitIds;
+        $unitIds = ($unitIds) ? explode(',', $unitIds) : [];
+        //echo count($unitIds);
+        print_r($categoryArr);exit;
         $data['category'] = $categoryName;
-        $data['units'] = DB::table("unit_master")->whereNotIn("id", $unitIds)->where("status", 1)->where("cat_id", $productData['category_id'])->pluck("unit", "id");
+        //echo $productData['category_id'];
+        if (count($unitIds) > 0) {
+            $data['units'] = DB::table("unit_master")->whereNotIn("id", $unitIds)->where("status", 1)->where("cat_id", $categoryArr);
+        } else {
+            $data['units'] = DB::table("unit_master")->where("status", 1)->where("cat_id", $categoryArr)->pluck("unit", "id");
+        }
         $data['is_unit_available'] = sizeof($data['units']);
         return json_encode($data);
     }
+
 
     public function addOrRemoveInventory($productUnitId)
     {

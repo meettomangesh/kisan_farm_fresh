@@ -94,18 +94,20 @@ class ProductUnitsController extends Controller
         $categoryArr = [];
         array_push($categoryArr, $productData['category_id']);
         $parentCatgory = Category::getParentCategory(array('category_id' => $productData['category_id']));
-        array_push($categoryArr, $parentCatgory);
+        //print_r($parentCatgory->cat_parent_id); exit;
+         
+        array_push($categoryArr, $parentCatgory->cat_parent_id);
         $unitIds = ProductUnits::getProductUnitIds($id);
-        echo $unitIds;
+        //echo $unitIds;
         $unitIds = ($unitIds) ? explode(',', $unitIds) : [];
         //echo count($unitIds);
-        print_r($categoryArr);exit;
+        //print_r($categoryArr);exit;
         $data['category'] = $categoryName;
         //echo $productData['category_id'];
         if (count($unitIds) > 0) {
-            $data['units'] = DB::table("unit_master")->whereNotIn("id", $unitIds)->where("status", 1)->where("cat_id", $categoryArr);
+            $data['units'] = DB::table("unit_master")->whereNotIn("id", $unitIds)->where("status", 1)->whereIn("cat_id", $categoryArr)->pluck("unit", "id");
         } else {
-            $data['units'] = DB::table("unit_master")->where("status", 1)->where("cat_id", $categoryArr)->pluck("unit", "id");
+            $data['units'] = DB::table("unit_master")->where("status", 1)->whereIn("cat_id", $categoryArr)->pluck("unit", "id");
         }
         $data['is_unit_available'] = sizeof($data['units']);
         return json_encode($data);

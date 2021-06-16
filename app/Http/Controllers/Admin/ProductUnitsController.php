@@ -93,7 +93,7 @@ class ProductUnitsController extends Controller
         $categoryName = Category::getCategoryName($productData['category_id']);
         $categoryArr = [];
         array_push($categoryArr, $productData['category_id']);
-        $parentCatgory = Category::getSubCategory(array('category_id' => $productData['category_id']));
+        $parentCatgory = Category::getParentCategory(array('category_id' => $productData['category_id']));
         array_push($categoryArr, $parentCatgory);
         $unitIds = ProductUnits::getProductUnitIds($id);
         echo $unitIds;

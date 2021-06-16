@@ -78,7 +78,7 @@ class Category extends Model
         return Category::select('id','cat_name','cat_image_name')->where('status', 1)->where('cat_parent_id', $params['category_id'])->get()->toArray();
     }
 
-    public static function getSubCategory($params) {
+    public static function getParentCategory($params) {
         return Category::select('id')->where('status', 1)->where('cat_parent_id', $params['category_id'])->get()->toArray();
     }
 

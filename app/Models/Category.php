@@ -79,7 +79,7 @@ class Category extends Model
     }
 
     public static function getParentCategory($params) {
-        return Category::select('id')->where('status', 1)->where('cat_parent_id', $params['category_id'])->get()->toArray();
+        return Category::select('cat_parent_id')->where('status', 1)->where('id', $params['category_id'])->get()->toArray();
     }
 
     protected function getCategoryName($id) {

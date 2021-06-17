@@ -21,6 +21,7 @@
                     <tr>
                         <th width="10"></th>
                         <th>{{ trans('cruds.product_unit.fields.id') }}</th>
+                        <th>{{ trans('cruds.product_unit.fields.category') }}</th>
                         <th>{{ trans('cruds.product_unit.fields.product_name') }}</th>
                         <th>{{ trans('cruds.product_unit.fields.unit') }}</th>
                         <th>{{ trans('cruds.product_unit.fields.selling_price') }}</th>
@@ -35,8 +36,9 @@
                         <tr data-entry-id="{{ $productUnit->id }}">
                             <td></td>
                             <td>{{ $productUnit->id ?? '' }}</td>
-                            <td><b>{{ ($productUnit->product)?$productUnit->product->product_name:"" }}</b></td>
-                            <td><b>{{ ($productUnit->unit)?$productUnit->unit->unit:"" }}</b></td>
+                            <td><b>{{ ($productUnit->product->category) ? $productUnit->product->category->cat_name : "" }}</b></td>
+                            <td><b>{{ ($productUnit->product) ? $productUnit->product->product_name : "" }}</b></td>
+                            <td><b>{{ ($productUnit->unit) ? $productUnit->unit->unit : "" }}</b></td>
                             <td>{{ round($productUnit->selling_price, 2) ?? '' }}</td>
                             <td>{{ round($productUnit->special_price, 2) ?? '' }}</td>
                             <td>{{ $productUnit->opening_quantity ?? '' }}</td>

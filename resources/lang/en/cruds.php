@@ -450,7 +450,6 @@ return [
             'product_helper'       => '',
             'product_name'              => 'Product Name',
             'product_name_helper'       => '',
-            'category'             => 'Category',
             'opening_quantity'                => 'Opening Quantity',
             'opening_quantity_helper'         => '',
             'current_quantity'                => 'Current Quantity',

@@ -28,7 +28,7 @@ class ProductsController extends Controller
     public function create()
     {
         abort_if(Gate::denies('product_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-        $categories = Category::all()->where('status', 1)->pluck('cat_name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $categories = Category::all()->where('status', 1)->where('cat_parent_id', 0)->pluck('cat_name', 'id')->prepend(trans('global.pleaseSelect'), '');
         return view('admin.products.create', compact('categories'));
     }
 

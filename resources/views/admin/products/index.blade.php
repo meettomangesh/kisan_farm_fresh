@@ -22,6 +22,7 @@
                         <th width="10"></th>
                         <th>{{ trans('cruds.product.fields.id') }}</th>
                         <th>{{ trans('cruds.product.fields.product_image') }}</th>
+                        <th>{{ trans('cruds.product.fields.category') }}</th>
                         <th>{{ trans('cruds.product.fields.product_name') }}</th>
                         <th>{{ trans('cruds.product.fields.sku') }}</th>
                         <th>{{ trans('cruds.product.fields.actions') }}</th>
@@ -30,6 +31,7 @@
                         <th width="10"></th>
                         <th></th>
                         <th></th>
+                        <th><input type="text" placeholder="Search" /></th>
                         <th><input type="text" placeholder="Search" /></th>
                         <th><input type="text" placeholder="Search" /></th>
                         <th></th>
@@ -41,6 +43,7 @@
                             <td></td>
                             <td>{{ $product->id ?? '' }}</td>
                             <td><img src="{{ asset(App\Models\ProductImages::getFirstImage($product->id))  }}" alt="" width="60" height="60"></td>
+                            <td><b>{{ ($product->category) ? $product->category->cat_name : "" }}</b></td>
                             <td>{{ $product->product_name ?? '' }}</td>
                             <td>{{ $product->sku ?? '' }}</td>
                             <td>

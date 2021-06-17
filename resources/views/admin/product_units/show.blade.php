@@ -17,47 +17,51 @@
                 <tbody>
                     <tr>
                         <th>{{ trans('cruds.product_unit.fields.id') }}</th>
-                        <td>{{ $productUnit->id }}</td>
+                        <td>{{ $productUnit->id ?? '' }}</td>
+                    </tr>
+                    <tr>
+                        <th>{{ trans('cruds.product_unit.fields.category') }}</th>
+                        <td><b>{{ ($productUnit->product->category) ? $productUnit->product->category->cat_name : "" }}</b></td>
                     </tr>
                     <tr>
                         <th>{{ trans('cruds.product_unit.fields.product_name') }}</th>
-                        <td><b>{{ $productUnit->product->product_name }}</b></td>
+                        <td><b>{{ ($productUnit->product) ? $productUnit->product->product_name : "" }}</b></td>
                     </tr>
                     <tr>
                         <th>{{ trans('cruds.product_unit.fields.unit') }}</th>
-                        <td><b>{{ $productUnit->unit->unit }}</b></td>
+                        <td><b>{{ ($productUnit->unit) ? $productUnit->unit->unit : "" }}</b></td>
                     </tr>
                     <tr>
                         <th>{{ trans('cruds.product_unit.fields.selling_price') }}</th>
-                        <td>{{ round($productUnit->selling_price, 2) }}</td>
+                        <td>{{ round($productUnit->selling_price, 2) ?? '' }}</td>
                     </tr>
                     <tr>
                         <th>{{ trans('cruds.product_unit.fields.special_price') }}</th>
-                        <td>{{ round($productUnit->special_price, 2) }}</td>
+                        <td>{{ round($productUnit->special_price, 2) ?? '' }}</td>
                     </tr>
                     <tr>
                         <th>{{ trans('cruds.product_unit.fields.special_price_start_date') }}</th>
-                        <td>{{ $productUnit->special_price_start_date }}</td>
+                        <td>{{ $productUnit->special_price_start_date ?? '' }}</td>
                     </tr>
                     <tr>
                         <th>{{ trans('cruds.product_unit.fields.special_price_end_date') }}</th>
-                        <td>{{ $productUnit->special_price_end_date }}</td>
+                        <td>{{ $productUnit->special_price_end_date ?? '' }}</td>
                     </tr>
                     <tr>
                         <th>{{ trans('cruds.product_unit.fields.min_quantity') }}</th>
-                        <td>{{ $productUnit->min_quantity }}</td>
+                        <td>{{ $productUnit->min_quantity ?? '' }}</td>
                     </tr>
                     <tr>
                         <th>{{ trans('cruds.product_unit.fields.max_quantity') }}</th>
-                        <td>{{ $productUnit->max_quantity }}</td>
+                        <td>{{ $productUnit->max_quantity ?? '' }}</td>
                     </tr>
                     <tr>
                         <th>{{ trans('cruds.product_unit.fields.opening_quantity') }}</th>
-                        <td>{{ $productUnit->opening_quantity }}</td>
+                        <td>{{ $productUnit->opening_quantity ?? '' }}</td>
                     </tr>
                     <tr>
                         <th>{{ trans('cruds.product_unit.fields.current_quantity') }}</th>
-                        <td>{{ App\Models\ProductLocationInventory::getProductUnitCurrentQuantity($productUnit->id) }}</td>
+                        <td>{{ ($productUnit->id) ? App\Models\ProductLocationInventory::getProductUnitCurrentQuantity($productUnit->id) : "" }}</td>
                     </tr>
                     <tr>
                         <th>{{ trans('cruds.product_unit.fields.status') }}</th>

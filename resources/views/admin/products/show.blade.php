@@ -17,7 +17,7 @@
                 <tbody>
                     <tr>
                         <th>{{ trans('cruds.product.fields.id') }}</th>
-                        <td>{{ $product->id }}</td>
+                        <td>{{ $product->id ?? '' }}</td>
                     </tr>
                     <tr>
                         <th>{{ trans('cruds.product.fields.product_image') }}</th>
@@ -25,23 +25,23 @@
                     </tr>
                     <tr>
                         <th>{{ trans('cruds.product.fields.category') }}</th>
-                        <td><b>{{ $product->category->cat_name }}</b></td>
+                        <td><b>{{ ($product->category) ? $product->category->cat_name : "" }}</b></td>
                     </tr>
                     <tr>
                         <th>{{ trans('cruds.product.fields.product_name') }}</th>
-                        <td><b>{{ $product->product_name }}</b></td>
+                        <td><b>{{ $product->product_name ?? '' }}</b></td>
                     </tr>
                     <tr>
                         <th>{{ trans('cruds.product.fields.sku') }}</th>
-                        <td><b>{{ $product->sku }}</b></td>
+                        <td><b>{{ $product->sku ?? '' }}</b></td>
                     </tr>
                     <tr>
                         <th>{{ trans('cruds.product.fields.short_description') }}</th>
-                        <td>{{ $product->short_description }}</td>
+                        <td>{{ $product->short_description ?? '' }}</td>
                     </tr>
                     <tr>
                         <th>{{ trans('cruds.product.fields.expiry_date') }}</th>
-                        <td>{{ $product->expiry_date }}</td>
+                        <td>{{ $product->expiry_date ?? '' }}</td>
                     </tr>
                     <tr>
                         <th>{{ trans('cruds.product.fields.stock_availability') }}</th>

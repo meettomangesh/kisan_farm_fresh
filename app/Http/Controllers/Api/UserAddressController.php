@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\API\BaseController as BaseController;
 use App\User;
 use App\Models\UserAddress;
+use App\Models\CustomerOrders;
 use Illuminate\Support\Facades\Auth;
 use Validator;
 use App\Helper\DataHelper;
@@ -115,6 +116,10 @@ class UserAddressController extends BaseController
             if ($userAddress === null) {
                 return $this->sendError('Please provide valid address details.', []);
             }
+            $customerOrders = CustomerOrders::where('shipping_address_id', $request->user_address_id)->whereIn('order_status', [0,1,2,3])->get()->toArray();
+            if (sizeof($customerOrders) > 0) {
+                return $this->sendError('You have some order(s) which are in transition, so we can not update your address.', []);
+            }
             $userAddress->name = $request->name;
             $userAddress->address = $request->address;
             $userAddress->pin_code = $request->pin_code;
@@ -156,6 +161,10 @@ class UserAddressController extends BaseController
             $userAddress =  UserAddress::where('id', $request->user_address_id)->first();
             if ($userAddress === null) {
                 return $this->sendError('Please provide valid address details.', []);
+            }
+            $customerOrders = CustomerOrders::where('shipping_address_id', $request->user_address_id)->whereIn('order_status', [0,1,2,3])->get()->toArray();
+            if (sizeof($customerOrders) > 0) {
+                return $this->sendError('You have some order(s) which are in transition, so we can not delete your address.', []);
             }
             $userAddress->delete();
             $success['user_address_id'] = $request->user_address_id;

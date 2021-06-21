@@ -7,13 +7,15 @@ use Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use DB;
+use Datatables;
+use Session;
 
 class ReportsController extends Controller
 {
     public function salesItemwise()
     {
         abort_if(Gate::denies('report_sales_itemwise_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-        return view('admin.reports.sales_itemwise', compact('srNo','salesItemsData'));
+        return view('admin.reports.sales_itemwise', compact(''));
     }
 
     /**
@@ -96,9 +98,8 @@ class ReportsController extends Controller
 
         // $salesItemsData->where('pmer.expiry_date', '>=', $expiryDate . "");
         
-        $salesItemsData = collect($salesItemsData->get());
-
-        // $customers = $this->repository->getRegisteredCustomers($filterParams);
+        // $salesItemsData = collect($salesItemsData->get());
+        // return $salesItemsData;
         return Datatables::of($salesItemsData)->make(true);
 
         /* $salesItemsData = DB::table('customer_order_details AS cod')

@@ -22,18 +22,18 @@
                         <th></th>
                     </tr>
                     <tr role="row" class="filter">
-                        <td></td>
-                        <td width="10%"><input name="order_id" type="text" placeholder="Search" /></td>
-                        <td><input name="product_name" type="text" placeholder="Search" /></td>
-                        <td><input name="selling_price" type="text" placeholder="Search" /></td>
-                        <td><input name="special_price" type="text" placeholder="Search" /></td>
-                        <td><input name="item_quantity" type="text" placeholder="Search" /></td>
-                        <td>
-                            <input class="form-control" type="date" name="order_date" id="order_date" max="{{ date('Y-m-d') }}">
-                        </td>
-                        <th><input name="order_status" type="text" placeholder="Search" /></td>
-                        <td> <button class="btn btn-sm yellow filter-submit margin-bottom-5" title="{!! trans('admin::messages.search') !!}"><i class="fa fa-search"></i></button>
-                            <button class="btn btn-sm red filter-cancel margin-bottom-5" title="{!! trans('admin::messages.reset') !!}"><i class="fa fa-times"></i></button></td>
+                        <th></th>
+                        <th width="10%"><input name="order_id" type="text" placeholder="Search" /></th>
+                        <th><input name="product_name" type="text" placeholder="Search" /></th>
+                        <th><input name="selling_price" type="text" placeholder="Search" /></th>
+                        <th><input name="special_price" type="text" placeholder="Search" /></th>
+                        <th><input name="item_quantity" type="text" placeholder="Search" /></th>
+                        <th>
+                            <input class="form-control" type="date" name="order_date" id="order_date" max="{{ date('Y-m-d') }}" />
+                        </th>
+                        <th><input name="order_status" type="text" placeholder="Search" /></th>
+                        <th> <button class="btn btn-sm yellow filter-submit margin-bottom-5" title="{!! trans('admin::messages.search') !!}"><i class="fa fa-search"></i></button>
+                            <button class="btn btn-sm red filter-cancel margin-bottom-5" title="{!! trans('admin::messages.reset') !!}"><i class="fa fa-times"></i></button></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -44,18 +44,9 @@
     </div>
 </div>
 
-@section('template-level-scripts')
-@parent
-<!-- script src="{{ asset('js/admin/sales_itemwise.js') }}"></script -->
-@stop
-
 @section('scripts')
 @parent
 <script>
-    /* jQuery(document).ready(function () {
-        siteObjJs.admin.SalesItemwise.init();
-        siteObjJs.admin.commonJs.boxExpandBtnClick();
-    }); */
     $(function () {
         let dtButtons = $.extend(true, [], $.fn.dataTable.defaults.buttons)
         $.extend(true, $.fn.dataTable.defaults, {
@@ -70,8 +61,10 @@
                 }
             });
         });
-        let table = $('.datatable-sales-itemwise').DataTable({ 
-            buttons: dtButtons,
+        let table = $('.datatable-sales-itemwise').DataTable({
+            processing: true,
+            serverSide: true,
+            // buttons: dtButtons,
             columns:  [
                 {data: null, name: 'rownum', searchable: false},
                 {data: 'order_id', name: 'order_id'},
@@ -84,7 +77,6 @@
                 {data: null, name: 'action', sortable: false}
             ],
             drawCallback: function (settings) {
-                console.log('IN drawCallback');
                 var api = this.api();
                 var rows = api.rows({page: 'current'}).nodes();
                 var last = null;
@@ -93,8 +85,24 @@
                 var displayLength = settings._iDisplayLength;
                 api.column(0, {page: 'current'}).data().each(function (group, i) {
                     recNum = ((page * displayLength) + i + 1);
-                    console.log("recNum: ", recNum);
                     $(rows).eq(i).children('td:first-child').html(recNum);
+                });
+                api.column(8, {page: 'current'}).data().each(function (data, i) {
+                    var orderStatus = "";
+                    if (data.order_status == 0) {
+                        orderStatus = 'Pending';
+                    } else if (data.order_status == 1) {
+                        orderStatus = 'Placed';
+                    } else if (data.order_status == 2) {
+                        orderStatus = 'Picked';
+                    } else if (data.order_status == 3) {
+                        orderStatus = 'Out for delivery';                    
+                    } else if (data.order_status == 4) {
+                        orderStatus = 'Delivered';                        
+                    } else if (data.order_status == 5) {
+                        orderStatus = 'Cancelled';
+                    }
+                    $(rows).eq(i).children('td:nth-child(8)').html(orderStatus);                      
                 });
             },
             ajax: {

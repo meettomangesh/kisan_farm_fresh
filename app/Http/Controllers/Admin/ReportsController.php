@@ -7,7 +7,7 @@ use Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use DB;
-use Datatables;
+use DataTables;
 use Session;
 
 class ReportsController extends Controller
@@ -25,6 +25,12 @@ class ReportsController extends Controller
     public function getFilterAttributes()
     {
         return [
+            'order_id',
+            'product_name',
+            'selling_price',
+            'special_price',
+            'item_quantity',
+            'order_status',
             'order_date'
         ];
     }
@@ -32,12 +38,14 @@ class ReportsController extends Controller
     public function getSalesItemwiseData(Request $request) {
         set_time_limit(0);
 
+        $input = $request->all();
         $filterParams = [];
-        if ($request->has('order_date_from')) {
-            $filterParams['order_date_from'] = $request->get('order_date_from');
-        }
-        if ($request->has('order_date_to')) {
-            $filterParams['order_date_to'] = $request->get('order_date_to');
+        if(isset($input['draw']) && $input['draw'] != 1) {
+            foreach($input['columns'] as $key => $value) {
+                if(isset($value['search']['value']) && !empty($value['search']['value'])) {
+                    $filterParams[$value['name']] = $value['search']['value'];
+                }
+            }
         }
 
         $salesItemsData = DB::table('customer_orders AS co')
@@ -55,14 +63,14 @@ class ReportsController extends Controller
             DB::raw('cod.special_price'),
             DB::raw('DATE(cod.created_at) AS order_date'),
             DB::raw('cod.is_basket'),
-            DB::raw('IF(cod.is_basket = 0, "", (
+            /* DB::raw('IF(cod.is_basket = 0, "", (
                 SELECT GROUP_CONCAT(CONCAT(pn.product_name, " (", umn.unit, ")")) FROM customer_order_details_basket AS codb
                 JOIN products AS pn ON pn.id = codb.products_id
                 JOIN product_units AS pun ON pun.id = codb.product_units_id
                 JOIN unit_master AS umn ON umn.id = pun.unit_id
                 WHERE codb.order_id = cod.order_id AND codb.order_details_id = cod.id
             )) AS basket_products'),
-            /* DB::raw('CASE 
+            DB::raw('CASE 
                     WHEN cod.order_status = 0 THEN "Pending"
                     WHEN cod.order_status = 1 THEN "Placed"
                     WHEN cod.order_status = 2 THEN "Picked"
@@ -74,7 +82,7 @@ class ReportsController extends Controller
             DB::raw('cod.order_status'),
         ]);
 
-        $orderDate = "";
+        /* $orderDate = "";
         if (!empty($filterParams['order_date_from']) && !empty($filterParams['order_date_to'])) {
             $orderDateFrom = Carbon::parse($filterParams['order_date_from'])->format('Y-m-d');
             $orderDateTo = Carbon::parse($filterParams['order_date_to'])->format('Y-m-d');
@@ -94,9 +102,14 @@ class ReportsController extends Controller
             $orderDate = Carbon::parse($orderDate)->format('Y-m-d');
             $salesItemsData->where('DATE(cod.created_at)', '>=', $orderDate . " 00:00:00");
             $salesItemsData->where('DATE(cod.created_at)', '<=', $orderDate . " 23:59:59");
-        }
+        } */
 
-        // $salesItemsData->where('pmer.expiry_date', '>=', $expiryDate . "");
+        if (isset($filterParams['order_id']) && !empty($filterParams['order_id'])) {
+            $salesItemsData->where('cod.order_id', '=', $filterParams['order_id']);
+        }
+        if (isset($filterParams['product_name']) && !empty($filterParams['product_name'])) {
+            $salesItemsData->where('p.product_name', 'LIKE', "%".$filterParams['product_name']."%");
+        }
         
         // $salesItemsData = collect($salesItemsData->get());
         // return $salesItemsData;

@@ -16,6 +16,8 @@
                         <th>{{ trans('cruds.order.fields.delivery_boy_name') }} <br> {{ trans('cruds.order.fields.mobile_number') }}</th>
                         <th>{{ trans('cruds.order.fields.net_amount') }}</th>
                         <th>{{ trans('cruds.order.fields.gross_amount') }}</th>
+                        <th>{{ trans('cruds.order.fields.discounted_amount') }}</th>
+                        <th>{{ trans('cruds.order.fields.delivery_charge') }}</th>
                         <th>{{ trans('cruds.order.fields.payment_type') }}</th>
                         <th>{{ trans('cruds.order.fields.delivery_date') }}</th>
                         <th>{{ trans('cruds.order.fields.status') }}</th>
@@ -25,6 +27,8 @@
                     <tr>
                         <th></th>
                         <th></th>
+                        <th><input type="text" placeholder="Search" /></th>
+                        <th><input type="text" placeholder="Search" /></th>
                         <th><input type="text" placeholder="Search" /></th>
                         <th><input type="text" placeholder="Search" /></th>
                         <th><input type="text" placeholder="Search" /></th>
@@ -45,6 +49,8 @@
                         <td><b>{{ $customerOrder->userDeliveryBoy->first_name ?? '-' }}</b><br>{{ $customerOrder->userDeliveryBoy->mobile_number ?? '' }}</td>
                         <td>{{ round($customerOrder->net_amount, 2) ?? '' }}</td>
                         <td>{{ round($customerOrder->gross_amount, 2) ?? '' }}</td>
+                        <td>{{ round($customerOrder->discounted_amount, 2) ?? '' }}</td>
+                        <td>{{ round($customerOrder->delivery_charge, 2) ?? '' }}</td>
                         <td>{{ $customerOrder->payment_type ?? '' }}</td>
                         <td>
                         @if($customerOrder->needAttention == 1)

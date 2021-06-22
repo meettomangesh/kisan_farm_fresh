@@ -597,6 +597,7 @@ return [
             'net_amount'     => 'Net Amount',
             'gross_amount'     => 'Gross Amount',
             'discounted_amount'     => 'Discounted Amount',
+            'delivery_charge'     => 'Delivery Charge',
             'payment_type' => 'Payment Type',
             'type_helper' => '',
             'products'     => 'Products',

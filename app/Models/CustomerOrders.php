@@ -34,7 +34,7 @@ class CustomerOrders extends Model
         'deleted_at',
     ];
 
-    protected $fillable = ['customer_id', 'delivery_boy_id', 'shipping_address_id', 'billing_address_id', 'delivery_date', 'net_amount', 'gross_amount', 'discounted_amount', 'payment_type', 'razorpay_order_id', 'razorpay_payment_id', 'razorpay_signature', 'total_items', 'total_items_quantity', 'reject_cancel_reason', 'purchased_from', 'is_coupon_applied', 'promo_code', 'is_basket_in_order', 'order_status', 'created_by', 'updated_by', 'created_at', 'updated_at'];
+    protected $fillable = ['customer_id', 'delivery_boy_id', 'shipping_address_id', 'billing_address_id', 'delivery_date', 'net_amount', 'gross_amount', 'discounted_amount', 'delivery_charge', 'payment_type', 'razorpay_order_id', 'razorpay_payment_id', 'razorpay_signature', 'total_items', 'total_items_quantity', 'reject_cancel_reason', 'purchased_from', 'is_coupon_applied', 'promo_code', 'is_basket_in_order', 'order_status', 'created_by', 'updated_by', 'created_at', 'updated_at'];
 
     protected function serializeDate(DateTimeInterface $date)
     {

@@ -72,9 +72,11 @@ Route::group([
     Route::post('deliveryboys/changeKYCStatus', 'DeliveryBoysController@changeKYCStatus')->name('deliveryboys.changeKYCStatus');
     Route::resource('deliveryboys', 'DeliveryBoysController');
 
-    // Trips
-    Route::delete('trips/destroy', 'TripsController@massDestroy')->name('trips.massDestroy');
-    Route::resource('trips', 'TripsController');
+    // Campaign
+    Route::delete('campaigns/destroy', 'CampaignController@massDestroy')->name('campaigns.massDestroy');
+    Route::get('campaigns/getCampaignMaster/{cid?}', 'CampaignController@getCampaignMaster')->name('campaigns.getCampaignMaster');
+    Route::get('campaigns/getAllActiveCustomer', 'CampaignController@getAllActiveCustomer')->name('campaigns.getAllActiveCustomer');
+    Route::resource('campaigns', 'CampaignController');
 
     // Products
     Route::delete('products/destroy', 'ProductsController@massDestroy')->name('products.massDestroy');

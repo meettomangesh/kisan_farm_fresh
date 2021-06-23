@@ -224,6 +224,15 @@
             </li>
             @endcan
 
+            @can('campaign_access')
+            <li class="nav-item">
+                <a href="{{ route("admin.campaigns.index") }}" class="nav-link {{ request()->is('admin/campaigns') || request()->is('admin/campaigns/*') ? 'active' : '' }}">
+                    <i class="fa-fw fas fa-cogs nav-icon"></i>
+                    {{ trans('cruds.campaign.title') }}
+                </a>
+            </li>
+            @endcan
+
             @can('report_access')
             <li class="nav-item nav-dropdown">
                 <a class="nav-link  nav-dropdown-toggle" href="#">

@@ -12,6 +12,7 @@ use App\Models\ProductLocationInventory;
 use App\Models\UserAddress;
 use App\Models\PromoCodes;
 use App\Models\CustomerDeviceTokens;
+use App\Models\ConfigSettings;
 use DB;
 use PDO;
 use App\Helper\PdfHelper;
@@ -33,7 +34,7 @@ class CustomerOrders extends Model
         'deleted_at',
     ];
 
-    protected $fillable = ['customer_id', 'delivery_boy_id', 'shipping_address_id', 'billing_address_id', 'delivery_date', 'net_amount', 'gross_amount', 'discounted_amount', 'payment_type', 'razorpay_order_id', 'razorpay_payment_id', 'razorpay_signature', 'total_items', 'total_items_quantity', 'reject_cancel_reason', 'purchased_from', 'is_coupon_applied', 'promo_code', 'is_basket_in_order', 'order_status', 'created_by', 'updated_by', 'created_at', 'updated_at'];
+    protected $fillable = ['customer_id', 'delivery_boy_id', 'shipping_address_id', 'billing_address_id', 'delivery_date', 'net_amount', 'gross_amount', 'discounted_amount', 'delivery_charge', 'payment_type', 'razorpay_order_id', 'razorpay_payment_id', 'razorpay_signature', 'total_items', 'total_items_quantity', 'reject_cancel_reason', 'purchased_from', 'is_coupon_applied', 'promo_code', 'is_basket_in_order', 'order_status', 'created_by', 'updated_by', 'created_at', 'updated_at'];
 
     protected function serializeDate(DateTimeInterface $date)
     {
@@ -128,6 +129,8 @@ class CustomerOrders extends Model
         // validate customer
         $usersData = User::select('id')->where('id', $params['user_id'])->where('status', 1)->get()->toArray();
         $userAddressData = UserAddress::select('id')->where('id', $params['delivery_details']['address']['id'])->where('user_id', $params['user_id'])->where('status', 1)->get()->toArray();
+        $minOrderAmountRes = ConfigSettings::where('name', 'minOrderAmount')->first();
+        $deliveryChargeRes = ConfigSettings::where('name', 'deliveryCharge')->first();
 
         if (sizeof($usersData) == 0) {
             return array("status" => false, "message" => "Invalid user", "order_id" => 0, "razorpay_order_id" => 0);
@@ -141,6 +144,10 @@ class CustomerOrders extends Model
         // validate delivery date
         if ($params['delivery_details']['date'] <= date('Y-m-d')) {
             return array("status" => false, "message" => "Invalid delivery date, must be greater than current date", "order_id" => 0, "razorpay_order_id" => 0);
+        }
+
+        if(($params['payment_details']['net_amount'] < $minOrderAmountRes->value && $params['payment_details']['delivery_charge'] == 0) || ($params['payment_details']['delivery_charge'] > 0 && $params['payment_details']['delivery_charge'] != $deliveryChargeRes->value)) {
+            return array("status" => false, "message" => "Delivery charge is not applied or incorrect.", "order_id" => 0, "razorpay_order_id" => 0);
         }
 
         if (isset($params['payment_details']['promo_code']) && !empty($params['payment_details']['promo_code']) && $params['payment_details']['promo_code'] != '') {
@@ -177,7 +184,7 @@ class CustomerOrders extends Model
             }
         }
 
-        if (!isset($params['payment_details']['promo_code']) && empty($params['payment_details']['promo_code']) && $orderAmount != $params['payment_details']['net_amount']) {
+        if (!isset($params['payment_details']['promo_code']) && empty($params['payment_details']['promo_code']) && $params['payment_details']['delivery_charge'] == 0 && $orderAmount != $params['payment_details']['net_amount']) {
             return array("status" => false, "message" => "Amount is not matching", "order_id" => 0, "razorpay_order_id" => 0);
         }
 
@@ -186,6 +193,7 @@ class CustomerOrders extends Model
             'net_amount' => $params['payment_details']['net_amount'],
             'gross_amount' => $params['payment_details']['gross_amount'],
             'discounted_amount' => $params['payment_details']['discounted_amount'],
+            'delivery_charge' => $params['payment_details']['delivery_charge'],
             'payment_type' => $params['payment_details']['type'],
             'total_items' => sizeof($params['products']),
             'total_items_quantity' => $totalItemQty,
@@ -349,6 +357,7 @@ class CustomerOrders extends Model
                 'paymentMethod' => $orderDetails->payment_type,
                 'paymentReference' => ($orderDetails->razorpay_payment_id) ? $orderDetails->razorpay_payment_id : '-',
                 'totalAmt' => $orderDetails->net_amount,
+                'deliveryCharge' => $orderDetails->delivery_charge,
                 'deliveryDate' => $orderDetails->delivery_date,
                 'isEmailVerified' => $orderDetails->userCustomer->email_verified
 
@@ -405,6 +414,7 @@ class CustomerOrders extends Model
             'productList' => $productStr,
             'grossAmount' => $orderDetails->gross_amount,
             'discount' => $orderDetails->discounted_amount,
+            'deliveryCharge' => $orderDetails->delivery_charge,
             'total' => $orderDetails->net_amount,
             'deliveryDate' => $orderDetails->delivery_date
         ]);
@@ -448,6 +458,7 @@ class CustomerOrders extends Model
                     "net_amount" => round($val->net_amount, 2),
                     "gross_amount" => round($val->gross_amount, 2),
                     "discounted_amount" => round($val->discounted_amount, 2),
+                    "delivery_charge" => round($val->delivery_charge, 2),
                     "order_id" => "",
                     "bill_no" => "",
                     "total_items" => $val->total_items,
@@ -497,6 +508,7 @@ class CustomerOrders extends Model
                     "net_amount" => round($val->net_amount, 2),
                     "gross_amount" => round($val->gross_amount, 2),
                     "discounted_amount" => round($val->discounted_amount, 2),
+                    "delivery_charge" => round($val->delivery_charge, 2),
                     "order_id" => "",
                     "bill_no" => "",
                     "total_items" => $val->total_items,

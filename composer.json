@@ -26,7 +26,7 @@
         "league/flysystem-aws-s3-v3": "~1",
         "mpdf/mpdf": "7.0.2",
         "phpmailer/phpmailer": "^6.3",
-        "yajra/laravel-datatables-oracle": "^9.9"
+        "yajra/laravel-datatables-oracle": "^9.18"
     },
     "require-dev": {
         "facade/ignition": "^2.0",

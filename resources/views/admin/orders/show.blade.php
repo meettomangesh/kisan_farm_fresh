@@ -92,6 +92,12 @@
                     <tr>
                         <td></td>
                         <td></td>
+                        <td><b>{{ trans('cruds.order.fields.delivery_charge') }}: </b></td>
+                        <td>{{ round($customerOrder->delivery_charge, 2) }}</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
                         <td><b>{{ trans('cruds.order.fields.net_amount') }}: </b></td>
                         <td>{{ round($customerOrder->net_amount, 2) }}</td>
                     </tr>

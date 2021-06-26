@@ -559,8 +559,10 @@ class UserCommunicationMessagesController extends Controller
             'from' => [
                 "name" => isset($inputs['email_from_name']) ? $inputs['email_from_name'] : '',
                 "email" => isset($inputs['email_from_email']) ? $inputs['email_from_email'] : '',
+               
             ],
             'to' => $toEmails,
+            "isEmailVerified" => 1,
         ));
 
 

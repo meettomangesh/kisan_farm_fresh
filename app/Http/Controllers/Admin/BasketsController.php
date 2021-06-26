@@ -13,7 +13,7 @@ use Symfony\Component\HttpFoundation\Response;
 use App\Models\Basket;
 use App\Models\ProductUnits;
 use App\Models\Category;
-
+use App\Models\Product;
 use DB;
 
 class BasketsController extends Controller
@@ -83,6 +83,7 @@ class BasketsController extends Controller
 
     public function massDestroy(MassDestroyBasketRequest $request)
     {
+
         Product::whereIn('id', request('ids'))->delete();
         return response(null, Response::HTTP_NO_CONTENT);
     }

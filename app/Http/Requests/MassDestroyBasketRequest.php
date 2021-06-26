@@ -19,7 +19,7 @@ class MassDestroyBasketRequest extends FormRequest
     {
         return [
             'ids'   => 'required|array',
-            'ids.*' => 'exists:baskets,id',
+            'ids.*' => 'exists:products,id',
         ];
     }
 }

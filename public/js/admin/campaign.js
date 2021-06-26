@@ -83,42 +83,46 @@ siteObjJs.admin.campaignJs = function () {
 
     };
 
+    $.validator.addMethod('startDateValid', function (value, element) {
+
+        var formElement = $(element).closest("form");
+        var formId = formElement.attr("id");
+        
+        if(value == '' ){
+            return false;
+        }
+        $('#' + formId).find('#end_date').attr('min',value);
+        return true;
+
+    }, 'Please select valid End Date.');
+
+    $.validator.addMethod('endDateValid', function (value, element) {
+        var formElement = $(element).closest("form");
+        var formId = formElement.attr("id");
+        var startDate = $('#' + formId).find('#start_date').val();
+
+        if(value == '' || startDate == ''){
+            return false;
+        }
+        var endDate=new Date(value);
+        var startDate = new Date(startDate);
+        if(startDate > endDate){
+            return false;
+        }
+        return true;
+
+    }, 'Please select valid End Date.');
+
     // Method to fetch and place edit form with data using ajax call
-    var fetchDataForEdit = function () {
-        $('.portlet-body').on('click', '.edit-form-link', function () {
-            var merchant_campaign_id = $(this).attr("id");
-            var actionUrl = 'merchant-campaign/' + merchant_campaign_id + '/edit';
-            $.ajax({
-                url: actionUrl,
-                cache: false,
-                dataType: "json",
-                type: "GET",
-                success: function (data) {
-                    $("#edit_form").html(data.form);
-                    $('form').find('input:radio').uniform();
-                    $('#edit_form .select2me').select2({
-                        placeholder: "Select",
-                        allowClear: true
-                    });
-                    siteObjJs.validation.formValidateInit('#edit-merchant-campaign', handleAjaxRequest);
-                },
-                error: function (jqXhr, json, errorThrown) {
-                    var errors = jqXhr.responseJSON;
-                    var errorsHtml = '';
-                    $.each(errors, function (key, value) {
-                        errorsHtml += value[0] + '<br />';
-                    });
-                    // alert(errorsHtml, "Error " + jqXhr.status + ': ' + errorThrown);
-                    Metronic.alert({
-                        type: 'danger',
-                        message: errorsHtml,
-                        container: $('#ajax-response-text'),
-                        place: 'prepend',
-                        closeInSeconds: siteObjJs.admin.commonJs.constants.alertCloseSec
-                    });
-                }
-            });
-        });
+    var fetchDataForEdit = function (obj) {
+        if (obj === 'update_campaign') {
+            var userTypeFlag = $('#' + obj).find('input[name="target_customer"]:checked').val();
+            if (userTypeFlag === '2') {
+                $('#' + obj).find('#user-selection-div').show();
+            } else {
+                $('#' + obj).find('#user-selection-div').hide();
+            }
+        }
     };
     // Common method to handle add and edit ajax request and reponse
     // method to handle add ajax request and reponse
@@ -215,7 +219,7 @@ siteObjJs.admin.campaignJs = function () {
         init: function (obj) {
             initializeListener(obj);
             // handleTable();
-            //fetchDataForEdit();                          
+            fetchDataForEdit(obj);                          
             //bind the validation method to 'add' form on load
             siteObjJs.validation.formValidateInit('#' + obj, handleAjaxRequest);
 

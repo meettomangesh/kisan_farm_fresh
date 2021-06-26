@@ -31,7 +31,7 @@ class PromoCodes extends Model
 
     public function userCustomer()
     {
-        return $this->belongsTo(User::class, 'customer_id');
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     public function promoCodeMaster()

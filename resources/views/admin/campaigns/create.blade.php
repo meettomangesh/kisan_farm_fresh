@@ -58,11 +58,4 @@
     <script src="{{ asset('global/plugins/owl.carousel.min.js') }}"></script>
     @endsection
 
-    @section('scripts')
-    <script>
-        jQuery(document).ready(function() {
-            siteObjJs.admin.communicationMessageJs.init('create-communication');
-        });
-    </script>
-    @endsection
 </div>

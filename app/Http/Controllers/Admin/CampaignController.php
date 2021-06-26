@@ -29,27 +29,70 @@ class CampaignController extends Controller
         $roles = Role::all()->whereNotIn('title', ['Delivery Boy', 'Customer'])->pluck('title', 'id');
         $regions = Region::all()->where('status', 1)->pluck('region_name', 'id');
         $campaignCategoriesMaster = CampaignCategoriesMaster::all()->where('status', 1)->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
-        return view('admin.campaigns.create', compact('campaigns', 'roles', 'regions', 'campaignCategoriesMaster'));
+        $users = User::select(DB::raw('CONCAT(users.first_name, " ", users.last_name) AS name'), 'users.id')
+        ->whereHas(
+            'roles',
+            function ($q) {
+                $q->where('title', 'Customer');
+                $q->where('status', 1);
+            }
+        )->get();
+        $users = $users->pluck('name', 'id');
+        $promocodeUsers = [];
+
+        return view('admin.campaigns.create', compact('promocodeUsers','campaigns', 'roles', 'regions', 'campaignCategoriesMaster','users','prmocodeUsers'));
     }
 
     public function store(Request $request)
     {
         $input = $request->all();
         $promoCodeMaster = PromoCodeMaster::addUpdateCampaignOffer($input);
-        exit;
         return redirect()->route('admin.campaigns.index');
     }
 
     public function edit($id)
     {
         abort_if(Gate::denies('campaign_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-        return view('admin.campaigns.edit', compact('campaigns'));
+        $campaigns=PromoCodeMaster::find($id);
+        $campaignCategoriesMaster = CampaignCategoriesMaster::all()->where('status', 1)->pluck('name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $users = User::select(DB::raw('CONCAT(users.first_name, " ", users.last_name) AS name'), 'users.id')
+        ->whereHas(
+            'roles',
+            function ($q) {
+                $q->where('title', 'Customer');
+                $q->where('status', 1);
+            }
+        )->get();
+        $users = $users->pluck('name', 'id');
+        $promocodeUsers = $campaigns->promoCodes()->get()->pluck('user_id');
+        return view('admin.campaigns.edit', compact('campaigns','campaignCategoriesMaster','users','promocodeUsers'));
     }
 
-    public function update(Request $request, PromoCodeMaster $promoCodeMaster)
+    public function update($id,Request $request)
     {
+       // echo $id; 
+        $campaigns=PromoCodeMaster::find($id);
+        $input = $request->all();
+        $input['campaign_category_id'] = $campaigns->campaign_category_id;
+        $input['campaign_master_id'] = $campaigns->campaign_master_id;
+        $input['title'] = $campaigns->title;
+        
+       // print_r($input);
+       // exit;
+
+        $promoCodeMaster = PromoCodeMaster::addUpdateCampaignOffer($input);
         return redirect()->route('admin.campaigns.index');
     }
+
+    public function show($id)
+    {
+        abort_if(Gate::denies('campaign_show'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+
+        $campaign=PromoCodeMaster::find($id);
+
+        return view('admin.campaigns.show', compact('campaign'));
+    }
+
 
     public function getCampaignMaster($id)
     {

@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use \DateTimeInterface;
 use App\Models\PromoCodes;
+use App\Models\PromoCodeFormat;
 use DB;
 use PDO;
 
@@ -28,10 +29,25 @@ class PromoCodeMaster extends Model
         return $date->format('Y-m-d H:i:s');
     }
 
+    public function campaignMaster(){
+        return $this->belongsTo(CampaignMaster::class, 'campaign_master_id');
+    } 
+
+    public function campaignCategory(){
+        return $this->belongsTo(CampaignCategoriesMaster::class, 'campaign_category_id');
+    } 
+
     public function promoCodes()
     {
         return $this->hasMany(PromoCodes::class, 'promo_code_master_id');
     }
+
+    public function promoCodesFormat()
+    {
+        return $this->hasOne(PromoCodeFormat::class, 'promo_code_master_id');
+    }
+
+
     public static function addUpdateCampaignOffer($params)
     {
         try {

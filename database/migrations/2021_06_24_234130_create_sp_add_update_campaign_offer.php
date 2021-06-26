@@ -1,6 +1,20 @@
-DELIMITER $$
-DROP PROCEDURE IF EXISTS addUpdateCampaignOffer$$
-CREATE PROCEDURE addUpdateCampaignOffer(IN inputData JSON)
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+class CreateSpAddUpdateCampaignOffer extends Migration
+{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        DB::unprepared("DROP PROCEDURE IF EXISTS addUpdateCampaignOffer;
+        CREATE PROCEDURE addUpdateCampaignOffer(IN inputData JSON)
 addUpdateCampaignOffer:BEGIN
     DECLARE campaignCategoryId,campaignMasterId,codeType,rewardTypeXValue,codeLength,isForInsert,lastInsertedId,codeFormat INTEGER(10) DEFAULT 0;
     DECLARE rewardType,campaignUse,campaignUseValue INTEGER(10) DEFAULT 1;
@@ -149,5 +163,18 @@ addUpdateCampaignOffer:BEGIN
         SELECT JSON_OBJECT('status', 'SUCCESS', 'message', 'Campaign/Offer updated successfully.','data',JSON_OBJECT(),'statusCode',200) AS response;
     END IF;
     LEAVE addUpdateCampaignOffer;
-END$$
-DELIMITER ;
+END"
+
+        );
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        DB::unprepared('DROP PROCEDURE IF EXISTS addUpdateCampaignOffer');
+    }
+}

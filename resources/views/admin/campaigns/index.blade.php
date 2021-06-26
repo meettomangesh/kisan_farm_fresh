@@ -28,7 +28,7 @@
                         <th width='10%'>{{ trans('cruds.campaign.fields.description') }} </th>
                         <th width='10%'>{{ trans('cruds.campaign.fields.start_date') }} </th>
                         <th width='10%'>{{ trans('cruds.campaign.fields.end_date') }} </th>
-                        <th width='10%'>{{ trans('cruds.campaign.fields.reward_type') }} </th>
+                        <th width='10%'>{{ trans('cruds.campaign.fields.code_type') }} </th>
                         <th width='10%'>{{ trans('cruds.campaign.fields.status') }} </th>
                         <th>
                             &nbsp;
@@ -57,7 +57,7 @@
                             {{ $campaign->end_date ?? '' }}
                         </td>
                         <td>
-                            {{ $campaign->reward_type ?? '' }}
+                            {{ ($campaign->code_type == 1?"Generic":"Unique") ?? '' }}
                         </td>
                         <td>
                             {{ ($campaign->status == 1?"Active":"Inactive") ?? '' }}

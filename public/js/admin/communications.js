@@ -27,7 +27,6 @@ siteObjJs.admin.communicationMessageJs = function () {
     // Method to fetch and place edit form with data using ajax call
 
     var fetchDataForEdit = function (obj) {
-        console.log('fetchDataForEdit', obj);
         if (obj === 'edit-communication') {
             var regionTypeFlag = $('#' + obj).find('input[name="region_type"]:checked').val();
             var userTypeFlag = $('#' + obj).find('input[name="user_type"]:checked').val();

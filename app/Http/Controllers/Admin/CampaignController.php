@@ -13,6 +13,7 @@ use App\Region;
 use App\Models\CampaignCategoriesMaster;
 use App\Models\CampaignMaster;
 use DB;
+use App\Http\Requests\StoreCampaignRequest;
 
 class CampaignController extends Controller
 {
@@ -43,7 +44,7 @@ class CampaignController extends Controller
         return view('admin.campaigns.create', compact('promocodeUsers','campaigns', 'roles', 'regions', 'campaignCategoriesMaster','users','prmocodeUsers'));
     }
 
-    public function store(Request $request)
+    public function store(StoreCampaignRequest $request)
     {
         $input = $request->all();
         $promoCodeMaster = PromoCodeMaster::addUpdateCampaignOffer($input);

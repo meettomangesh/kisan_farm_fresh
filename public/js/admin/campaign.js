@@ -94,7 +94,7 @@ siteObjJs.admin.campaignJs = function () {
         $('#' + formId).find('#end_date').attr('min',value);
         return true;
 
-    }, 'Please select valid End Date.');
+    }, 'Please select valid Start Date.');
 
     $.validator.addMethod('endDateValid', function (value, element) {
         var formElement = $(element).closest("form");

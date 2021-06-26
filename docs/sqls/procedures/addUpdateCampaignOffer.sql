@@ -33,11 +33,17 @@ addUpdateCampaignOffer:BEGIN
     SET targetCustomer = JSON_UNQUOTE(JSON_EXTRACT(inputData,'$.target_customer'));
     SET targetCustomerValue = JSON_UNQUOTE(JSON_EXTRACT(inputData,'$.target_customer_value'));
 
-    IF codePrefix IS NULL THEN 
+    IF targetCustomer = 1 THEN 
+        SELECT JSON_ARRAYAGG(id) INTO targetCustomerValue FROM users 
+            JOIN role_user ON role_user.user_id=users.id
+            WHERE role_user.role_id=4;
+    END IF;
+
+    IF codePrefix IS NULL OR codePrefix='null' THEN 
         SET codePrefix = '';
     END IF;
 
-    IF codeSuffix IS NULL THEN 
+    IF codeSuffix IS NULL OR codeSuffix='null' THEN 
         SET codeSuffix = '';
     END IF;
     
@@ -69,7 +75,7 @@ addUpdateCampaignOffer:BEGIN
             ELSE
                 SET lastInsertedId = LAST_INSERT_ID();
                 SET isForInsert = 1;
-                IF codeType = 1 THEN
+                -- IF codeType = 1 THEN
                     INSERT INTO promo_code_format_master (`promo_code_master_id`,`code_format`,`code_prefix`,`code_suffix`,`code_length`,`created_by`) VALUES
                         (lastInsertedId,codeFormat,codePrefix,codeSuffix,codeLength,1);
                     IF LAST_INSERT_ID() = 0 THEN
@@ -77,7 +83,7 @@ addUpdateCampaignOffer:BEGIN
                         SELECT JSON_OBJECT('status', 'SUCCESS', 'message', 'There is problem to add campaign offers code format.','data',JSON_OBJECT(),'statusCode',500) AS response;
                         LEAVE addUpdateCampaignOffer;
                     END IF;
-                END IF;
+                -- END IF;
                 
                 IF codeType = 1 THEN 
                     -- CODE FOR GENERIC CODE

@@ -1091,29 +1091,60 @@ siteObjJs.admin.basketMerchantJs = function () {
 
     }, 'Special Price must be smaller than Selling Price.');
 
+    // $.validator.addMethod('startDateValid', function (value, element) {
+    //     var formElement = $(element).closest("form");
+    //     var formId = formElement.attr("id");
+    //     var minVal = $('#' + formId).find('#special_price').val();
+    //     if (minVal != '' && value == '') {
+    //         return false;
+    //     } else {
+    //         return true;
+    //     }
+
+    // }, 'Please select Special Price Start Date.');
+
+    // $.validator.addMethod('endDateValid', function (value, element) {
+    //     var formElement = $(element).closest("form");
+    //     var formId = formElement.attr("id");
+    //     var minVal = $('#' + formId).find('#special_price').val();
+    //     if (minVal != '' && value == '') {
+    //         return false;
+    //     } else {
+    //         return true;
+    //     }
+
+    // }, 'Please select Special Price End Date.');
+
     $.validator.addMethod('startDateValid', function (value, element) {
+
         var formElement = $(element).closest("form");
         var formId = formElement.attr("id");
         var minVal = $('#' + formId).find('#special_price').val();
-        if (minVal != '' && value == '') {
+        if (value == '' && minVal != '') {
             return false;
-        } else {
-            return true;
         }
+        $('#' + formId).find('#special_price_end_date').attr('min', value);
+        return true;
 
     }, 'Please select Special Price Start Date.');
 
     $.validator.addMethod('endDateValid', function (value, element) {
         var formElement = $(element).closest("form");
         var formId = formElement.attr("id");
+        var startDate = $('#' + formId).find('#special_price_start_date').val();
         var minVal = $('#' + formId).find('#special_price').val();
-        if (minVal != '' && value == '') {
+        if ((value == '' || startDate == '') && minVal != '') {
             return false;
-        } else {
-            return true;
         }
+        var endDate = new Date(value);
+        var startDate = new Date(startDate);
+        if (startDate > endDate) {
+            return false;
+        }
+        return true;
 
     }, 'Please select Special Price End Date.');
+
 
     $.validator.addMethod('quantityValid', function (value, element) {
         var formElement = $(element).closest("form");
@@ -1542,7 +1573,7 @@ siteObjJs.admin.basketMerchantJs = function () {
 
         var categoryId = $('#category_id').val();
         var categoryName = $('#category_id option:selected').text();
-        if(categoryName === 'Please select'){
+        if (categoryName === 'Please select') {
             categoryName = '';
         }
         var formData = new FormData();
@@ -1645,7 +1676,7 @@ siteObjJs.admin.basketMerchantJs = function () {
     return {
         //main function to initiate the module
         init: function (formId) {
-           
+
             initializeListener(formId);
             // handleTable();
             fetchDataForEdit();

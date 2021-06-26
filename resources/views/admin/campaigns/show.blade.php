@@ -77,7 +77,7 @@
             <?php 
             //print_r($campaign->promoCodes()->get()); exit;
             ?>
-         
+                <h3 class="block">Promo Codes</h3>
                 <div class="table-responsive">
                     <table class=" table table-bordered table-striped table-hover datatable datatable-Campaign">
                         <thead>

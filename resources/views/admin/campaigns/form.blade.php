@@ -194,7 +194,7 @@
             <div class="col-md-6">
                 <div class="form-group">
                     <label class="control-label col-md-4">{{ trans('cruds.campaign.fields.code_prefix') }}
-                        <span class="required"> </span>
+                       
                     </label>
                     <div class="col-md-8">
                         @if($from == 'create_campaign')
@@ -209,7 +209,7 @@
             <div class="col-md-6">
                 <div class="form-group">
                     <label class="control-label col-md-4">{{ trans('cruds.campaign.fields.code_suffix') }}
-                        <span class="required"> </span>
+                        
                     </label>
                     <div class="col-md-8">
                     @if($from == 'create_campaign')

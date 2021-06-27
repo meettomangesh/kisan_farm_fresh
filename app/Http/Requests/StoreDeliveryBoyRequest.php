@@ -32,6 +32,9 @@ class StoreDeliveryBoyRequest extends FormRequest
             'mobile_number' => [
                 'required',
                 'unique:users',
+                'digits:10',
+                'regex:/^([0-9\s\-\+\(\)]*)$/',
+                'min:10',
             ],
             'password' => [
                 'required',

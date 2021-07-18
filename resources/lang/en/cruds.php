@@ -856,4 +856,16 @@ return [
             'cancelled'     => 'Cancelled',
         ],
     ],
+    'loginlogs' => [
+        'title'          => 'Login Logs',
+        'title_singular' => 'Login Log',
+        'fields'         => [
+            'id' => 'ID',
+            'sr_no' => 'Sr No',
+            'name' => 'Name',
+            'platform' => 'Platform',
+            'login_time' => 'Activity Time',
+            'is_login' => 'Activity',
+        ],
+    ],
 ];

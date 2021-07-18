@@ -3,7 +3,7 @@ DROP PROCEDURE IF EXISTS storeUserLoginLogs$$
 CREATE PROCEDURE storeUserLoginLogs(IN inputData JSON)
 storeUserLoginLogs:BEGIN
     
-    DECLARE userId INTEGER(10) DEFAULT 0;
+    DECLARE userId,idDeliveryBoy,roleId INTEGER(10) DEFAULT 0;
     DECLARE isLogin,platform TINYINT(3) DEFAULT 1;
     DECLARE token TEXT DEFAULT NULL;
     DECLARE loginTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
@@ -22,9 +22,18 @@ storeUserLoginLogs:BEGIN
         SELECT JSON_OBJECT('status', 'FAILURE', 'message', 'User data is not available.','data',JSON_OBJECT(),'statusCode',520) AS response;
         LEAVE storeUserLoginLogs;
     END IF;
+    SELECT role_id INTO roleId FROM role_user WHERE user_id = userId;
+    
+    IF roleId IS NULL OR roleId = 0 THEN
+        SELECT JSON_OBJECT('status', 'FAILURE', 'message', 'User role data is not available.','data',JSON_OBJECT(),'statusCode',520) AS response;
+        LEAVE storeUserLoginLogs;
+    END IF;
+    IF roleId = 3 THEN 
 
-    INSERT INTO user_login_logs (`user_id`,`platform`,`login_time`,`is_login`) VALUES (userId,platform,now(),isLogin);
+        INSERT INTO user_login_logs (`user_id`,`platform`,`login_time`,`is_login`) VALUES (userId,platform,now(),isLogin);
 
+    END IF;
+    
     SELECT JSON_OBJECT('status', 'SUCCESS', 'message', 'Campaign/Offer updated successfully.','data',JSON_OBJECT(),'statusCode',200) AS response;
     LEAVE storeUserLoginLogs;
 

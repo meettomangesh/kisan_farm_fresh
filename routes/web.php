@@ -135,8 +135,10 @@ Route::group([
     Route::resource('purchase_form', 'PurchaseFormController');
 
     // Reports
+    Route::get('reports/login_logs', 'ReportsController@loginLogs')->name('reports.loginLogs');
     Route::get('reports/sales-itemwise', 'ReportsController@salesItemwise')->name('reports.salesItemwise');
     Route::post('reports/sales-itemwise/data', 'ReportsController@getSalesItemwiseData')->name('reports.getSalesItemwiseData');
+    
     Route::resource('reports', 'ReportsController');
 });
 Route::group(['prefix' => 'profile', 'as' => 'profile.', 'namespace' => 'Auth', 'middleware' => ['auth']], function () {

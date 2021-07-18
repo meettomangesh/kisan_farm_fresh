@@ -9,6 +9,7 @@ use Symfony\Component\HttpFoundation\Response;
 use DB;
 use DataTables;
 use Session;
+use App\UserLoginLogs;
 
 class ReportsController extends Controller
 {
@@ -34,6 +35,16 @@ class ReportsController extends Controller
             'order_date'
         ];
     }
+
+    public function loginLogs()
+    {
+      //  abort_if(Gate::denies('deliveryboy_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+
+        $userLoginLogs = UserLoginLogs::all();
+
+        return view('admin.reports.login_logs', compact('userLoginLogs'));
+    }
+
 
     public function getSalesItemwiseData(Request $request) {
         set_time_limit(0);

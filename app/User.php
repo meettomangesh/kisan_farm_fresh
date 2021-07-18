@@ -53,7 +53,7 @@ class User extends Authenticatable
         'gender',
         'marital_status',
         'date_of_birth',
-        
+
     ];
 
     protected function serializeDate(DateTimeInterface $date)
@@ -212,17 +212,17 @@ class User extends Authenticatable
         }
     }
 
-        /**
+    /**
      * Specifies the user's FCM token
      *
      * @return string|array
      */
     public function routeNotificationForFcm($notification)
     {
-        
+
 
         $data = $notification->data;
-       // print_r($data['user_id']); exit;
+        // print_r($data['user_id']); exit;
         unset($notification->data['user_id']);
         if (is_array($data)) {
             //return CustomerDeviceTokens::select('device_token')->where('user_id', $data['user_id'])->first()->device_token;
@@ -233,16 +233,17 @@ class User extends Authenticatable
         }
     }
 
-    protected function changePassword($reqParams, $user) {
-        if($reqParams['password'] != $reqParams['password_confirmation']) {
+    protected function changePassword($reqParams, $user)
+    {
+        if ($reqParams['password'] != $reqParams['password_confirmation']) {
             return ["status" => false, "message" => "New and confirm password should be same"];
         }
 
-        if($reqParams['password'] == $reqParams['old_password']) {
+        if ($reqParams['password'] == $reqParams['old_password']) {
             return ["status" => false, "message" => "New and old password should not be same"];
         }
 
-        if(Hash::check($reqParams['old_password'], $user->password)) {
+        if (Hash::check($reqParams['old_password'], $user->password)) {
             $input['password'] = bcrypt($reqParams['password']);
             $user->update($input);
             return ["status" => true, "message" => "Password changed successfully"];
@@ -260,7 +261,7 @@ class User extends Authenticatable
     {
         try {
             $user = User::where('referral_code', $referralCouponCode)->first();
-            if(!$user) {
+            if (!$user) {
                 return ["status" => false];
             }
             return ["status" => true, "referred_by_user_id" => $user['id']];
@@ -269,4 +270,28 @@ class User extends Authenticatable
         }
     }
 
+    /**
+     * This function saves the sent push notification for future use
+     * @param array $customerData
+     */
+    public static function saveUserLoginLogs($params)
+    {
+        try {
+            $inputData = json_encode($params);
+            $pdo = DB::connection()->getPdo();
+            $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, true);
+            $stmt = $pdo->prepare("CALL storeUserLoginLogs(?)");
+            $stmt->execute([$inputData]);
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+            $stmt->closeCursor();
+            $reponse = json_decode($result['response']);
+            if ($reponse->status == "FAILURE" && $reponse->statusCode != 200) {
+                return false;
+            }
+            return true;
+        } catch (Exception $e) {
+            return $this->sendError('Error.', $e->getMessage());
+        }
+    }
 }

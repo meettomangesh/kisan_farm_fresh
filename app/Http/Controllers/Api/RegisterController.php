@@ -193,7 +193,7 @@ class RegisterController extends BaseController
         }
 
         $input['updated_by'] = 1;
-       
+
         $customer->update($input);
         // print_r($input);
         if ($request->role_id == 3) {
@@ -282,7 +282,7 @@ class RegisterController extends BaseController
             $success['id'] = $user->id;
             $success['role'] = (!empty($user->load('roles')->roles->toArray())) ? $user->load('roles')->roles[0]->id : 0;
             $success['role_name'] = (!empty($user->load('roles')->roles->toArray())) ? $user->load('roles')->roles[0]->title : "";
-
+            $loginLogs = User::saveUserLoginLogs(array('user_id' => $user->id, 'is_login' => 1, 'platform' => ($request->platform ? $request->platform : 1)));
             $userDetails = $user->details;
             unset($userDetails->id);
             unset($userDetails->user_id);
@@ -413,6 +413,7 @@ class RegisterController extends BaseController
 
         try {
             $token = $request->user()->token();
+            $loginLogs = User::saveUserLoginLogs(array('user_id' => $request->user()->id, 'is_login' => 2, 'platform' => $request->platform));
             $token->revoke();
             $response = $this->sendResponse("", "You have been successfully logged out!");
         } catch (Exception $e) {

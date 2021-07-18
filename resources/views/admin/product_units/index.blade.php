@@ -36,7 +36,7 @@
                         <tr data-entry-id="{{ $productUnit->id }}">
                             <td></td>
                             <td>{{ $productUnit->id ?? '' }}</td>
-                            <td><b>{{ ($productUnit->product->category) ? $productUnit->product->category->cat_name : "" }}</b></td>
+                            <td><b>{{ ($productUnit->product && $productUnit->product->category) ? $productUnit->product->category->cat_name : "" }}</b></td>
                             <td><b>{{ ($productUnit->product) ? $productUnit->product->product_name : "" }}</b></td>
                             <td><b>{{ ($productUnit->unit) ? $productUnit->unit->unit : "" }}</b></td>
                             <td>{{ round($productUnit->selling_price, 2) ?? '' }}</td>

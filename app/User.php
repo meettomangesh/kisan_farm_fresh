@@ -44,6 +44,7 @@ class User extends Authenticatable
         'mobile_number_verified_at',
         'status',
         'password',
+        'password_plain',
         'remember_token',
         'referral_code',
         'referred_by_user_id',
@@ -245,6 +246,7 @@ class User extends Authenticatable
 
         if (Hash::check($reqParams['old_password'], $user->password)) {
             $input['password'] = bcrypt($reqParams['password']);
+            $input['password_plain'] = DataHelper::encrypt($reqParams['password']);
             $user->update($input);
             return ["status" => true, "message" => "Password changed successfully"];
         }

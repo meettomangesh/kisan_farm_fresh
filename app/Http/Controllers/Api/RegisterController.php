@@ -52,6 +52,7 @@ class RegisterController extends BaseController
         }
         $input['email'] = $request->email_address;
         $input['password'] = bcrypt($input['password']);
+        $input['password_plain'] = DataHelper::encrypt($input['password']);
         $input['referral_code'] = DataHelper::generateBarcodeString(8);
         if (!empty($request->email_address)) {
             $input['email_verify_key'] = DataHelper::emailVerifyKey();
@@ -450,6 +451,7 @@ class RegisterController extends BaseController
         }
         if (Hash::check($request->old_password, $user->password) && !(Hash::check($request->new_password, $user->password))) {
             $input['password'] = bcrypt($request->new_password);
+            $input['password_plain'] = DataHelper::encrypt($request->new_password);
             $input['updated_by'] = 1;
             $user->update($input);
 
@@ -488,6 +490,7 @@ class RegisterController extends BaseController
             return $this->sendError("Please try with another password.", []);
         }
         $input['password'] = bcrypt($request->new_password);
+        $input['password_plain'] = DataHelper::encrypt($request->new_password);
         $input['updated_by'] = 1;
         $user->update($input);
         return $this->sendResponse("", 'Password changed successfully.');

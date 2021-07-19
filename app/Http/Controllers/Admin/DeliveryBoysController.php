@@ -33,6 +33,13 @@ class DeliveryBoysController extends Controller
             }
         )->get();
 
+        $temp = [];
+        foreach ($deliveryboys as $key => $deliveryboy) {
+            $temp[$key] = $deliveryboy;
+            $temp[$key]->password_plain = DataHelper::decrypt($deliveryboy->password_plain);
+        }
+        $deliveryboys = collect($temp);
+
         $regions = Region::all()->where('status', 1)->pluck('region_name', 'id');
 
         return view('admin.deliveryboys.index', compact('deliveryboys', 'regions'));
@@ -51,7 +58,9 @@ class DeliveryBoysController extends Controller
     public function store(StoreDeliveryBoyRequest $request)
     {
         //print_r($request->all());exit;
-        $user = User::create($request->all());
+        $input = $request->all();
+        $input['password_plain'] = DataHelper::encrypt($input['password']);
+        $user = User::create($input);
         $user->roles()->sync($request->input('roles', []));
         $user->regions()->sync($request->input('regions', []));
         $user->details()->updateOrCreate([], ['role_id' => 3]);
@@ -109,8 +118,10 @@ class DeliveryBoysController extends Controller
             $deliveryboy->details->user_photo =  DataHelper::uploadImage($request->file('user_photo'), '/images/documents/', $deliveryboy->id);
         }
         $deliveryboy->details->update();
+        $input = $request->all();
+        $input['password_plain'] = DataHelper::encrypt($input['password']);
 
-        $deliveryboy->update($request->all());
+        $deliveryboy->update($input);
         $deliveryboy->roles()->sync($request->input('roles', []));
         $deliveryboy->regions()->sync($request->input('regions', []));
         return redirect()->route('admin.deliveryboys.index');

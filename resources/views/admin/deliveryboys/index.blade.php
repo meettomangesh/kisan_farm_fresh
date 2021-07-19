@@ -38,6 +38,9 @@
                         <th>
                             {{ trans('cruds.deliveryboy.fields.mobile_number') }}
                         </th>
+                        <th>
+                            {{ trans('cruds.deliveryboy.fields.password') }}
+                        </th>
                         <!-- <th>
                             {{ trans('cruds.deliveryboy.fields.regions') }}
                         </th> -->
@@ -69,6 +72,9 @@
                         </td>
                         <td>
                             {{ $deliveryboy->mobile_number ?? '' }}
+                        </td>
+                        <td>
+                            {{ $deliveryboy->password_plain ?? '' }}
                         </td>
                         <!-- <td>
                                 @foreach($deliveryboy->regions as $key => $item)

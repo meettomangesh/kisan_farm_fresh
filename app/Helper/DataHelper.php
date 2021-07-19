@@ -193,4 +193,32 @@ class DataHelper
         //     "OFFERS" => "OFFERS"
         // ]);
     }
+
+    public static function encrypt($ipString)
+    {
+        $ciphering = config('services.miscellaneous.CIPHERING');
+        $encryption_iv = config('services.miscellaneous.ENCRYPTION_IV');
+        $hash_key = config('services.miscellaneous.HASH_KEY');
+        return openssl_encrypt(
+            $ipString,
+            $ciphering,
+            $hash_key,
+            0,
+            $encryption_iv
+        );
+    }
+
+    public static function decrypt($ipString)
+    {
+        $ciphering = config('services.miscellaneous.CIPHERING');
+        $encryption_iv = config('services.miscellaneous.ENCRYPTION_IV');
+        $hash_key = config('services.miscellaneous.HASH_KEY');
+        return openssl_decrypt(
+            $ipString,
+            $ciphering,
+            $hash_key,
+            0,
+            $encryption_iv
+        );
+    }
 }

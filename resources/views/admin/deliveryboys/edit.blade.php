@@ -53,7 +53,7 @@
                 <span class="help-block">{{ trans('cruds.deliveryboy.fields.email_helper') }}</span>
             </div>
 
-            <!-- <div class="form-group">
+            <div class="form-group">
                 <label class="required" for="password">{{ trans('cruds.deliveryboy.fields.password') }}</label>
                 <input class="form-control {{ $errors->has('password') ? 'is-invalid' : '' }}" type="password" name="password" id="password">
                 @if($errors->has('password'))
@@ -62,7 +62,7 @@
                     </div>
                 @endif
                 <span class="help-block">{{ trans('cruds.deliveryboy.fields.password_helper') }}</span>
-            </div> -->
+            </div>
             <div class="form-group">
                 <label class="required" for="roles">{{ trans('cruds.deliveryboy.fields.roles') }}</label>
                 <div style="padding-bottom: 4px">

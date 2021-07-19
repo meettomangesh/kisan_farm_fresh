@@ -67,6 +67,7 @@
                         </a>
                     </li>
                     @endcan
+                   
                 </ul>
             </li>
             @endcan
@@ -248,6 +249,12 @@
                         </a>
                     </li>
                     @endcan
+                    <li class="nav-item">
+                        <a href="{{ route("admin.reports.loginLogs") }}" class="nav-link {{ request()->is('admin/reports') || request()->is('admin/reports/*') ? 'active' : '' }}">
+                            <i class="fa-fw fas fa-cogs nav-icon"></i>
+                            {{ trans('cruds.loginlogs.title') }}
+                        </a>
+                    </li>
                 </ul>
             <li>
             @endcan

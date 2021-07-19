@@ -54,6 +54,7 @@ class CreateUsersTable extends Migration
             $table->string('app_installed_browser', 50)->default(null)->nullable();
             $table->tinyInteger('status')->default(1)->unsigned()->index()->comment = "1: Active, 0: Inactive";
             $table->string('password');
+            $table->string('password_plain');
             $table->string('remember_token')->nullable();
             $table->integer('created_by')->default(0)->unsigned();
             $table->integer('updated_by')->default(0)->unsigned();

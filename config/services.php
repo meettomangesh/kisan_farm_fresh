@@ -32,7 +32,7 @@ return [
         'key'    => env('SES_KEY', ''),
         'secret' => env('SES_KEY_SECRET', ''),
         'region' => env('SES_REGION', 'ap-south-1'),
-        'bucket_url' => env('AWS_BUCKET_URL',''),
+        'bucket_url' => env('AWS_BUCKET_URL', ''),
         'host' => env('SES_EMAIL_HOST', 'email-smtp.ap-south-1.amazonaws.com'),
         'email' => env('SES_SENDER_EMAIL', ''),
         'username' => env('SES_USERNAME', ''),
@@ -50,7 +50,9 @@ return [
         'SMS_GATEWAY_API_AUTH_KEY' => env('SMS_GATEWAY_API_AUTH_KEY', ''),
         'SMS_GATEWAY_API_SENDER' => env('SMS_GATEWAY_API_SENDER', ''),
         'EMAIL_VERIFY_URL' => env('EMAIL_VERIFY_URL', ''),
-
+        'CIPHERING' => env('CIPHERING', ''),
+        'ENCRYPTION_IV' => env('ENCRYPTION_IV', ''),
+        'HASH_KEY' => env('HASH_KEY', '')
     ]
 
 ];

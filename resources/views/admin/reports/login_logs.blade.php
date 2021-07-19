@@ -101,7 +101,6 @@
 
         $('.datatable-LoginLogs:not(.ajaxTable) thead tr:eq(1) th').each(function(i) {
             $('input', this).on('keyup change', function() {
-                console.log('event is triggered',this.value,table.column(i).search());
                 if (table.column(i).search() !== this.value) {
                     table
                         .column(i)

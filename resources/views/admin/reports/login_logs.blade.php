@@ -38,8 +38,8 @@
                         <th><input type="text" placeholder="Search" /></th>
                         <th></th>
                         <th>
-                            <input type="text" placeholder="Search" />
-                            <!-- <select>
+                            <!--<input type="text" placeholder="Search" />
+                             <select>
                                 <option value="">Select</option>
                                 <option value="1">Login</option>
                                 <option value="2">Logout</option>

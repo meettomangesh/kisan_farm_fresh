@@ -58,7 +58,7 @@ class ReportsController extends Controller
                 }
             }
         }
-
+        
         $salesItemsData = DB::table('customer_orders AS co')
             ->leftJoin('customer_order_details AS cod', 'co.id', '=', 'cod.order_id')
             ->leftJoin('products AS p', 'p.id', '=', 'cod.products_id')
@@ -121,10 +121,11 @@ class ReportsController extends Controller
         if (isset($filterParams['product_name']) && !empty($filterParams['product_name'])) {
             $salesItemsData->where('p.product_name', 'LIKE', "%".$filterParams['product_name']."%");
         }
-        
+       
         // $salesItemsData = collect($salesItemsData->get());
         // return $salesItemsData;
-        return Datatables::of($salesItemsData)->make(true);
+        return datatables()->collection($salesItemsData->get())->toJson();
+       // return Datatables::of($salesItemsData)->make(true);
 
         /* $salesItemsData = DB::table('customer_order_details AS cod')
             ->leftJoin('customer_order_details_basket AS codb', 'cod.id', '=', 'codb.order_details_id')

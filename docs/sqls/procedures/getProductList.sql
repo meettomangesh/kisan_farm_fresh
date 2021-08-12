@@ -68,7 +68,16 @@ getProductList:BEGIN
     FROM products AS p
     LEFT JOIN categories_master AS c ON c.id = p.category_id AND c.status = 1
     WHERE p.deleted_at IS NULL AND p.status = 1 AND p.stock_availability = 1 AND IF(p.expiry_date IS NOT NULL, p.expiry_date >= CURDATE(), 1=1) AND '
-    , @whrCategory, ' AND ', @whrSearch, ' ORDER BY ', @orderBy, ' LIMIT ', noOfRecords, ' OFFSET ', pageNumber);
+    , @whrCategory, ' AND ', @whrSearch, '
+    AND IF(p.is_basket = 1, 1=1, 
+            IF((SELECT COUNT(pu.id) FROM product_units AS pu
+                JOIN unit_master AS um ON um.id = pu.unit_id
+                JOIN product_location_inventory AS pli ON pli.product_units_id = pu.id
+                WHERE pu.deleted_at IS NULL AND pu.status = 1 AND pu.products_id = p.id AND pu.selling_price > 0 AND pli.current_quantity > 0) > 0, 
+                true, false
+            )
+        )
+    ORDER BY ', @orderBy, ' LIMIT ', noOfRecords, ' OFFSET ', pageNumber);
 
     PREPARE stmt from @sqlStmt;
     EXECUTE stmt;

@@ -34,7 +34,7 @@ class Category extends Model
         $imageName = $time . '-' . $image->getClientOriginalName();
         $image->move(base_path().'/public' . $path, $imageName);
         Category::create(array(
-            'cat_parent_id' => $inputs['cat_parent_id'],
+            'cat_parent_id' => (isset($inputs['cat_parent_id']) && !empty($inputs['cat_parent_id'])) ? $inputs['cat_parent_id'] : 0,
             'cat_name' => $inputs['cat_name'],
             'cat_image_name' => $path.$imageName,
             'cat_description' => $inputs['cat_description'],

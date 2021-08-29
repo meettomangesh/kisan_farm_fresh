@@ -231,7 +231,7 @@ class OrdersController extends BaseController
         return $response;
     }
 
-    public function paymentCallbackUrl(Request $request)
+    /* public function paymentCallbackUrl(Request $request)
     {
         try {
             $input=$request->all();
@@ -265,7 +265,7 @@ class OrdersController extends BaseController
             $response = $this->sendResponse(array(), $e->getMessage());
         }
         return $response;
-    }
+    } */
 
     public function checkDeliveryBoyAvailability(Request $request)
     {
@@ -298,5 +298,25 @@ class OrdersController extends BaseController
         } catch (Exception $e) {
             return $this->sendResponse(array(), $e->getMessage());
         }
+    }
+
+    public function paymentCallbackUrl(Request $request)
+    {
+        try {
+            $input = $request->all();
+            //Create order object to call functions
+            $customerOrders = new CustomerOrders();
+            // Function call to update order status using payment response
+            $responseDetails = $customerOrders->paymentCallbackUrl($input);
+            
+            $message = 'Success.';
+            if ($responseDetails == false) {
+                $message = 'Failure.';
+            }
+            $response = $this->sendResponse($responseDetails, $message);
+        } catch (Exception $e) {
+            $response = $this->sendResponse(array(), $e->getMessage());
+        }
+        return $response;
     }
 }

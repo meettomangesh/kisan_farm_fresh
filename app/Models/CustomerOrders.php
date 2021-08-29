@@ -570,7 +570,7 @@ class CustomerOrders extends Model
         return array("status" => false, "order_status" => "");
     }
 
-    public function paymentCallbackUrl($params)
+    /* public function paymentCallbackUrl($params)
     {
         //Log::info('inside model paymentCallbackUrl.', ['razorpay_order_id' => $params['razorpay_order_id'], 'razorpay_payment_id' => $params['razorpay_payment_id'], 'razorpay_signature' => $params['razorpay_signature']]);
         if (!empty($params['razorpay_payment_id']) && !empty($params['razorpay_order_id']) && !empty($params['razorpay_signature'])) {
@@ -594,7 +594,7 @@ class CustomerOrders extends Model
             return false;
         }
         return false;
-    }
+    } */
 
     public function createOrderAtRazorpay($params)
     {
@@ -686,5 +686,12 @@ class CustomerOrders extends Model
             return array("status" => false, "message" => "Delivery boy assigned successfully!");
         }
         return array("status" => true, "message" => "Delivery boy is available");
+    }
+
+    public function paymentCallbackUrl($params)
+    {
+        Log::info('inside model paymentCallbackUrl.', $params);
+        DB::select('CALL storePaymentCallBack(?)', [$params]);
+        return true;
     }
 }

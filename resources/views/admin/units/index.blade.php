@@ -108,7 +108,7 @@
     order: [[ 1, 'desc' ]],
     pageLength: 100,
   });
-  let table = $('.datatable-Unit:not(.ajaxTable)').DataTable({ buttons: dtButtons })
+  let table = $('.datatable-Unit:not(.ajaxTable)').DataTable({ buttons: dtButtons,stateSave: true })
   $('a[data-toggle="tab"]').on('shown.bs.tab', function(e){
       $($.fn.dataTable.tables(true)).DataTable()
           .columns.adjust();

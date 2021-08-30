@@ -27,7 +27,7 @@
                         <th>{{ trans('cruds.product.fields.sku') }}</th>
                         <th>{{ trans('cruds.product.fields.actions') }}</th>
                     </tr>
-                    <tr>
+                    <!-- <tr>
                         <th width="10"></th>
                         <th></th>
                         <th></th>
@@ -35,7 +35,7 @@
                         <th><input type="text" placeholder="Search" /></th>
                         <th><input type="text" placeholder="Search" /></th>
                         <th></th>
-                    </tr>
+                    </tr> -->
                 </thead>
                 <tbody>
                     @foreach($products as $key => $product)

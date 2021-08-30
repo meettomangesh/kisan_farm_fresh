@@ -130,7 +130,7 @@
         } );
     } );
 
-  let table = $('.datatable-Product:not(.ajaxTable)').DataTable({ buttons: dtButtons })
+  let table = $('.datatable-Product:not(.ajaxTable)').DataTable({ buttons: dtButtons, stateSave: true })
   $('a[data-toggle="tab"]').on('shown.bs.tab', function(e){
       $($.fn.dataTable.tables(true)).DataTable()
           .columns.adjust();

@@ -128,7 +128,7 @@ class CustomerOrders extends Model
     {
         $hash = "";
         // validate customer
-        $usersData = User::select('id')->where('id', $params['user_id'])->where('status', 1)->get()->toArray();
+        $usersData = User::select('id','first_name','last_name')->where('id', $params['user_id'])->where('status', 1)->get()->toArray();
         $userAddressData = UserAddress::select('id')->where('id', $params['delivery_details']['address']['id'])->where('user_id', $params['user_id'])->where('status', 1)->get()->toArray();
         $minOrderAmountRes = ConfigSettings::where('name', 'minOrderAmount')->first();
         $deliveryChargeRes = ConfigSettings::where('name', 'deliveryCharge')->first();
@@ -246,7 +246,7 @@ class CustomerOrders extends Model
         // return true;
         $razorPayOrderId = 0;
         if ($params['payment_details']['type'] == 'online') {
-            $createOrderIdParams = array("order_amount" => $orderAmount, "order_id" => $orderId);
+            $createOrderIdParams = array("order_amount" => $orderAmount, "order_id" => $orderId, "customer_name" => $usersData[0]['first_name'].' '.$usersData[0]['last_name']);
             /* $razorPayOrderId = $this->createOrderAtRazorpay($createOrderIdParams);
             if (isset($razorPayOrderId) && !empty($razorPayOrderId)) {
                 $updateOrder = CustomerOrders::find($orderId);
@@ -254,6 +254,11 @@ class CustomerOrders extends Model
                 $updateOrder->save();
             } */
             $hash = $this->generateHash($createOrderIdParams);
+            if (isset($hash) && !empty($hash)) {
+                $updateOrder = CustomerOrders::find($orderId);
+                $updateOrder->payu_hash = $hash;
+                $updateOrder->save();
+            }
         }
 
         if (isset($params['payment_details']['promo_code']) && !empty($params['payment_details']['promo_code']) && $params['payment_details']['promo_code'] != '') {
@@ -601,7 +606,7 @@ class CustomerOrders extends Model
     public function generateHash($params) {
         $merchantKey = env('PAYU_MERCHANT_KEY');
         $salt = env('PAYU_SALT');
-        $payhash_str = $merchantKey . '|' . $params["order_id"] . '|' .$params["order_amount"]  . '|Shopping|Test|test@test.com|||||||||||'. $salt;
+        $payhash_str = $merchantKey . '|' . $params["order_id"] . '|' .$params["order_amount"]  . '|Shopping|'. $params["customer_name"] .'||||||||||||'. $salt;
         return strtolower(hash('sha512', $payhash_str));
     }
 
@@ -699,8 +704,25 @@ class CustomerOrders extends Model
 
     public function paymentCallbackUrl($params)
     {
-        Log::info('inside model paymentCallbackUrl.', $params);
+        Log::info('inside model paymentCallbackUrl customerorders model.', $params);
+        Log::info('$params["hash"]: ', $params['hash']);
         DB::select('CALL storePaymentCallBack(?)', [$params]);
-        return true;
+        if (!empty($params['mihpayid']) && !empty($params['status']) && !empty($params['hash']) && $params['status'] == "success") {
+            $order = CustomerOrders::select('id')->where('payu_hash', $params['hash'])->get()->toArray();
+
+            if (sizeof($order) > 0) {
+                $updateOrder = CustomerOrders::where('payu_hash', $params['hash'])->first();
+                $updateOrder->order_status = 1;
+                $updateOrder->update();
+                $params['order_id'] = $updateOrder->id;
+                $params['order_email_template'] = 'IN_APP_ORDER_PLACED_NOTIFICATION';
+                
+                $emailResult = $this->sendOrderTransactionEmail($params);
+                $notificationResult = $this->sendOrderTransactionNotification($params);
+                return true;
+            }
+            return false;
+        }
+        return false;
     }
 }

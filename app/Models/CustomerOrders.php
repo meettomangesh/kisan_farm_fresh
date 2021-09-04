@@ -126,28 +126,29 @@ class CustomerOrders extends Model
 
     public function placeOrder($params)
     {
+        $hash = "";
         // validate customer
-        $usersData = User::select('id')->where('id', $params['user_id'])->where('status', 1)->get()->toArray();
+        $usersData = User::select('id','first_name','last_name')->where('id', $params['user_id'])->where('status', 1)->get()->toArray();
         $userAddressData = UserAddress::select('id')->where('id', $params['delivery_details']['address']['id'])->where('user_id', $params['user_id'])->where('status', 1)->get()->toArray();
         $minOrderAmountRes = ConfigSettings::where('name', 'minOrderAmount')->first();
         $deliveryChargeRes = ConfigSettings::where('name', 'deliveryCharge')->first();
 
         if (sizeof($usersData) == 0) {
-            return array("status" => false, "message" => "Invalid user", "order_id" => 0, "razorpay_order_id" => 0);
+            return array("status" => false, "message" => "Invalid user", "order_id" => 0, "payu_hash" => "");
         }
         if (sizeof($params['products']) == 0) {
-            return array("status" => false, "message" => "Product(s) not present", "order_id" => 0, "razorpay_order_id" => 0);
+            return array("status" => false, "message" => "Product(s) not present", "order_id" => 0, "payu_hash" => "");
         }
         if (sizeof($userAddressData) == 0) {
-            return array("status" => false, "message" => "Invalid user address", "order_id" => 0, "razorpay_order_id" => 0);
+            return array("status" => false, "message" => "Invalid user address", "order_id" => 0, "payu_hash" => "");
         }
         // validate delivery date
         if ($params['delivery_details']['date'] <= date('Y-m-d')) {
-            return array("status" => false, "message" => "Invalid delivery date, must be greater than current date", "order_id" => 0, "razorpay_order_id" => 0);
+            return array("status" => false, "message" => "Invalid delivery date, must be greater than current date", "order_id" => 0, "payu_hash" => "");
         }
 
         if(($params['payment_details']['net_amount'] < $minOrderAmountRes->value && $params['payment_details']['delivery_charge'] == 0) || ($params['payment_details']['delivery_charge'] > 0 && $params['payment_details']['delivery_charge'] != $deliveryChargeRes->value)) {
-            return array("status" => false, "message" => "Delivery charge is not applied or incorrect.", "order_id" => 0, "razorpay_order_id" => 0);
+            return array("status" => false, "message" => "Delivery charge is not applied or incorrect.", "order_id" => 0, "payu_hash" => "");
         }
 
         if (isset($params['payment_details']['promo_code']) && !empty($params['payment_details']['promo_code']) && $params['payment_details']['promo_code'] != '') {
@@ -156,7 +157,7 @@ class CustomerOrders extends Model
             $promoCodes = new PromoCodes();
             $vpcResponse = $promoCodes->validatePromoCode($vpcData);
             if (!$vpcResponse) {
-                return array("status" => false, "message" => "Promo code is incorrect", "order_id" => 0, "razorpay_order_id" => 0);
+                return array("status" => false, "message" => "Promo code is incorrect", "order_id" => 0, "payu_hash" => "");
             }
         }
 
@@ -177,7 +178,7 @@ class CustomerOrders extends Model
             $stmt->closeCursor();
             $reponse = json_decode($result['response']);
             if ($reponse->status == "FAILURE" && $reponse->statusCode != 200) {
-                return array("status" => false, "message" => "Product validation is failed", "order_id" => 0, "razorpay_order_id" => 0);
+                return array("status" => false, "message" => "Product validation is failed", "order_id" => 0, "payu_hash" => "");
             }
             if ($value['is_basket'] == 1) {
                 $isBasketInOrder = 1;
@@ -185,7 +186,7 @@ class CustomerOrders extends Model
         }
 
         if (!isset($params['payment_details']['promo_code']) && empty($params['payment_details']['promo_code']) && $params['payment_details']['delivery_charge'] == 0 && $orderAmount != $params['payment_details']['net_amount']) {
-            return array("status" => false, "message" => "Amount is not matching", "order_id" => 0, "razorpay_order_id" => 0);
+            return array("status" => false, "message" => "Amount is not matching", "order_id" => 0, "payu_hash" => "");
         }
 
         $customerOrdersResponse = CustomerOrders::create(array(
@@ -226,7 +227,7 @@ class CustomerOrders extends Model
 
             if ($reponse->status == "FAILURE" && $reponse->statusCode != 200) {
                 $this->cancelOrder($orderId, 1);
-                return array("status" => false, "message" => "Failed to create order detail", "order_id" => 0, "razorpay_order_id" => 0);
+                return array("status" => false, "message" => "Failed to create order detail", "order_id" => 0, "payu_hash" => "");
             }
         }
 
@@ -245,11 +246,17 @@ class CustomerOrders extends Model
         // return true;
         $razorPayOrderId = 0;
         if ($params['payment_details']['type'] == 'online') {
-            $createOrderIdParams = array("order_amount" => $orderAmount, "order_id" => $orderId);
-            $razorPayOrderId = $this->createOrderAtRazorpay($createOrderIdParams);
+            $createOrderIdParams = array("order_amount" => $orderAmount, "order_id" => $orderId, "customer_name" => $usersData[0]['first_name'].' '.$usersData[0]['last_name']);
+            /* $razorPayOrderId = $this->createOrderAtRazorpay($createOrderIdParams);
             if (isset($razorPayOrderId) && !empty($razorPayOrderId)) {
                 $updateOrder = CustomerOrders::find($orderId);
                 $updateOrder->razorpay_order_id = $razorPayOrderId;
+                $updateOrder->save();
+            } */
+            $hash = $this->generateHash($createOrderIdParams);
+            if (isset($hash) && !empty($hash)) {
+                $updateOrder = CustomerOrders::find($orderId);
+                $updateOrder->payu_hash = $hash;
                 $updateOrder->save();
             }
         }
@@ -284,7 +291,7 @@ class CustomerOrders extends Model
             $notificationResult = $this->sendOrderTransactionNotification($params);
         }
         $invoiceGenerated = 0;
-        return array("status" => true, "order_id" => $orderId, "razorpay_order_id" => $razorPayOrderId, "invoice_generated " => $invoiceGenerated);
+        return array("status" => true, "order_id" => $orderId, "payu_hash" => $hash, "invoice_generated " => $invoiceGenerated);
     }
 
     public function sendOrderTransactionNotification($params)
@@ -596,6 +603,13 @@ class CustomerOrders extends Model
         return false;
     } */
 
+    public function generateHash($params) {
+        $merchantKey = env('PAYU_MERCHANT_KEY');
+        $salt = env('PAYU_SALT');
+        $payhash_str = $merchantKey . '|' . $params["order_id"] . '|' .$params["order_amount"]  . '|Shopping|'. $params["customer_name"] .'||||||||||||'. $salt;
+        return strtolower(hash('sha512', $payhash_str));
+    }
+
     public function createOrderAtRazorpay($params)
     {
         try {
@@ -690,8 +704,25 @@ class CustomerOrders extends Model
 
     public function paymentCallbackUrl($params)
     {
-        Log::info('inside model paymentCallbackUrl.', $params);
+        Log::info('inside model paymentCallbackUrl customerorders model.', $params);
+        Log::info('$params["hash"]: ', $params['hash']);
         DB::select('CALL storePaymentCallBack(?)', [$params]);
-        return true;
+        if (!empty($params['mihpayid']) && !empty($params['status']) && !empty($params['hash']) && $params['status'] == "success") {
+            $order = CustomerOrders::select('id')->where('payu_hash', $params['hash'])->get()->toArray();
+
+            if (sizeof($order) > 0) {
+                $updateOrder = CustomerOrders::where('payu_hash', $params['hash'])->first();
+                $updateOrder->order_status = 1;
+                $updateOrder->update();
+                $params['order_id'] = $updateOrder->id;
+                $params['order_email_template'] = 'IN_APP_ORDER_PLACED_NOTIFICATION';
+                
+                $emailResult = $this->sendOrderTransactionEmail($params);
+                $notificationResult = $this->sendOrderTransactionNotification($params);
+                return true;
+            }
+            return false;
+        }
+        return false;
     }
 }

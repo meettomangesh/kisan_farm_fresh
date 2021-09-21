@@ -21,6 +21,7 @@ use App\Helper\EmailHelper;
 use App\Helper\NotificationHelper;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Log;
+use App\Helper\PaytmChecksum;
 
 class CustomerOrders extends Model
 {
@@ -128,7 +129,7 @@ class CustomerOrders extends Model
     {
         $hash = "";
         // validate customer
-        $usersData = User::select('id','first_name','last_name')->where('id', $params['user_id'])->where('status', 1)->get()->toArray();
+        $usersData = User::select('id', 'first_name', 'last_name')->where('id', $params['user_id'])->where('status', 1)->get()->toArray();
         $userAddressData = UserAddress::select('id')->where('id', $params['delivery_details']['address']['id'])->where('user_id', $params['user_id'])->where('status', 1)->get()->toArray();
         $minOrderAmountRes = ConfigSettings::where('name', 'minOrderAmount')->first();
         $deliveryChargeRes = ConfigSettings::where('name', 'deliveryCharge')->first();
@@ -147,7 +148,7 @@ class CustomerOrders extends Model
             return array("status" => false, "message" => "Invalid delivery date, must be greater than current date", "order_id" => 0, "payu_hash" => "");
         }
 
-        if(($params['payment_details']['net_amount'] < $minOrderAmountRes->value && $params['payment_details']['delivery_charge'] == 0) || ($params['payment_details']['delivery_charge'] > 0 && $params['payment_details']['delivery_charge'] != $deliveryChargeRes->value)) {
+        if (($params['payment_details']['net_amount'] < $minOrderAmountRes->value && $params['payment_details']['delivery_charge'] == 0) || ($params['payment_details']['delivery_charge'] > 0 && $params['payment_details']['delivery_charge'] != $deliveryChargeRes->value)) {
             return array("status" => false, "message" => "Delivery charge is not applied or incorrect.", "order_id" => 0, "payu_hash" => "");
         }
 
@@ -244,19 +245,13 @@ class CustomerOrders extends Model
         $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
         $stmt->closeCursor();
         // return true;
-        $razorPayOrderId = 0;
+        $paytmTransactionToken = 0;
         if ($params['payment_details']['type'] == 'online') {
-            $createOrderIdParams = array("order_amount" => $orderAmount, "order_id" => $orderId, "customer_name" => $usersData[0]['first_name'].' '.$usersData[0]['last_name']);
-            /* $razorPayOrderId = $this->createOrderAtRazorpay($createOrderIdParams);
-            if (isset($razorPayOrderId) && !empty($razorPayOrderId)) {
+            $createOrderIdParams = array("order_amount" => $orderAmount, "customer_id" => $params['user_id'], "order_id" => $orderId, "first_name" => $usersData[0]['first_name'], "last_name" => $usersData[0]['last_name']);
+            $paytmTransactionToken = $this->createOrderAtPaytm($createOrderIdParams);
+            if (isset($paytmTransactionToken) && !empty($paytmTransactionToken)) {
                 $updateOrder = CustomerOrders::find($orderId);
-                $updateOrder->razorpay_order_id = $razorPayOrderId;
-                $updateOrder->save();
-            } */
-            $hash = $this->generateHash($createOrderIdParams);
-            if (isset($hash) && !empty($hash)) {
-                $updateOrder = CustomerOrders::find($orderId);
-                $updateOrder->payu_hash = $hash;
+                $updateOrder->paytm_transaction_token = $paytmTransactionToken;
                 $updateOrder->save();
             }
         }
@@ -267,7 +262,7 @@ class CustomerOrders extends Model
             $promoCodes->markPromoCodeAsUtilized($vpcData);
         }
         $params['order_id'] = $orderId;
-        $params['razorpay_order_id'] = $razorPayOrderId;
+        $params['paytm_transaction_token'] = $paytmTransactionToken;
         $params['invoice_template'] = 'IN_APP_INVOICE_AFTER_ORDER';
 
         $invoiceGeneratedPath =  $this->generateInvoice($params);
@@ -291,7 +286,7 @@ class CustomerOrders extends Model
             $notificationResult = $this->sendOrderTransactionNotification($params);
         }
         $invoiceGenerated = 0;
-        return array("status" => true, "order_id" => $orderId, "payu_hash" => $hash, "invoice_generated " => $invoiceGenerated);
+        return array("status" => true, "order_id" => $orderId, "paytm_transaction_token" => $paytmTransactionToken, "invoice_generated " => $invoiceGenerated);
     }
 
     public function sendOrderTransactionNotification($params)
@@ -603,45 +598,95 @@ class CustomerOrders extends Model
         return false;
     } */
 
-    public function generateHash($params) {
+    public function generateHash($params)
+    {
         $merchantKey = env('PAYU_MERCHANT_KEY');
         $salt = env('PAYU_SALT');
-        $payhash_str = $merchantKey . '|' . $params["order_id"] . '|' .$params["order_amount"]  . '|Shopping|'. $params["customer_name"] .'||||||||||||'. $salt;
+        $payhash_str = $merchantKey . '|' . $params["order_id"] . '|' . $params["order_amount"]  . '|Shopping|' . $params["customer_name"] . '||||||||||||' . $salt;
         return strtolower(hash('sha512', $payhash_str));
     }
 
-    public function createOrderAtRazorpay($params)
+    public function createOrderAtPaytm($params)
     {
         try {
             // $inputData = array("amount" => number_format($params["order_amount"], 2, ".", ""), "currency" => "INR", "receipt" => "rcptid_" . $params["order_id"]);
             $inputData = array("amount" => $params["order_amount"], "currency" => "INR", "receipt" => "rcptid_" . $params["order_id"]);
-            $curl = curl_init();
+            // $curl = curl_init();
 
-            curl_setopt_array($curl, array(
-                CURLOPT_URL => 'https://api.razorpay.com/v1/orders',
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_ENCODING => '',
-                CURLOPT_MAXREDIRS => 10,
-                CURLOPT_TIMEOUT => 30,
-                // CURLOPT_FOLLOWLOCATION => true,
-                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                CURLOPT_SSL_VERIFYPEER => false,
-                CURLOPT_CUSTOMREQUEST => 'POST',
-                CURLOPT_POSTFIELDS => json_encode($inputData),
-                CURLOPT_HTTPHEADER => array(
-                    'Authorization: Basic cnpwX3Rlc3RfVmFjZVN1U1ZGaURXcTQ6WGdLY1dDb3BTRjlKZDhEUUQ0T3I2bXRr',
-                    'Content-Type: application/json'
+            // curl_setopt_array($curl, array(
+            //     CURLOPT_URL => 'https://api.razorpay.com/v1/orders',
+            //     CURLOPT_RETURNTRANSFER => true,
+            //     CURLOPT_ENCODING => '',
+            //     CURLOPT_MAXREDIRS => 10,
+            //     CURLOPT_TIMEOUT => 30,
+            //     // CURLOPT_FOLLOWLOCATION => true,
+            //     CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            //     CURLOPT_SSL_VERIFYPEER => false,
+            //     CURLOPT_CUSTOMREQUEST => 'POST',
+            //     CURLOPT_POSTFIELDS => json_encode($inputData),
+            //     CURLOPT_HTTPHEADER => array(
+            //         'Authorization: Basic cnpwX3Rlc3RfVmFjZVN1U1ZGaURXcTQ6WGdLY1dDb3BTRjlKZDhEUUQ0T3I2bXRr',
+            //         'Content-Type: application/json'
+            //     ),
+            // ));
+
+            // $response = json_decode(curl_exec($curl));
+
+            // $err = curl_error($curl);
+            // curl_close($curl);
+            // if ($err || isset($response->error)) {
+            //     return 0;
+            // }
+            // return $response->id;
+
+
+            $paytmParams = array();
+
+            $paytmParams["body"] = array(
+                "requestType"   => "Payment",
+                "mid"           => config('services.miscellaneous.PAYTM_MERCHANT_ID'),
+                "websiteName"   => config('services.miscellaneous.APP_NAME'),
+                "orderId"       => "ORDERID_" . $params["order_id"],
+                "callbackUrl"   => config('services.miscellaneous.PAYTM_CALLBACK_URL'),
+                "txnAmount"     => array(
+                    "value"     => "1.00", //$params["order_amount"]
+                    "currency"  => "INR",
                 ),
-            ));
+                "userInfo"      => array(
+                    "custId"    => $params["customer_id"],
+                    "firstName" => $params["first_name"],
+                    "lastName" => $params["last_name"],
+                ),
+            );
 
-            $response = json_decode(curl_exec($curl));
+            /*
+                * Generate checksum by parameters we have in body
+                * Find your Merchant Key in your Paytm Dashboard at https://dashboard.paytm.com/next/apikeys 
+                */
+            $checksum = PaytmChecksum::generateSignature(json_encode($paytmParams["body"], JSON_UNESCAPED_SLASHES), config('services.miscellaneous.PAYTM_MERCHANT_KEY'));
 
-            $err = curl_error($curl);
-            curl_close($curl);
-            if ($err || isset($response->error)) {
+            $paytmParams["head"] = array(
+                "signature"    => $checksum
+            );
+
+            $post_data = json_encode($paytmParams, JSON_UNESCAPED_SLASHES);
+
+            $url = config('services.miscellaneous.PAYTM_END_POINT') . "mid=" . config('services.miscellaneous.PAYTM_MERCHANT_ID') . "&orderId=" . "ORDERID_" . $params["order_id"];
+
+            $ch = curl_init($url);
+            curl_setopt($ch, CURLOPT_POST, 1);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $post_data);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, array("Content-Type: application/json"));
+            // $response = curl_exec($ch);
+            $response = json_decode(curl_exec($ch));
+
+            $err = curl_error($ch);
+            curl_close($ch);
+            if ($err || $response->body->resultInfo->resultStatus == "F") {
                 return 0;
             }
-            return $response->id;
+            return $response->body->txnToken;
         } catch (Exception $e) {
             throw new Exception($e->getMessage());
         }
@@ -707,16 +752,19 @@ class CustomerOrders extends Model
         Log::info('inside model paymentCallbackUrl customerorders model.', $params);
         Log::info('$params["hash"]: ', $params['hash']);
         DB::select('CALL storePaymentCallBack(?)', [$params]);
-        if (!empty($params['mihpayid']) && !empty($params['status']) && !empty($params['hash']) && $params['status'] == "success") {
-            $order = CustomerOrders::select('id')->where('payu_hash', $params['hash'])->get()->toArray();
+        if (!empty($params['ORDERID']) && !empty($params['STATUS']) && !empty($params['TXNID']) && $params['STATUS'] == "TXN_SUCCESS") {
+            $orderId = str_replace("ORDERID_", "", $params['ORDERID']);
+            $order = CustomerOrders::select('id')->where('id', $orderId)->get()->toArray();
 
             if (sizeof($order) > 0) {
-                $updateOrder = CustomerOrders::where('payu_hash', $params['hash'])->first();
+                $updateOrder = CustomerOrders::where('id', $orderId)->first();
+                $updateOrder->paytm_response = $params;
+                $updateOrder->paytm_transaction_id = $params['TXNID'];
                 $updateOrder->order_status = 1;
                 $updateOrder->update();
                 $params['order_id'] = $updateOrder->id;
                 $params['order_email_template'] = 'IN_APP_ORDER_PLACED_NOTIFICATION';
-                
+
                 $emailResult = $this->sendOrderTransactionEmail($params);
                 $notificationResult = $this->sendOrderTransactionNotification($params);
                 return true;

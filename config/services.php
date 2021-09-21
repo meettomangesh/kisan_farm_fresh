@@ -52,7 +52,12 @@ return [
         'EMAIL_VERIFY_URL' => env('EMAIL_VERIFY_URL', ''),
         'CIPHERING' => env('CIPHERING', ''),
         'ENCRYPTION_IV' => env('ENCRYPTION_IV', ''),
-        'HASH_KEY' => env('HASH_KEY', '')
+        'HASH_KEY' => env('HASH_KEY', ''),
+        'PAYTM_MERCHANT_ID' =>  env('PAYTM_MERCHANT_ID', ''),
+        'PAYTM_MERCHANT_KEY' =>  env('PAYTM_MERCHANT_KEY', ''),
+        'APP_NAME' =>  env('APP_NAME', ''),
+        'PAYTM_CALLBACK_URL' => env('PAYTM_CALLBACK_URL', ''),
+        'PAYTM_END_POINT' => env('PAYTM_END_POINT', ''),
     ]
 
 ];

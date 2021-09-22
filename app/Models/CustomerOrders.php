@@ -751,9 +751,10 @@ class CustomerOrders extends Model
 
     public function paymentCallbackUrl($params)
     {
+        //print_r($params); exit;
         Log::info('inside model paymentCallbackUrl customerorders model.', $params);
-        Log::info('$params["hash"]: ', $params['hash']);
-        DB::select('CALL storePaymentCallBack(?)', [$params]);
+        //Log::info('$params["hash"]: ', $params['hash']);
+        //DB::select('CALL storePaymentCallBack(?)', [$params]);
         if (!empty($params['ORDERID']) && !empty($params['STATUS']) && !empty($params['TXNID']) && $params['STATUS'] == "TXN_SUCCESS") {
             $orderId = str_replace("ORDERID_", "", $params['ORDERID']);
             $order = CustomerOrders::select('id')->where('id', $orderId)->get()->toArray();

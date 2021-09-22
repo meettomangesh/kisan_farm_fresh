@@ -263,8 +263,8 @@ class CustomerOrders extends Model
         }
         $params['order_id'] = $orderId;
         $params['paytm_transaction_token'] = $paytmTransactionToken;
-        $params['paytm_order_id'] = "ORDERID_" .$orderId;
-         
+        $params['paytm_order_id'] = "ORDERID_" . $orderId;
+
         $params['invoice_template'] = 'IN_APP_INVOICE_AFTER_ORDER';
 
         $invoiceGeneratedPath =  $this->generateInvoice($params);
@@ -288,7 +288,7 @@ class CustomerOrders extends Model
             $notificationResult = $this->sendOrderTransactionNotification($params);
         }
         $invoiceGenerated = 0;
-        return array("status" => true, "order_id" => $orderId, "paytm_order_id" => "ORDERID_" .$orderId, "paytm_transaction_token" => $paytmTransactionToken, "invoice_generated " => $invoiceGenerated);
+        return array("status" => true, "callback_url" => config('services.miscellaneous.PAYTM_CALLBACK_URL'), "merchant_id" => config('services.miscellaneous.PAYTM_MERCHANT_ID'), "order_id" => $orderId, "paytm_order_id" => "ORDERID_" . $orderId, "paytm_transaction_token" => $paytmTransactionToken, "invoice_generated " => $invoiceGenerated);
     }
 
     public function sendOrderTransactionNotification($params)
@@ -651,7 +651,7 @@ class CustomerOrders extends Model
                 "orderId"       => "ORDERID_" . $params["order_id"],
                 "callbackUrl"   => config('services.miscellaneous.PAYTM_CALLBACK_URL'),
                 "txnAmount"     => array(
-                    "value"     => "1.00", //$params["order_amount"]
+                    "value"     => $params["order_amount"],
                     "currency"  => "INR",
                 ),
                 "userInfo"      => array(

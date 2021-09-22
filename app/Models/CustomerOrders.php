@@ -263,6 +263,8 @@ class CustomerOrders extends Model
         }
         $params['order_id'] = $orderId;
         $params['paytm_transaction_token'] = $paytmTransactionToken;
+        $params['paytm_order_id'] = "ORDERID_" .$orderId;
+         
         $params['invoice_template'] = 'IN_APP_INVOICE_AFTER_ORDER';
 
         $invoiceGeneratedPath =  $this->generateInvoice($params);
@@ -286,7 +288,7 @@ class CustomerOrders extends Model
             $notificationResult = $this->sendOrderTransactionNotification($params);
         }
         $invoiceGenerated = 0;
-        return array("status" => true, "order_id" => $orderId, "paytm_transaction_token" => $paytmTransactionToken, "invoice_generated " => $invoiceGenerated);
+        return array("status" => true, "order_id" => $orderId, "paytm_order_id" => "ORDERID_" .$orderId, "paytm_transaction_token" => $paytmTransactionToken, "invoice_generated " => $invoiceGenerated);
     }
 
     public function sendOrderTransactionNotification($params)

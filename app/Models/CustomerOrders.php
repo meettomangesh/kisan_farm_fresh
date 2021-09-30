@@ -247,7 +247,7 @@ class CustomerOrders extends Model
         // return true;
         $paytmTransactionToken = 0;
         if ($params['payment_details']['type'] == 'online') {
-            $createOrderIdParams = array("order_amount" => $orderAmount, "customer_id" => $params['user_id'], "order_id" => $orderId, "first_name" => $usersData[0]['first_name'], "last_name" => $usersData[0]['last_name']);
+            $createOrderIdParams = array("order_amount" => $params['payment_details']['gross_amount'], "customer_id" => $params['user_id'], "order_id" => $orderId, "first_name" => $usersData[0]['first_name'], "last_name" => $usersData[0]['last_name']);
             $paytmTransactionToken = $this->createOrderAtPaytm($createOrderIdParams);
             if (isset($paytmTransactionToken) && !empty($paytmTransactionToken)) {
                 $updateOrder = CustomerOrders::find($orderId);

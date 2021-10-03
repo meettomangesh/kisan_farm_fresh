@@ -16,15 +16,15 @@ getProductList:BEGIN
         SET searchValue = JSON_UNQUOTE(JSON_EXTRACT(inputData,'$.search_value'));
         SET sortType = JSON_UNQUOTE(JSON_EXTRACT(inputData,'$.sort_type'));
         SET sortOn = JSON_UNQUOTE(JSON_EXTRACT(inputData,'$.sort_on'));
-        IF noOfRecords IS NULL OR pageNumber IS NULL THEN
+        /* IF noOfRecords IS NULL OR pageNumber IS NULL THEN
             SELECT JSON_OBJECT('status', 'FAILURE', 'message', 'Something missing in input.','data',JSON_OBJECT(),'statusCode',520) AS response;
             LEAVE getProductList;
-        END IF;
+        END IF; */
     END IF;
 
-    IF pageNumber > 0 THEN
+    /* IF pageNumber > 0 THEN
         SET pageNumber = pageNumber * noOfRecords;
-    END IF;
+    END IF; */
 
     /* SELECT p.id,p.product_name,p.short_description,p.expiry_date,TRUNCATE(p.selling_price, 2) AS selling_price,IF(p.special_price IS NOT NULL AND p.special_price_start_date <= CURDATE() AND p.special_price_end_date >= CURDATE(), TRUNCATE(p.special_price, 2), 0.00)  AS special_price,p.special_price_start_date,p.special_price_end_date,p.min_quantity,p.max_quantity,pli.current_quantity
     FROM products AS p
@@ -77,7 +77,7 @@ getProductList:BEGIN
                 true, false
             )
         )
-    ORDER BY ', @orderBy, ' LIMIT ', noOfRecords, ' OFFSET ', pageNumber);
+    ORDER BY ', @orderBy);
 
     PREPARE stmt from @sqlStmt;
     EXECUTE stmt;

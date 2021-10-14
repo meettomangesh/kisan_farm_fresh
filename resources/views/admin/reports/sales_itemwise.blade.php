@@ -19,8 +19,8 @@
                         <th></th>
                         <th>{{ trans('cruds.sales_itemwise.fields.order_id') }}</th>
                         <th>{{ trans('cruds.sales_itemwise.fields.product_name') }}</th>
-                        <th>{{ trans('cruds.sales_itemwise.fields.selling_price') }}</th>
-                        <th>{{ trans('cruds.sales_itemwise.fields.special_price') }}</th>
+                        <!-- <th>{{ trans('cruds.sales_itemwise.fields.selling_price') }}</th>
+                        <th>{{ trans('cruds.sales_itemwise.fields.special_price') }}</th> -->
                         <th>{{ trans('cruds.sales_itemwise.fields.item_qty') }}</th>
                         <th>{{ trans('cruds.sales_itemwise.fields.order_date') }}</th>
                         <th>{{ trans('cruds.sales_itemwise.fields.order_status') }}</th>
@@ -30,8 +30,8 @@
                         <th></th>
                         <th><input class="search" name="order_id" type="text" placeholder="Search" /></th>
                         <th><input class="search" name="product_name" type="text" placeholder="Search" /></th>
-                        <th><input class="search" name="selling_price" type="text" placeholder="Search" /></th>
-                        <th><input class="search" name="special_price" type="text" placeholder="Search" /></th>
+                        <!-- <th><input class="search" name="selling_price" type="text" placeholder="Search" /></th>
+                        <th><input class="search" name="special_price" type="text" placeholder="Search" /></th> -->
                         <th><input class="search" name="item_quantity" type="text" placeholder="Search" /></th>
                         <th>
                             <input class="search form-control" type="date" name="order_date" id="order_date" max="{{ date('Y-m-d') }}" />
@@ -86,14 +86,14 @@
                     data: 'product_name',
                     name: 'product_name'
                 },
-                {
+                /* {
                     data: 'selling_price',
                     name: 'selling_price'
                 },
                 {
                     data: 'special_price',
                     name: 'special_price'
-                },
+                }, */
                 {
                     data: 'item_quantity',
                     name: 'item_quantity'
@@ -127,7 +127,7 @@
                     // recNum = ((page * displayLength) + i + 1);
                     $(rows).eq(i).children('td:first-child').html(recNum);
                 });
-                api.column(8, {
+                /* api.column(6, {
                     page: 'current'
                 }).data().each(function(data, i) {
                     var orderStatus = "";
@@ -144,14 +144,14 @@
                     } else if (data.order_status == 5) {
                         orderStatus = 'Cancelled';
                     }
-                    $(rows).eq(i).children('td:nth-child(8)').html(orderStatus);
-                });
+                    $(rows).eq(i).children('td:nth-child(6)').html(orderStatus);
+                }); */
 
-                api.column(8, {
+                api.column(6, {
                     page: 'current'
                 }).data().each(function(group, i) {
                     // recNum = ((page * displayLength) + i + 1);
-                    $(rows).eq(i).children('td:nth-child(9)').html(null);
+                    $(rows).eq(i).children('td:nth-child(7)').html(null);
                 });
             },
             ajax: {
@@ -178,7 +178,6 @@
                 $('.filter-submit').click();
             }
         });
-
         $('.filter-submit').on('click', function(e) {
             $('.datatable-sales-itemwise thead tr:eq(1) th').each(function(i) {
                 if ($('input', this).val()) {
@@ -186,7 +185,6 @@
                         table.column(i).search($('input', this).val()).draw();
                     }
                 }
-
             });
         });
     });

@@ -80,7 +80,7 @@ class ReportsController extends Controller
                 JOIN product_units AS pun ON pun.id = codb.product_units_id
                 JOIN unit_master AS umn ON umn.id = pun.unit_id
                 WHERE codb.order_id = cod.order_id AND codb.order_details_id = cod.id
-            )) AS basket_products'),
+            )) AS basket_products'), */
             DB::raw('CASE 
                     WHEN cod.order_status = 0 THEN "Pending"
                     WHEN cod.order_status = 1 THEN "Placed"
@@ -89,8 +89,8 @@ class ReportsController extends Controller
                     WHEN cod.order_status = 4 THEN "Delivered"
                     WHEN cod.order_status = 5 THEN "Cancelled"
                     ELSE "" END AS order_status
-                    ') */
-            DB::raw('cod.order_status'),
+                    ')
+            // DB::raw('cod.order_status'),
         ]);
 
         /* $orderDate = "";

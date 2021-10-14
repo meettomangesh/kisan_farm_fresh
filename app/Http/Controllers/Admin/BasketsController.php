@@ -91,23 +91,28 @@ class BasketsController extends Controller
     public function getProducts(Request $request)
     {
         $input = $request->all();
+        $productDetails = array();
         if ($input['category_id'] && ( $input['category_name'] && $input['category_name'] != 'Basket') ) {
-            $productUnits = ProductUnits::all()->where('status', 1)->where('product.category_id', $input['category_id']);
+            $productUnits = ProductUnits::join('products', 'products.id', '=', 'product_units.products_id')
+                ->join('categories_master', 'categories_master.id', '=', 'products.category_id')
+                ->join('unit_master', 'unit_master.id', '=', 'product_units.unit_id')
+                ->where('product_units.status', 1)
+                ->where('categories_master.cat_parent_id', $input['category_id'])
+                ->where('products.status', 1)
+                ->select(DB::raw('product_units.id, products.product_name, unit_master.unit'))->get()->toArray();
+            foreach($productUnits as $productUnit) {
+                $productDetails[$productUnit['id']]= $productUnit['product_name'].' ('.$productUnit['unit'].') ';
+            }
         } else {
             $productUnits = ProductUnits::all()->where('status', 1);
-        }
-
-        $productDetails = array();
-        foreach($productUnits as $productUnit) {
-
-            $productDetails[$productUnit->id]= $productUnit->product->product_name.' ('.$productUnit->unit->unit.') ';
+            foreach($productUnits as $productUnit) {
+                $productDetails[$productUnit->id]= $productUnit->product->product_name.' ('.$productUnit->unit->unit.') ';
+            }
         }
 
         $response['product_details'] = $productDetails;
-
         $response['status'] = '';
         $response['message'] = '';
-
         return response()->json($response);
     }
 }

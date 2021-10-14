@@ -20,10 +20,7 @@
         <form method="POST" id="edit-basket" action="{{ route('admin.baskets.update', [$basket->id]) }}" enctype="multipart/form-data">
             @method('PUT')
             @csrf
-
-
-
-        
+       
         <div class="row">
                 <div class="col-md-6">
                     <div class="form-group">
@@ -59,9 +56,9 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-group">
-                        <label class="control-label col-md-4 required" for="short_description">{{ trans('cruds.basket.fields.short_description') }}</label>
+                        <label class="control-label col-md-4" for="short_description">{{ trans('cruds.basket.fields.short_description') }}</label>
                         <div class="col-md-8 float-right">
-                            <textarea class="form-control {{ $errors->has('short_description') ? 'is-invalid' : '' }}" rows="2" name="short_description" id="short_description" maxlength="250" required>{{ old('short_description', $basket->short_description) }}</textarea>
+                            <textarea class="form-control {{ $errors->has('short_description') ? 'is-invalid' : '' }}" rows="2" name="short_description" id="short_description" maxlength="250">{{ old('short_description', $basket->short_description) }}</textarea>
                             @if($errors->has('short_description'))
                             <div class="invalid-feedback">
                                 {{ $errors->first('short_description') }}
@@ -77,7 +74,7 @@
                         <label class="control-label col-md-4 required" for="category_id">{{ trans('cruds.product.fields.category') }}</label>
 
                         <div class="col-md-8 float-right">
-                            <label>{{ App\Models\Category::getCategoryName($basket->category_id) }}</label>
+                            <label>{{ $basket->category->cat_name }}</label>
                         </div>
                         @if($errors->has('category'))
                         <div class="invalid-feedback">

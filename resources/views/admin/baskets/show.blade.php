@@ -24,7 +24,6 @@
                         <!-- <td><img src="{{ asset($basket->images) }}" alt="" width="50" height="50"></td> -->
                         <td><img src="{{ asset(App\Models\ProductImages::getFirstImage($basket->id)) }}" alt="" width="50" height="50"></td>
                     </tr>
-                   
                     <tr>
                         <th>{{ trans('cruds.basket.fields.basket_name') }}</th>
                         <td><b>{{ $basket->product_name }}</b></td>
@@ -32,6 +31,10 @@
                     <tr>
                         <th>{{ trans('cruds.basket.fields.sku') }}</th>
                         <td><b>{{ $basket->sku }}</b></td>
+                    </tr>
+                    <tr>
+                        <th>{{ trans('cruds.basket.fields.category') }}</th>
+                        <td><b>{{ $basket->category->cat_name }}</b></td>
                     </tr>
                     <tr>
                         <th>{{ trans('cruds.basket.fields.short_description') }}</th>

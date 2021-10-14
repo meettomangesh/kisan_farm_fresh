@@ -54,9 +54,9 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-group">
-                        <label class="control-label col-md-4 required" for="short_description">{{ trans('cruds.basket.fields.short_description') }}</label>
+                        <label class="control-label col-md-4" for="short_description">{{ trans('cruds.basket.fields.short_description') }}</label>
                         <div class="col-md-8 float-right">
-                            <textarea class="form-control {{ $errors->has('short_description') ? 'is-invalid' : '' }}" rows="2" name="short_description" id="short_description" maxlength="250" required>{{ old('short_description', '') }}</textarea>
+                            <textarea class="form-control {{ $errors->has('short_description') ? 'is-invalid' : '' }}" rows="2" name="short_description" id="short_description" maxlength="250">{{ old('short_description', '') }}</textarea>
                             @if($errors->has('short_description'))
                             <div class="invalid-feedback">
                                 {{ $errors->first('short_description') }}

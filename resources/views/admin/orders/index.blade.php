@@ -61,7 +61,9 @@
                             
                         </td>
                         <td>
-                            @if($customerOrder->order_status == 1)
+                            @if($customerOrder->order_status == 0)
+                            {{ trans('cruds.order.fields.pending') }}
+                            @elseif($customerOrder->order_status == 1)
                             {{ trans('cruds.order.fields.placed') }}
                             @elseif($customerOrder->order_status == 2)
                             {{ trans('cruds.order.fields.picked') }}

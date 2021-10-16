@@ -16,7 +16,9 @@
             <div class="row">
                 <div class="col-md-6">
                     <label><b>{{ trans('cruds.order.fields.order_status') }}:</b>
-                        @if($customerOrder->order_status == 1)
+                        @if($customerOrder->order_status == 0)
+                            {{ trans('cruds.order.fields.pending') }}
+                        @elseif($customerOrder->order_status == 1)
                             {{ trans('cruds.order.fields.placed') }}
                         @elseif($customerOrder->order_status == 2)
                             {{ trans('cruds.order.fields.picked') }}

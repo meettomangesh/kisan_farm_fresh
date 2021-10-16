@@ -416,10 +416,10 @@ class CustomerOrders extends Model
             'paymentMethod' => $orderDetails->payment_type,
             'paymentReference' => ($orderDetails->razorpay_payment_id) ? $orderDetails->razorpay_payment_id : '-',
             'productList' => $productStr,
-            'grossAmount' => $orderDetails->gross_amount,
-            'discount' => $orderDetails->discounted_amount,
-            'deliveryCharge' => $orderDetails->delivery_charge,
-            'total' => $orderDetails->net_amount,
+            'grossAmount' => round($orderDetails->gross_amount, 2),
+            'discount' => round($orderDetails->discounted_amount, 2),
+            'deliveryCharge' => round($orderDetails->delivery_charge, 2),
+            'total' => round($orderDetails->net_amount, 2),
             'deliveryDate' => $orderDetails->delivery_date
         ]);
 

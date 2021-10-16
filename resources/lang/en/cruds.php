@@ -584,6 +584,7 @@ return [
             'total_price'   => 'Total Price',
             'status'                => 'Status',
             'status_helper'         => '',
+            'pending'     => 'Pending',
             'placed'     => 'Placed',
             'picked'     => 'Picked',
             'out_for_delivery'     => 'Out for delivery',

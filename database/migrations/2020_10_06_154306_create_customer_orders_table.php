@@ -25,10 +25,6 @@ class CreateCustomerOrdersTable extends Migration
             $table->decimal('discounted_amount', 14, 4)->nullable();
             $table->decimal('delivery_charge', 10, 4);
             $table->string('payment_type', 20)->index()->nullable();
-            $table->string('razorpay_order_id', 255)->index()->nullable();
-            $table->string('razorpay_payment_id', 255)->index()->nullable();
-            $table->string('razorpay_signature', 255)->index()->nullable();
-            $table->string('payu_hash', 255)->index()->nullable();
             $table->string('paytm_transaction_id', 1000)->index()->nullable();
             $table->string('paytm_transaction_token', 1000)->index()->nullable();
             $table->text('paytm_response')->nullable();

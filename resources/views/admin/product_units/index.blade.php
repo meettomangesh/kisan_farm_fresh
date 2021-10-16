@@ -26,8 +26,8 @@
                         <th>{{ trans('cruds.product_unit.fields.unit') }}</th>
                         <th>{{ trans('cruds.product_unit.fields.selling_price') }}</th>
                         <th>{{ trans('cruds.product_unit.fields.special_price') }}</th>
-                        <th>{{ trans('cruds.product_unit.fields.opening_quantity') }}</th>
                         <th>{{ trans('cruds.product_unit.fields.current_quantity') }}</th>
+                        <th>{{ trans('cruds.product_unit.fields.status') }}</th>
                         <th>{{ trans('cruds.product_unit.fields.actions') }}</th>
                     </tr>
                 </thead>
@@ -41,8 +41,14 @@
                             <td><b>{{ ($productUnit->unit) ? $productUnit->unit->unit : "" }}</b></td>
                             <td>{{ round($productUnit->selling_price, 2) ?? '' }}</td>
                             <td>{{ round($productUnit->special_price, 2) ?? '' }}</td>
-                            <td>{{ $productUnit->opening_quantity ?? '' }}</td>
                             <td>{{ App\Models\ProductLocationInventory::getProductUnitCurrentQuantity($productUnit->id) }}</td>
+                            <td>
+                                @if($productUnit->status == 0)
+                                    {{ trans('cruds.product_unit.fields.inactive') }}
+                                @elseif($productUnit->status == 1)
+                                    {{ trans('cruds.product_unit.fields.active') }}
+                                @endif
+                            </td>
                             <td>
                                 @can('product_unit_show')
                                     <a class="btn btn-xs btn-primary" href="{{ route('admin.product_units.show', $productUnit->id) }}">

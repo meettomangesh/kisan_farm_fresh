@@ -42,33 +42,31 @@ class SmsController extends BaseController
                 }
             }
 
+            $requestedParams['otp'] = $otpNumber;
             $smsValidityTime = config('services.miscellaneous.SMS_VALIDITY_TIME_MINUTES');
             $smsgTemplates = new SmsTemplate($this->pdo, $this->redis);
             $requestedParams["template_name"] = $smsTemplateName;
-
             $smsgTemplatesData = $smsgTemplates->getSmsTemplates($requestedParams);
 
-            $textMessage = "";
-            $merchantID = "";
+            $sendMessage = 0;
             if ($smsgTemplatesData) {
-                $textMessage = str_replace('$OTP', $otpNumber, $smsgTemplatesData);
-                $textMessage = str_replace('Kisan Farm Fresh', getenv("APP_NAME"), $textMessage);
-                $textMessage = str_replace('$SMS_VALIDITY_TIME_MINUTES', $smsValidityTime, $textMessage);
-                $textMessage = '<#> ' . $textMessage;
-                //LP_REGISTRATION_OTP
-            }
+                $data = [
+                    "symbol"=> " ".config('services.miscellaneous.SMS_SYMBOL'),
+                    "OTP"=> $otpNumber,
+                    "code"=> config('services.miscellaneous.SMS_CODE')
+                ];
+                $jsonData = json_encode($data);
+                $requestedParams['template_id'] = $smsgTemplatesData['flow_id'];
+                $message = new Message($this->pdo, $this->redis);
+                //Call function to send message
+                $sendMessage = $message->sendOtp($request->mobile_number, $requestedParams, $jsonData);
+                // $sendMessage = $message->sendMessage($jsonData);
+            }            
 
             $requestedParams['from_no'] = config('services.miscellaneous.from_no');
             $requestedParams['SMS_VALIDITY_TIME_MINUTES'] = $smsValidityTime;
-            $requestedParams['otp'] = $otpNumber;
-            $message = new Message($this->pdo, $this->redis);
-            //Call function to send message
-
-            $sendMessage = $message->sendOtp($request->mobile_number, $textMessage, $requestedParams);
-
 
             if ($sendMessage) {
-
                 $params = $request->all();
                 $params["mobile_number"] = $request->mobile_number;
                 $params["otp"] = $otpNumber;
@@ -97,8 +95,6 @@ class SmsController extends BaseController
                 $responseDetails = CustomerOtp::create($params);
                 $responseDetails = array("id" => $responseDetails->id, "Otp" => $responseDetails->otp);
             }
-
-
             $response = $this->sendResponse($responseDetails, $e->getMessage());
         }
         return $response;

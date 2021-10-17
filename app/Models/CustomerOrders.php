@@ -13,6 +13,8 @@ use App\Models\UserAddress;
 use App\Models\PromoCodes;
 use App\Models\CustomerDeviceTokens;
 use App\Models\ConfigSettings;
+use App\Models\SmsTemplate;
+use App\Models\Message;
 use DB;
 use PDO;
 use App\Helper\PdfHelper;
@@ -129,7 +131,7 @@ class CustomerOrders extends Model
     {
         $hash = "";
         // validate customer
-        $usersData = User::select('id', 'first_name', 'last_name')->where('id', $params['user_id'])->where('status', 1)->get()->toArray();
+        $usersData = User::select('id', 'first_name', 'last_name', 'mobile_number')->where('id', $params['user_id'])->where('status', 1)->get()->toArray();
         $userAddressData = UserAddress::select('id')->where('id', $params['delivery_details']['address']['id'])->where('user_id', $params['user_id'])->where('status', 1)->get()->toArray();
         $minOrderAmountRes = ConfigSettings::where('name', 'minOrderAmount')->first();
         $deliveryChargeRes = ConfigSettings::where('name', 'deliveryCharge')->first();
@@ -286,6 +288,10 @@ class CustomerOrders extends Model
         if ($params['payment_details']['type'] != 'online') {
             $emailResult = $this->sendOrderTransactionEmail($params);
             $notificationResult = $this->sendOrderTransactionNotification($params);
+            $params['sms_template_name'] = "APP_ORDER_PLACED";
+            $params['mobile_number'] = $usersData[0]['mobile_number'];
+            $params['delivery_date'] = $params['delivery_details']['date'];
+            $smsResult = $this->sendOrderTransactionSMS($params);
         }
         $invoiceGenerated = 0;
         return array("status" => true, "callback_url" => config('services.miscellaneous.PAYTM_CALLBACK_URL'), "merchant_id" => config('services.miscellaneous.PAYTM_MERCHANT_ID'), "order_id" => $orderId, "paytm_order_id" => "ORDERID_" . $orderId, "paytm_transaction_token" => $paytmTransactionToken, "invoice_generated " => $invoiceGenerated);
@@ -561,6 +567,11 @@ class CustomerOrders extends Model
                 $params['attachment'] = array(array('attachment' => 'invoices/' . $orderDetails->customer_id . '/' . $params['order_id'] . '.pdf'));
             }
             $this->sendOrderTransactionEmail($params);
+
+            $params['sms_template_name'] = "APP_ORDER_DELIVERED";
+            $params['mobile_number'] = $orderDetails->userCustomer->mobile_number;
+            $params['delivery_date'] = $orderDetails->delivery_date;
+            $this->sendOrderTransactionSMS($params);
         }
         return true;
     }
@@ -770,10 +781,45 @@ class CustomerOrders extends Model
 
                 $emailResult = $this->sendOrderTransactionEmail($params);
                 $notificationResult = $this->sendOrderTransactionNotification($params);
+                $params['sms_template_name'] = "APP_ORDER_PLACED";
+                $params['mobile_number'] = $updateOrder->userCustomer->mobile_number;
+                $params['delivery_date'] = $updateOrder->delivery_date;
+                $smsResult = $this->sendOrderTransactionSMS($params);
                 return true;
             }
             return false;
         }
         return false;
+    }
+
+    public function sendOrderTransactionSMS($params)
+    {
+        $smsgTemplates = new SmsTemplate($this->pdo, $this->redis);
+        $requestedParams["template_name"] = $params['sms_template_name'];
+        $smsgTemplatesData = $smsgTemplates->getSmsTemplates($requestedParams);
+
+        $sendMessage = 0;
+        if ($smsgTemplatesData) {
+            if($params['sms_template_name'] = "APP_ORDER_PLACED") {
+                $data = [
+                    "flow_id" => $smsgTemplatesData['flow_id'],
+                    "sender" => "",
+                    "mobiles"=> "91".$params['mobile_number'],
+                    "orderid"=> $params['order_id'],
+                    "date"=> $params['delivery_date']
+                ];
+            } else if($params['sms_template_name'] = "APP_ORDER_DELIVERED") {
+                $data = [
+                    "flow_id" => $smsgTemplatesData['flow_id'],
+                    "sender" => "",
+                    "mobiles"=> "91".$params['mobile_number'],
+                    "date"=> $params['delivery_date']
+                ];
+            }
+            $jsonData = json_encode($data);
+            $message = new Message($this->pdo, $this->redis);
+            $sendMessage = $message->sendMessage($jsonData);
+        }
+        return 1;
     }
 }

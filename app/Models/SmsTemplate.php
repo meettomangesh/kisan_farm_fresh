@@ -26,12 +26,9 @@ class SmsTemplate extends ApiModel
             $stmt = $this->pdo->prepare("CALL getSmsTemplates(?)");
             $stmt->execute(array($params['template_name']));
             $result = $stmt->fetch(PDO::FETCH_ASSOC);
-            if($result)
-            {
-                return $result['message'];
-            }
-            else
-            {
+            if($result) {
+                return $result;
+            } else {
                 return "";
             }
         } catch (Exception $e) {

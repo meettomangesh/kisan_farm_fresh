@@ -13,7 +13,7 @@ class Message extends ApiModel
      * Send Message to user mobile
      * return success response or error response in json
      */
-    public function sendMessage($to, $textMessage, $merchantId, $channelType, $params = [])
+    public function sendMessageBkp($to, $textMessage, $merchantId, $channelType, $params = [])
     {
         try {
             // $smsGateway = [];
@@ -39,32 +39,63 @@ class Message extends ApiModel
     }
 
     /**
+     * Send Message to user mobile
+     * return success response or error response in json
+     */
+    public function sendMessage($jsonData)
+    {
+        try {
+            $smsGateWayUrl = config('services.miscellaneous.SMS_GATEWAY_API_BASE_URL_FLOW');
+            $authkey = config('services.miscellaneous.SMS_GATEWAY_API_AUTH_KEY');
+
+            $curl = curl_init();
+
+            curl_setopt_array($curl, array(
+                CURLOPT_URL => $smsGateWayUrl,
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => "",
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 30,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => "POST",
+                CURLOPT_POSTFIELDS => $jsonData,
+                CURLOPT_HTTPHEADER => array(
+                  "authkey: ".$authkey,
+                  "content-type: application/JSON"
+                ),
+            ));
+              
+            $response = json_decode(curl_exec($curl));
+            $err = curl_error($curl);
+            curl_close($curl);
+            if ($err || $response->type == 'error') {
+                return 0;
+            } else {
+                return 1;
+            }
+        } catch (Exception $e) {
+            throw new Exception($e->getMessage());
+        }
+    }
+
+    /**
      * Send OTP to user mobile
      * return success response or error response in json
      */
-    public function sendOtp($to, $textMessage, $params = [])
+    public function sendOtp($to, $params = [], $jsonData = [])
     {
         try {
-
-
             $toMob = '91' . $to;
-            $otp = $params['otp'];
-            $SMS_VALIDITY_TIME_MINUTES = $params['SMS_VALIDITY_TIME_MINUTES'];
-
+            // $SMS_VALIDITY_TIME_MINUTES = $params['SMS_VALIDITY_TIME_MINUTES'];
             $smsGateWayUrl = config('services.miscellaneous.SMS_GATEWAY_API_BASE_URL');
-            //$smsGateWayUrl .= 'sendotp.php';
-
             $authkey = config('services.miscellaneous.SMS_GATEWAY_API_AUTH_KEY');
             $sender = config('services.miscellaneous.SMS_GATEWAY_API_SENDER');
-            $templateId = '5fb9ffe4f4b56659f70ec1b7';
 
             $smsGateWayUrl = $smsGateWayUrl . '?authkey=' . $authkey;
-            $smsGateWayUrl = $smsGateWayUrl . '&template_id=' . $templateId;
+            $smsGateWayUrl = $smsGateWayUrl . '&template_id=' . $params['template_id'];
             $smsGateWayUrl = $smsGateWayUrl . '&mobile=' . $toMob;
-            $smsGateWayUrl = $smsGateWayUrl . '&otp=' . $otp;
-            $smsGateWayUrl = $smsGateWayUrl . '&otp_expiry=' . $SMS_VALIDITY_TIME_MINUTES;
-            $smsGateWayUrl = $smsGateWayUrl . '&message=' . urlencode($textMessage);
-
+            $smsGateWayUrl = $smsGateWayUrl . '&otp=' . $params['otp'];
+            // $smsGateWayUrl = $smsGateWayUrl . '&otp_expiry=' . $SMS_VALIDITY_TIME_MINUTES;
 
             $curl = curl_init();
 
@@ -86,7 +117,7 @@ class Message extends ApiModel
                 CURLOPT_TIMEOUT => 30,
                 CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
                 CURLOPT_CUSTOMREQUEST => "GET",
-                CURLOPT_POSTFIELDS => "{\"Value1\":\"Param1\",\"Value2\":\"Param2\",\"Value3\":\"Param3\"}",
+                CURLOPT_POSTFIELDS => $jsonData,
                 CURLOPT_HTTPHEADER => array(
                     "content-type: application/json"
                 ),
@@ -105,7 +136,6 @@ class Message extends ApiModel
         }
     }
 
-
     /**
      * Send OTP to user mobile
      * return success response or error response in json
@@ -123,7 +153,6 @@ class Message extends ApiModel
             $smsGateWayUrl = $smsGateWayUrl . '&mobile=' . $toMob;
             $smsGateWayUrl = $smsGateWayUrl . '&otp=' . $otp;
 
-
             $curl = curl_init();
 
             curl_setopt_array($curl, array(
@@ -136,7 +165,6 @@ class Message extends ApiModel
                 CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
                 CURLOPT_CUSTOMREQUEST => "GET",
             ));
-
 
             $response = json_decode(curl_exec($curl));
             $err = curl_error($curl);

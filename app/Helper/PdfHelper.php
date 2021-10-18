@@ -14,8 +14,9 @@ namespace App\Helper;
 use Exception;
 use DB;
 // use Barryvdh\DomPDF\PDF;
-use Dompdf\Dompdf;
-use Barryvdh\DomPDF\Facade as PDF;
+//use Dompdf\Dompdf;
+//use Barryvdh\DomPDF\Facade as PDF;
+use PDF;
 use Storage;
 
 class PdfHelper
@@ -35,7 +36,14 @@ class PdfHelper
             $filename = $fileName;
             $finalFileNameWithPath = $filepath . $filename . '.pdf';
             $path = '';
-            PDF::setOptions(['isRemoteEnabled' => true])->loadHTML($html)->setPaper('a4', 'landscape')->setWarnings(false)->save($finalFileNameWithPath);
+            //echo "finalFileNameWithPath".$finalFileNameWithPath;
+            //PDF::setOptions(['isRemoteEnabled' => true])->loadHTML($html)->setPaper('a4', 'landscape')->setWarnings(false)->save($finalFileNameWithPath);
+            PDF::SetTitle('');
+            PDF::AddPage();
+            PDF::SetFont('freesans','',10);
+            PDF::writeHTML($html,true,false,true,false,'');
+            PDF::Output($finalFileNameWithPath,'F');
+
             if (file_exists($finalFileNameWithPath)) {
                 //send mail of newly generated quotation pdf.
                 $path = self::uploadInvoiceToS3($finalFileNameWithPath, $details);

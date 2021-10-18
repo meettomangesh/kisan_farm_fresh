@@ -419,7 +419,7 @@ class CustomerOrders extends Model
             'mobileNumber' => $orderDetails->customerShippingAddress->mobile_number,
             'email' => '',
             'paymentMethod' => $orderDetails->payment_type,
-            'paymentReference' => ($orderDetails->razorpay_payment_id) ? $orderDetails->razorpay_payment_id : '-',
+            'paymentReference' => ($orderDetails->paytm_transaction_id) ? $orderDetails->paytm_transaction_id : '-',
             'productList' => $productStr,
             'grossAmount' => round($orderDetails->gross_amount, 2),
             'discount' => round($orderDetails->discounted_amount, 2),

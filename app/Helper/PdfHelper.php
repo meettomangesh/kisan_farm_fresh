@@ -41,7 +41,7 @@ class PdfHelper
             PDF::Reset();
             PDF::SetTitle('');
             PDF::AddPage();
-            PDF::SetFont('freesans','',10);
+            PDF::SetFont('freesans','',1);
             PDF::writeHTML($html,true,false,true,false,'');
             PDF::Output($finalFileNameWithPath,'F');
 

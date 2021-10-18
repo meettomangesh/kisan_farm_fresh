@@ -94,12 +94,12 @@
                             @endif
                             @endcan  
                             @can('assign_order_delivery_boy')         
-                            @if($customerOrder->needAttention == 1)
+                           <?php /* @if($customerOrder->needAttention == 1) */ ?>
                             <a class="" data-toggle="tooltip" data-placement="top" title="{{ trans('cruds.order.fields.re_assign_delivery_boy') }}" href="{{ route('admin.orders.reAssign', $customerOrder->id) }}">
                                 <!-- {{ trans('cruds.order.fields.re_assign_delivery_boy') }} -->
                                 <i class="fa fa-refresh" aria-hidden="true"></i>
                             </a>
-                            @endif
+                           <?php /* @endif */ ?>
                             @endcan
                             @if($customerOrder->customer_invoice_url)
                             <a class=""  target="_blank" data-toggle="tooltip" data-placement="top" title="{{ trans('cruds.order.fields.customer_invoice_url') }}" href="{{ $customerOrder->customer_invoice_url }}">

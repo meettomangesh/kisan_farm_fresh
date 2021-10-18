@@ -38,6 +38,7 @@ class PdfHelper
             $path = '';
             //echo "finalFileNameWithPath".$finalFileNameWithPath;
             //PDF::setOptions(['isRemoteEnabled' => true])->loadHTML($html)->setPaper('a4', 'landscape')->setWarnings(false)->save($finalFileNameWithPath);
+            PDF::Reset();
             PDF::SetTitle('');
             PDF::AddPage();
             PDF::SetFont('freesans','',10);
@@ -51,6 +52,7 @@ class PdfHelper
                 $path = ''; //not generated successfully  
             }
         } catch (Exception $e) {
+           // echo $e->getMessage();
             $path = '';
         }
         return $path;

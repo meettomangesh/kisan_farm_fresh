@@ -47,6 +47,7 @@ return [
         'SMS_VALIDITY_TIME_MINUTES' => env('SMS_VALIDITY_TIME_MINUTES', 10),
         'FROM_NO' => env('FROM_NO', 10),
         'SMS_GATEWAY_API_BASE_URL' => env('SMS_GATEWAY_API_BASE_URL', ''),
+        'SMS_GATEWAY_API_BASE_URL_FLOW' => env('SMS_GATEWAY_API_BASE_URL_FLOW', ''),
         'SMS_GATEWAY_API_AUTH_KEY' => env('SMS_GATEWAY_API_AUTH_KEY', ''),
         'SMS_GATEWAY_API_SENDER' => env('SMS_GATEWAY_API_SENDER', ''),
         'EMAIL_VERIFY_URL' => env('EMAIL_VERIFY_URL', ''),
@@ -57,7 +58,8 @@ return [
         'PAYTM_MERCHANT_KEY' =>  env('PAYTM_MERCHANT_KEY', ''),
         'APP_NAME' =>  env('APP_NAME', ''),
         'PAYTM_CALLBACK_URL' => env('PAYTM_CALLBACK_URL', ''),
-        'PAYTM_END_POINT' => env('PAYTM_END_POINT', ''),
+        'SMS_SYMBOL' => env('SMS_SYMBOL', ''),
+        'SMS_CODE' => env('SMS_CODE', ''),
     ]
 
 ];

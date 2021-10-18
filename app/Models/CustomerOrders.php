@@ -13,8 +13,6 @@ use App\Models\UserAddress;
 use App\Models\PromoCodes;
 use App\Models\CustomerDeviceTokens;
 use App\Models\ConfigSettings;
-use App\Models\SmsTemplate;
-use App\Models\Message;
 use DB;
 use PDO;
 use App\Helper\PdfHelper;
@@ -24,6 +22,7 @@ use App\Helper\NotificationHelper;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Log;
 use App\Helper\PaytmChecksum;
+use App\Helper\SMSHelper;
 
 class CustomerOrders extends Model
 {
@@ -794,13 +793,16 @@ class CustomerOrders extends Model
 
     public function sendOrderTransactionSMS($params)
     {
-        $smsgTemplates = new SmsTemplate($this->pdo, $this->redis);
-        $requestedParams["template_name"] = $params['sms_template_name'];
-        $smsgTemplatesData = $smsgTemplates->getSmsTemplates($requestedParams);
-
+        $pdo = DB::connection()->getPdo();
+        $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, true);
+        $stmt = $pdo->prepare("CALL getSmsTemplates(?)");
+        $stmt->execute(array($params['sms_template_name']));
+        $smsgTemplatesData = $stmt->fetch(PDO::FETCH_ASSOC);
+        $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+        $stmt->closeCursor();
         $sendMessage = 0;
         if ($smsgTemplatesData) {
-            if($params['sms_template_name'] = "APP_ORDER_PLACED") {
+            if($params['sms_template_name'] == "APP_ORDER_PLACED") {
                 $data = [
                     "flow_id" => $smsgTemplatesData['flow_id'],
                     "sender" => "",
@@ -808,7 +810,7 @@ class CustomerOrders extends Model
                     "orderid"=> $params['order_id'],
                     "date"=> $params['delivery_date']
                 ];
-            } else if($params['sms_template_name'] = "APP_ORDER_DELIVERED") {
+            } else if($params['sms_template_name'] == "APP_ORDER_DELIVERED") {
                 $data = [
                     "flow_id" => $smsgTemplatesData['flow_id'],
                     "sender" => "",
@@ -817,8 +819,7 @@ class CustomerOrders extends Model
                 ];
             }
             $jsonData = json_encode($data);
-            $message = new Message($this->pdo, $this->redis);
-            $sendMessage = $message->sendMessage($jsonData);
+            SMSHelper::sendMessage($jsonData);
         }
         return 1;
     }

@@ -80,6 +80,8 @@ class SmsController extends BaseController
                 $responseDetails = array("id" => $responseDetails->id, "Otp" => $responseDetails->otp);
                 // $lastInsertId = $customerOtp->save($params);
                 $response = $this->sendResponse($responseDetails, 'OTP sent successfully.');
+            } else {
+                $response = $this->sendResponse([], 'Failed to send OTP.');
             }
         } catch (Exception $e) {
             if ($request->mobile_number != 0) {
@@ -95,7 +97,7 @@ class SmsController extends BaseController
                 $responseDetails = CustomerOtp::create($params);
                 $responseDetails = array("id" => $responseDetails->id, "Otp" => $responseDetails->otp);
             }
-            $response = $this->sendResponse($responseDetails, $e->getMessage());
+            $response = $this->sendResponse([], $e->getMessage());
         }
         return $response;
         // $this->response->setContent(json_encode($response)); // send response in json format

@@ -38,7 +38,7 @@ class BaseController extends Controller
     const REFERRAL_COUPON_VERIFICATION_RESPONSE_FAILURE_CODE = 302;
     const INVENTORY_RESTRICTION_FAILURE_RESPONSE_CODE = 108;
     //SMS transaction type
-    const SMS_MSG_TEMPLATES = [201 => "APP_REGISTER_OTP", 202 => "APP_LOGIN_OTP" ];
+    const SMS_MSG_TEMPLATES = [201 => "APP_REGISTER_OTP", 202 => "APP_LOGIN_OTP", 203 => "APP_RESET_PASSWORD", 204 => "APP_FORGET_PASSWORD"];
     CONST VALIDATION_ERROR = 'Validation Error.';
         /**
      * Create a new controller instance.

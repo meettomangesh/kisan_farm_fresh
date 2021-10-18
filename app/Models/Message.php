@@ -63,6 +63,8 @@ class Message extends ApiModel
                   "authkey: ".$authkey,
                   "content-type: application/JSON"
                 ),
+                CURLOPT_SSL_VERIFYHOST => 0,
+                CURLOPT_SSL_VERIFYPEER => 0,
             ));
               
             $response = json_decode(curl_exec($curl));
@@ -121,6 +123,8 @@ class Message extends ApiModel
                 CURLOPT_HTTPHEADER => array(
                     "content-type: application/json"
                 ),
+                CURLOPT_SSL_VERIFYHOST => 0,
+                CURLOPT_SSL_VERIFYPEER => 0,
             ));
 
             $response = json_decode(curl_exec($curl));
@@ -164,6 +168,8 @@ class Message extends ApiModel
                 CURLOPT_FOLLOWLOCATION => true,
                 CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
                 CURLOPT_CUSTOMREQUEST => "GET",
+                CURLOPT_SSL_VERIFYHOST => 0,
+                CURLOPT_SSL_VERIFYPEER => 0,
             ));
 
             $response = json_decode(curl_exec($curl));

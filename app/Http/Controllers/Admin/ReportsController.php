@@ -38,15 +38,12 @@ class ReportsController extends Controller
 
     public function loginLogs()
     {
-      //  abort_if(Gate::denies('deliveryboy_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
-
+        // abort_if(Gate::denies('deliveryboy_access'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $userLoginLogs = UserLoginLogs::all();
-
         return view('admin.reports.login_logs', compact('userLoginLogs'));
     }
 
-
-    public function getSalesItemwiseData(Request $request) {
+    public function getSalesItemwiseDataBkp(Request $request) {
         set_time_limit(0);
 
         $input = $request->all();
@@ -125,7 +122,7 @@ class ReportsController extends Controller
         // $salesItemsData = collect($salesItemsData->get());
         // return $salesItemsData;
         return datatables()->collection($salesItemsData->get())->toJson();
-       // return Datatables::of($salesItemsData)->make(true);
+        // return Datatables::of($salesItemsData)->make(true);
 
         /* $salesItemsData = DB::table('customer_order_details AS cod')
             ->leftJoin('customer_order_details_basket AS codb', 'cod.id', '=', 'codb.order_details_id')
@@ -168,6 +165,77 @@ class ReportsController extends Controller
         LEFT JOIN unit_master AS um ON um.id = pu.unit_id
         LEFT JOIN categories_master AS cm ON cm.id = p.category_id
         WHERE DATE(cod.created_at) = "2021-05-31"
-        GROUP BY product_units_id */
+        GROUP BY cod.product_units_id */
+    }
+
+    public function getSalesItemwiseData(Request $request) {
+        set_time_limit(0);
+
+        $input = $request->all();
+        $filterParams = [];
+        if(isset($input['draw']) && $input['draw'] != 1) {
+            foreach($input['columns'] as $key => $value) {
+                if(isset($value['search']['value']) && !empty($value['search']['value'])) {
+                    $filterParams[$value['name']] = $value['search']['value'];
+                }
+            }
+        }
+
+        $salesItemsData = DB::table('customer_order_details AS cod')
+            ->leftJoin('customer_order_details_basket AS codb', 'cod.id', '=', 'codb.order_details_id')
+            // ->leftJoin('products AS p', 'p.id', '=', 'cod.products_id', 'OR', 'p.id', '=', 'codb.products_id')
+            ->leftJoin('products AS p', function($join){
+                $join->on('p.id', '=', 'cod.products_id');
+                $join->orOn('p.id', '=', 'codb.products_id');
+            })
+            // ->leftJoin('product_units AS pu', 'pu.id', '=', 'cod.product_units_id', 'OR', 'pu.id', '=', 'codb.product_units_id')
+            ->leftJoin('product_units AS pu', function($join){
+                $join->on('pu.id', '=', 'cod.product_units_id');
+                $join->orOn('pu.id', '=', 'codb.product_units_id');
+            })
+            ->leftJoin('unit_master AS um', 'um.id', '=', 'pu.unit_id')
+            ->leftJoin('categories_master AS cm', 'cm.id', '=', 'p.category_id');
+
+        $salesItemsData->select([
+            // DB::raw('IF(cod.is_basket = 0, cod.product_units_id, codb.product_units_id) AS product_units_id'),
+            DB::raw('p.product_name'),
+            DB::raw('um.unit'),
+            DB::raw('cm.cat_name'),
+            DB::raw('DATE(cod.created_at) AS order_date'),
+            DB::raw('ROUND(SUM(IFNULL(codb.item_quantity / 2, cod.item_quantity))) AS total_unit'),
+        ]);
+
+        $orderDate = "";
+        if (!empty($filterParams['order_date'])) {
+            // $orderDate = Carbon::parse($filterParams['order_date'])->format('Y-m-d');
+            $salesItemsData->whereRaw('DATE(cod.created_at) = "'.$filterParams['order_date'].'"');
+        } else {
+            $salesItemsData->whereRaw('DATE(cod.created_at) = CURDATE()');
+        }
+
+        if (!empty($filterParams['product_name'])) {
+            $salesItemsData->whereRaw('p.product_name LIKE "%'.$filterParams['product_name'].'%"');
+        }
+
+        if (!empty($filterParams['unit'])) {
+            $salesItemsData->whereRaw('um.unit LIKE "%'.$filterParams['unit'].'%"');
+        }
+
+        if (!empty($filterParams['cat_name'])) {
+            $salesItemsData->whereRaw('cm.cat_name LIKE "%'.$filterParams['cat_name'].'%"');
+        }
+
+        if (!empty($filterParams['total_unit'])) {
+            $salesItemsData->having('total_unit', '=', $filterParams['total_unit']);
+        }
+
+        $salesItemsData->whereRaw('cod.order_status = 1');
+        $salesItemsData->groupBy('cod.product_units_id');
+
+        // To print query
+        // echo $salesItemsData->toSql(); exit;
+
+        return datatables()->collection($salesItemsData->get())->toJson();
+        // return Datatables::of($salesItemsData)->make(true);
     }
 }

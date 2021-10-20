@@ -17,22 +17,26 @@
                     <tr>
                         <!-- <th></th> -->
                         <th></th>
+                        <th>{{ trans('cruds.sales_itemwise.fields.order_id') }}</th>
                         <th>{{ trans('cruds.sales_itemwise.fields.product_name') }}</th>
-                        <th>{{ trans('cruds.sales_itemwise.fields.unit') }}</th>
+                        <!-- <th>{{ trans('cruds.sales_itemwise.fields.selling_price') }}</th>
+                        <th>{{ trans('cruds.sales_itemwise.fields.special_price') }}</th> -->
                         <th>{{ trans('cruds.sales_itemwise.fields.item_qty') }}</th>
-                        <th>{{ trans('cruds.sales_itemwise.fields.cat_name') }}</th>
                         <th>{{ trans('cruds.sales_itemwise.fields.order_date') }}</th>
+                        <th>{{ trans('cruds.sales_itemwise.fields.order_status') }}</th>
                         <th>Action</th>
                     </tr>
                     <tr role="row" class="filter">
                         <th></th>
+                        <th><input class="search" name="order_id" type="text" placeholder="Search" /></th>
                         <th><input class="search" name="product_name" type="text" placeholder="Search" /></th>
-                        <th><input class="search" name="unit" type="text" placeholder="Search" /></th>
-                        <th><input class="search" name="total_unit" type="text" placeholder="Search" /></th>
-                        <th><input class="search" name="cat_name" type="text" placeholder="Search" /></th>
+                        <!-- <th><input class="search" name="selling_price" type="text" placeholder="Search" /></th>
+                        <th><input class="search" name="special_price" type="text" placeholder="Search" /></th> -->
+                        <th><input class="search" name="item_quantity" type="text" placeholder="Search" /></th>
                         <th>
                             <input class="search form-control" type="date" name="order_date" id="order_date" max="{{ date('Y-m-d') }}" />
                         </th>
+                        <th><input class="search" name="order_status" type="text" placeholder="Search" /></th>
                         <th> <button class="btn btn-sm yellow filter-submit margin-bottom-5" title="{!! trans('admin::messages.search') !!}"><i class="fa fa-search"></i></button>
                             <button class="btn btn-sm red filter-cancel margin-bottom-5" title="{!! trans('admin::messages.reset') !!}"><i class="fa fa-times"></i></button>
                         </th>
@@ -75,24 +79,32 @@
                     searchable: false
                 },
                 {
+                    data: 'order_id',
+                    name: 'order_id'
+                },
+                {
                     data: 'product_name',
                     name: 'product_name'
                 },
-                {
-                    data: 'unit',
-                    name: 'unit'
+                /* {
+                    data: 'selling_price',
+                    name: 'selling_price'
                 },
                 {
-                    data: 'total_unit',
-                    name: 'total_unit'
-                },
+                    data: 'special_price',
+                    name: 'special_price'
+                }, */
                 {
-                    data: 'cat_name',
-                    name: 'cat_name'
+                    data: 'item_quantity',
+                    name: 'item_quantity'
                 },
                 {
                     data: 'order_date',
                     name: 'order_date'
+                },
+                {
+                    data: 'order_status',
+                    name: 'order_status'
                 },
                 {
                     data: null,
@@ -115,6 +127,26 @@
                     // recNum = ((page * displayLength) + i + 1);
                     $(rows).eq(i).children('td:first-child').html(recNum);
                 });
+                /* api.column(6, {
+                    page: 'current'
+                }).data().each(function(data, i) {
+                    var orderStatus = "";
+                    if (data.order_status == 0) {
+                        orderStatus = 'Pending';
+                    } else if (data.order_status == 1) {
+                        orderStatus = 'Placed';
+                    } else if (data.order_status == 2) {
+                        orderStatus = 'Picked';
+                    } else if (data.order_status == 3) {
+                        orderStatus = 'Out for delivery';
+                    } else if (data.order_status == 4) {
+                        orderStatus = 'Delivered';
+                    } else if (data.order_status == 5) {
+                        orderStatus = 'Cancelled';
+                    }
+                    $(rows).eq(i).children('td:nth-child(6)').html(orderStatus);
+                }); */
+
                 api.column(6, {
                     page: 'current'
                 }).data().each(function(group, i) {
@@ -131,6 +163,7 @@
             }
         });
         $('.filter-cancel').on('click', function(e) {
+
             $('.datatable-sales-itemwise thead tr:eq(1) th').each(function(i) {
                 $('input', this).val('');
 

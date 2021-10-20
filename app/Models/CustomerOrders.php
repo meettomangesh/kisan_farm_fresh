@@ -302,7 +302,6 @@ class CustomerOrders extends Model
         $orderDetails = CustomerOrders::find($params['order_id']);
 
         $templateName = NotificationHelper::getNotitificationTemplateName($orderDetails->order_status, 0);
-
         $notificationContent = NotificationHelper::getPushNotificationTemplate($templateName, '', [
             'name' => $orderDetails->userCustomer->first_name
         ]);
@@ -312,19 +311,20 @@ class CustomerOrders extends Model
         $orderDetails->notify($notifyHelper);
         if ($orderDetails->delivery_boy_id != 0) {
             $templateName = NotificationHelper::getNotitificationTemplateName($orderDetails->order_status, 1);
+            if ($templateName) {
+                $notificationContent = NotificationHelper::getPushNotificationTemplate($templateName, '', [
+                    'name' => $orderDetails->userDeliveryBoy->first_name
+                ]);
+                $type = '';
+                if ($orderDetails->order_status == 1) {
+                    $type = 'Assigned';
+                } elseif ($orderDetails->order_status == 5) {
+                    $type = 'Rejected';
+                }
+                $notifyHelper->setParameters(["user_id" => $orderDetails->delivery_boy_id, "deep_link" => $notificationContent['deeplink'], "details" => json_encode(array('orderNo' => $orderId, 'userId' => $orderDetails->userDeliveryBoy, 'type' => $type))], $notificationContent['title'], $notificationContent['message']);
 
-            $notificationContent = NotificationHelper::getPushNotificationTemplate($templateName, '', [
-                'name' => $orderDetails->userDeliveryBoy->first_name
-            ]);
-            $type = '';
-            if ($orderDetails->order_status == 1) {
-                $type = 'Assigned';
-            } elseif ($orderDetails->order_status == 5) {
-                $type = 'Rejected';
+                $orderDetails->notify($notifyHelper);
             }
-            $notifyHelper->setParameters(["user_id" => $orderDetails->delivery_boy_id, "deep_link" => $notificationContent['deeplink'], "details" => json_encode(array('orderNo' => $orderId, 'userId' => $orderDetails->userDeliveryBoy, 'type' => $type))], $notificationContent['title'], $notificationContent['message']);
-
-            $orderDetails->notify($notifyHelper);
         }
         return 1;
     }
@@ -419,7 +419,7 @@ class CustomerOrders extends Model
             'mobileNumber' => $orderDetails->customerShippingAddress->mobile_number,
             'email' => '',
             'paymentMethod' => $orderDetails->payment_type,
-            'paymentReference' => ($orderDetails->razorpay_payment_id) ? $orderDetails->razorpay_payment_id : '-',
+            'paymentReference' => ($orderDetails->paytm_transaction_id) ? $orderDetails->paytm_transaction_id : '-',
             'productList' => $productStr,
             'grossAmount' => round($orderDetails->gross_amount, 2),
             'discount' => round($orderDetails->discounted_amount, 2),
@@ -802,20 +802,20 @@ class CustomerOrders extends Model
         $stmt->closeCursor();
         $sendMessage = 0;
         if ($smsgTemplatesData) {
-            if($params['sms_template_name'] == "APP_ORDER_PLACED") {
+            if ($params['sms_template_name'] == "APP_ORDER_PLACED") {
                 $data = [
                     "flow_id" => $smsgTemplatesData['flow_id'],
                     "sender" => "",
-                    "mobiles"=> "91".$params['mobile_number'],
-                    "orderid"=> $params['order_id'],
-                    "date"=> $params['delivery_date']
+                    "mobiles" => "91" . $params['mobile_number'],
+                    "orderid" => "#" . $params['order_id'],
+                    "date" => $params['delivery_date']
                 ];
-            } else if($params['sms_template_name'] == "APP_ORDER_DELIVERED") {
+            } else if ($params['sms_template_name'] == "APP_ORDER_DELIVERED") {
                 $data = [
                     "flow_id" => $smsgTemplatesData['flow_id'],
                     "sender" => "",
-                    "mobiles"=> "91".$params['mobile_number'],
-                    "date"=> $params['delivery_date']
+                    "mobiles" => "91" . $params['mobile_number'],
+                    "date" => "#" . $params['order_id']
                 ];
             }
             $jsonData = json_encode($data);

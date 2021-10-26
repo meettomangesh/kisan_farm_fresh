@@ -834,11 +834,13 @@ return [
         'title_singular' => 'Report',
         'fields'         => [
             'sales_itemwise' => 'Sales Itemwise',
+            'sales_orderwise_item' => 'Sales Orderwise Item',
+            'sales_for_supplier' => 'Sales For Supplier',
         ],
     ],
     'sales_itemwise' => [
-        'title'          => 'Sales Itemise',
-        'title_singular' => 'Sales Itemise',
+        'title'          => 'Sales Itemwise',
+        'title_singular' => 'Sales Itemwise',
         'fields'         => [
             'id' => 'ID',
             'sr_no' => 'Sr No',
@@ -847,6 +849,36 @@ return [
             'unit' => 'Unit',
             'cat_name' => 'Category',
             'order_date' => 'Order Date',
+        ],
+    ],
+    'sales_orderwise_item' => [
+        'title'          => 'Sales Orderwise Item',
+        'title_singular' => 'Sales Orderwise Item',
+        'fields'         => [
+            'id' => 'ID',
+            'sr_no' => 'Sr No',
+            'order_id' => 'Order Id',
+            'product_name' => 'Product Name',
+            'item_qty' => 'Item Qty',
+            'unit' => 'Unit',
+            'cat_name' => 'Category',
+            'order_date' => 'Order Date',
+            'order_status' => 'Order Status',
+        ],
+    ],
+    'sales_for_supplier' => [
+        'title'          => 'Sales For Supplier',
+        'title_singular' => 'Sales For Supplier',
+        'fields'         => [
+            'id' => 'ID',
+            'sr_no' => 'Sr No',
+            'product_name' => 'Product Name',
+            'item_qty' => 'Item Qty',
+            'unit' => 'Unit',
+            'cat_name' => 'Category',
+            'order_date' => 'Order Date',
+            'prod_units' => 'Units',
+            'prod_units_qty' => 'Product Units Qty'
         ],
     ],
     'loginlogs' => [

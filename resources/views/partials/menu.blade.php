@@ -241,11 +241,27 @@
                     {{ trans('cruds.report.title') }}
                 </a>
                 <ul class="nav-dropdown-items">
+                    @can('report_sales_orderwise_item_access')
+                    <li class="nav-item">
+                        <a href="{{ route('admin.reports.salesOrderwiseItem') }}" class="nav-link {{ request()->is('admin/reports') || request()->is('admin/reports/*') ? 'active' : '' }}">
+                            <i class="fa-fw fas fa-cogs nav-icon"></i>
+                            {{ trans('cruds.report.fields.sales_orderwise_item') }}
+                        </a>
+                    </li>
+                    @endcan
                     @can('report_sales_itemwise_access')
                     <li class="nav-item">
                         <a href="{{ route('admin.reports.salesItemwise') }}" class="nav-link {{ request()->is('admin/reports') || request()->is('admin/reports/*') ? 'active' : '' }}">
                             <i class="fa-fw fas fa-cogs nav-icon"></i>
                             {{ trans('cruds.report.fields.sales_itemwise') }}
+                        </a>
+                    </li>
+                    @endcan
+                    @can('report_sales_for_supplier_access')
+                    <li class="nav-item">
+                        <a href="{{ route('admin.reports.salesForSupplier') }}" class="nav-link {{ request()->is('admin/reports') || request()->is('admin/reports/*') ? 'active' : '' }}">
+                            <i class="fa-fw fas fa-cogs nav-icon"></i>
+                            {{ trans('cruds.report.fields.sales_for_supplier') }}
                         </a>
                     </li>
                     @endcan

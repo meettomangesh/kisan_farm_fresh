@@ -138,6 +138,10 @@ Route::group([
     Route::get('reports/login_logs', 'ReportsController@loginLogs')->name('reports.loginLogs');
     Route::get('reports/sales-itemwise', 'ReportsController@salesItemwise')->name('reports.salesItemwise');
     Route::post('reports/sales-itemwise/data', 'ReportsController@getSalesItemwiseData')->name('reports.getSalesItemwiseData');
+    Route::get('reports/sales-orderwise-item', 'ReportsController@salesOrderwiseItem')->name('reports.salesOrderwiseItem');
+    Route::post('reports/sales-orderwise-item/data', 'ReportsController@getSalesOrderwiseItemData')->name('reports.getSalesOrderwiseItemData');
+    Route::get('reports/sales-for-supplier', 'ReportsController@salesForSupplier')->name('reports.salesForSupplier');
+    Route::post('reports/sales-for-supplier/data', 'ReportsController@getSalesForSupplierData')->name('reports.getSalesForSupplierData');
     
     Route::resource('reports', 'ReportsController');
 });

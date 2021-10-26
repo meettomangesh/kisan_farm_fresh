@@ -7,23 +7,24 @@
 </style>
 <div class="card">
     <div class="card-header">
-        {{ trans('cruds.report.fields.sales_itemwise') }} {{ trans('global.list') }}
+        {{ trans('cruds.report.fields.sales_orderwise_item') }} {{ trans('global.list') }}
     </div>
 
     <div class="card-body">
         <div class="table-responsive">
-            <table class=" table table-bordered table-striped table-hover datatable datatable-sales-itemwise" id="datatable-sales-itemwise">
+            <table class=" table table-bordered table-striped table-hover datatable datatable-sales-orderwise-item" id="datatable-sales-orderwise-item">
                 <thead>
                     <tr>
                         <!-- <th></th> -->
                         <th></th>
-                        <th>{{ trans('cruds.sales_itemwise.fields.order_id') }}</th>
-                        <th>{{ trans('cruds.sales_itemwise.fields.product_name') }}</th>
-                        <!-- <th>{{ trans('cruds.sales_itemwise.fields.selling_price') }}</th>
-                        <th>{{ trans('cruds.sales_itemwise.fields.special_price') }}</th> -->
-                        <th>{{ trans('cruds.sales_itemwise.fields.item_qty') }}</th>
-                        <th>{{ trans('cruds.sales_itemwise.fields.order_date') }}</th>
-                        <th>{{ trans('cruds.sales_itemwise.fields.order_status') }}</th>
+                        <th>{{ trans('cruds.sales_orderwise_item.fields.order_id') }}</th>
+                        <th>{{ trans('cruds.sales_orderwise_item.fields.product_name') }}</th>
+                        <!-- <th>{{ trans('cruds.sales_orderwise_item.fields.selling_price') }}</th>
+                        <th>{{ trans('cruds.sales_orderwise_item.fields.special_price') }}</th> -->
+                        <th>{{ trans('cruds.sales_orderwise_item.fields.item_qty') }}</th>
+                        <th>{{ trans('cruds.sales_orderwise_item.fields.cat_name') }}</th>
+                        <th>{{ trans('cruds.sales_orderwise_item.fields.order_status') }}</th>
+                        <th>{{ trans('cruds.sales_orderwise_item.fields.order_date') }}</th>
                         <th>Action</th>
                     </tr>
                     <tr role="row" class="filter">
@@ -33,10 +34,11 @@
                         <!-- <th><input class="search" name="selling_price" type="text" placeholder="Search" /></th>
                         <th><input class="search" name="special_price" type="text" placeholder="Search" /></th> -->
                         <th><input class="search" name="item_quantity" type="text" placeholder="Search" /></th>
+                        <th><input class="search" name="cat_name" type="text" placeholder="Search" /></th>
+                        <th><input class="search" name="order_status" type="text" placeholder="Search" /></th>
                         <th>
                             <input class="search form-control" type="date" name="order_date" id="order_date" max="{{ date('Y-m-d') }}" />
                         </th>
-                        <th><input class="search" name="order_status" type="text" placeholder="Search" /></th>
                         <th> <button class="btn btn-sm yellow filter-submit margin-bottom-5" title="{!! trans('admin::messages.search') !!}"><i class="fa fa-search"></i></button>
                             <button class="btn btn-sm red filter-cancel margin-bottom-5" title="{!! trans('admin::messages.reset') !!}"><i class="fa fa-times"></i></button>
                         </th>
@@ -62,14 +64,14 @@
             ],
             pageLength: 10,
         });
-        // $('.datatable-sales-itemwise thead tr:eq(1) th').each(function(i) {
+        // $('.datatable-sales-orderwise-item thead tr:eq(1) th').each(function(i) {
         //     $('input', this).on('keyup change', function() {
         //         if (table.column(i).search() !== this.value) {
         //             table.column(i).search(this.value).draw();
         //         }
         //     });
         // });
-        let table = $('.datatable-sales-itemwise').DataTable({
+        let table = $('.datatable-sales-orderwise-item').DataTable({
             processing: true,
             serverSide: true,
             // buttons: dtButtons,
@@ -99,12 +101,16 @@
                     name: 'item_quantity'
                 },
                 {
-                    data: 'order_date',
-                    name: 'order_date'
+                    data: 'cat_name',
+                    name: 'cat_name'
                 },
                 {
                     data: 'order_status',
                     name: 'order_status'
+                },
+                {
+                    data: 'order_date',
+                    name: 'order_date'
                 },
                 {
                     data: null,
@@ -146,16 +152,15 @@
                     }
                     $(rows).eq(i).children('td:nth-child(6)').html(orderStatus);
                 }); */
-
-                api.column(6, {
+                api.column(7, {
                     page: 'current'
                 }).data().each(function(group, i) {
                     // recNum = ((page * displayLength) + i + 1);
-                    $(rows).eq(i).children('td:nth-child(7)').html(null);
+                    $(rows).eq(i).children('td:nth-child(8)').html(null);
                 });
             },
             ajax: {
-                url: "sales-itemwise/data",
+                url: "sales-orderwise-item/data",
                 type: "POST",
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -163,8 +168,7 @@
             }
         });
         $('.filter-cancel').on('click', function(e) {
-
-            $('.datatable-sales-itemwise thead tr:eq(1) th').each(function(i) {
+            $('.datatable-sales-orderwise-item thead tr:eq(1) th').each(function(i) {
                 $('input', this).val('');
 
                 if (table.column(i).search() !== $('input', this).val()) {
@@ -179,7 +183,7 @@
             }
         });
         $('.filter-submit').on('click', function(e) {
-            $('.datatable-sales-itemwise thead tr:eq(1) th').each(function(i) {
+            $('.datatable-sales-orderwise-item thead tr:eq(1) th').each(function(i) {
                 if ($('input', this).val()) {
                     if (table.column(i).search() !== $('input', this).val()) {
                         table.column(i).search($('input', this).val()).draw();

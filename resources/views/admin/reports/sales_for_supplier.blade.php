@@ -22,6 +22,7 @@
                         <th>{{ trans('cruds.sales_for_supplier.fields.cat_name') }}</th>
                         <th>{{ trans('cruds.sales_for_supplier.fields.prod_units') }}</th>
                         <th>{{ trans('cruds.sales_for_supplier.fields.prod_units_qty') }}</th>
+                        <th>{{ trans('cruds.sales_for_supplier.fields.final') }}</th>
                         <th>{{ trans('cruds.sales_for_supplier.fields.order_date') }}</th>
                         <th>Action</th>
                     </tr>
@@ -30,7 +31,8 @@
                         <th><input class="search" name="product_name" type="text" placeholder="Search" /></th>
                         <th><input class="search" name="total_unit" type="text" placeholder="Search" /></th>
                         <th><input class="search" name="cat_name" type="text" placeholder="Search" /></th>
-                        <th><input class="search" name="prod_units" type="text" placeholder="Search" /></th>
+                        <th></th>
+                        <th></th>
                         <th></th>
                         <th>
                             <input class="search form-control" type="date" name="order_date" id="order_date" max="{{ date('Y-m-d') }}" />
@@ -78,6 +80,7 @@
                 {data: 'cat_name', name: 'cat_name'},
                 {data: 'prod_units', name: 'prod_units'},
                 {data: 'product_units_qty', name: 'product_units_qty'},
+                {data: 'final', name: 'final'},
                 {data: 'order_date', name: 'order_date'},
                 {data: null, name: 'action', sortable: false}
             ],
@@ -94,49 +97,49 @@
                     // recNum = ((page * displayLength) + i + 1);
                     $(rows).eq(i).children('td:first-child').html(recNum);
                 });
-                api.column(5, {page: 'current'}).data().each(function(data, i) {
+                api.column(6, {page: 'current'}).data().each(function(data, i) {
                     var units = $(rows).eq(i).children('td:nth-child(5)').html();
                     var qty = $(rows).eq(i).children('td:nth-child(6)').html();
                     var unitsSplit = units.split(",");
                     var qtySplit = qty.split(",");
-                    var final = 0;
-                    /* console.log($(rows).eq(i).children('td:nth-child(2)').html() + " unitsSplit: ", unitsSplit);
+                    var finalOP = 0;
+                    console.log($(rows).eq(i).children('td:nth-child(2)').html() + " unitsSplit: ", unitsSplit);
                     console.log("unitsSplit.length: ", unitsSplit.length);
-                    console.log($(rows).eq(i).children('td:nth-child(2)').html() + " qtySplit: ", qtySplit); */
+                    console.log($(rows).eq(i).children('td:nth-child(2)').html() + " qtySplit: ", qtySplit);
                     if(unitsSplit.length > 0) {
-                        for(var i = 0; i < unitsSplit.length; i++) {
-                            /* console.log(i + " unit: " + unitsSplit[i]);
-                            console.log(i + " qty: " + qtySplit[i]); */
-                            if(unitsSplit[i] === "250gm") {
-                                final = final + ((250/1000) * qtySplit[i]);
-                            } else if(unitsSplit[i] === "400gm") {
-                                final = final + ((400/1000) * qtySplit[i]);
-                            } else if(unitsSplit[i] === "500gm") {
-                                final = final + ((500/1000) * qtySplit[i]);
-                            } else if(unitsSplit[i] === "1kg") {
-                                final = final + (1 * qtySplit[i]);
-                            } else if(unitsSplit[i] === "250ml") {
-                                final = final + ((250/1000) * qtySplit[i]);
-                            } else if(unitsSplit[i] === "500ml") {
-                                final = final + ((500/1000) * qtySplit[i]);
-                            }else if(unitsSplit[i] === "1litr") {
-                                final = final + (1 * qtySplit[i]);
-                            } else if(unitsSplit[i] === "1Unit") {
-                                final = final + (1 * qtySplit[i]);
-                            } else if(unitsSplit[i] === "1Dozen") {
-                                final = final + (1 * qtySplit[i]);
-                            } else if(unitsSplit[i] === "Half Dozen") {
-                                final = final + ((6/12) * qtySplit[i]);
+                        for(var j = 0; j < unitsSplit.length; j++) {
+                            console.log(j + " unit: " + unitsSplit[j]);
+                            console.log(j + " qty: " + qtySplit[j]);
+                            if(unitsSplit[j] == "250gm") {
+                                finalOP = finalOP + ((250/1000) * qtySplit[j]);
+                            } else if(unitsSplit[j] == "400gm") {
+                                finalOP = finalOP + ((400/1000) * qtySplit[j]);
+                            } else if(unitsSplit[j] == "500gm") {
+                                finalOP = finalOP + ((500/1000) * qtySplit[j]);
+                            } else if(unitsSplit[j] == "1kg") {
+                                finalOP = finalOP + (1 * qtySplit[j]);
+                            } else if(unitsSplit[j] == "250ml") {
+                                finalOP = finalOP + ((250/1000) * qtySplit[j]);
+                            } else if(unitsSplit[j] == "500ml") {
+                                finalOP = finalOP + ((500/1000) * qtySplit[j]);
+                            }else if(unitsSplit[j] == "1litr") {
+                                finalOP = finalOP + (1 * qtySplit[j]);
+                            } else if(unitsSplit[j] == "1Unit") {
+                                finalOP = finalOP + (1 * qtySplit[j]);
+                            } else if(unitsSplit[j] == "1Dozen") {
+                                finalOP = finalOP + (1 * qtySplit[j]);
+                            } else if(unitsSplit[j] == "Half Dozen") {
+                                finalOP = finalOP + ((6/12) * qtySplit[j]);
                             }
                         }
                     }
-                    // console.log($(rows).eq(i).children('td:nth-child(2)').html() + " final: ", final);
-                    $(rows).eq(i).children('td:nth-child(6)').html(final);
+                    console.log($(rows).eq(i).children('td:nth-child(2)').html() + " finalOP: ", finalOP);
+                    $(rows).eq(i).children('td:nth-child(7)').html(finalOP);
                     // console.log($(rows).eq(i).children('td:nth-child(2)').html() + "Test: ", $(rows).eq(i).children('td:nth-child(5)').html());
                 });
-                api.column(7, {page: 'current'}).data().each(function(group, i) {
+                api.column(8, {page: 'current'}).data().each(function(group, i) {
                     // recNum = ((page * displayLength) + i + 1);
-                    $(rows).eq(i).children('td:nth-child(8)').html(null);
+                    $(rows).eq(i).children('td:nth-child(9)').html(null);
                 });
             },
             ajax: {

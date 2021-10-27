@@ -69,42 +69,36 @@
             processing: true,
             serverSide: true,
             // buttons: dtButtons,
-            columns: [{
-                    data: null,
-                    name: 'rownum',
-                    searchable: false
+            buttons: [
+                {
+                    extend: 'csv',
+                    text: 'CSV',
+                    className: 'btn btn-default',
+                    exportOptions: {
+                        columns: 'th:not(:last-child,:first-child)'
+                    }
                 },
                 {
-                    data: 'product_name',
-                    name: 'product_name'
-                },
-                {
-                    data: 'unit',
-                    name: 'unit'
-                },
-                {
-                    data: 'total_unit',
-                    name: 'total_unit'
-                },
-                {
-                    data: 'cat_name',
-                    name: 'cat_name'
-                },
-                {
-                    data: 'order_date',
-                    name: 'order_date'
-                },
-                {
-                    data: null,
-                    name: 'action',
-                    sortable: false
+                    extend: 'excel',
+                    text: 'EXCEL',
+                    className: 'btn btn-default',
+                    exportOptions: {
+                        columns: 'th:not(:last-child,:first-child)'
+                    }
                 }
+            ],
+            columns: [
+                {data: null,name: 'rownum',searchable: false},
+                {data: 'product_name',name: 'product_name'},
+                {data: 'unit',name: 'unit'},
+                {data: 'total_unit',name: 'total_unit'},
+                {data: 'cat_name',name: 'cat_name'},
+                {data: 'order_date',name: 'order_date'},
+                {data: null,name: 'action',sortable: false}
             ],
             drawCallback: function(settings) {
                 var api = this.api();
-                var rows = api.rows({
-                    page: 'current'
-                }).nodes();
+                var rows = api.rows({page: 'current'}).nodes();
                 var last = null;
                 var page = api.page();
                 var recNum = null;
@@ -115,9 +109,7 @@
                     // recNum = ((page * displayLength) + i + 1);
                     $(rows).eq(i).children('td:first-child').html(recNum);
                 });
-                api.column(6, {
-                    page: 'current'
-                }).data().each(function(group, i) {
+                api.column(6, {page: 'current'}).data().each(function(group, i) {
                     // recNum = ((page * displayLength) + i + 1);
                     $(rows).eq(i).children('td:nth-child(7)').html(null);
                 });

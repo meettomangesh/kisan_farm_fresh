@@ -12,7 +12,6 @@
                 <thead>
                     <tr>
                         <th width="10">
-
                         </th>
                         <th>
                             {{ trans('cruds.loginlogs.fields.id') }}
@@ -70,8 +69,6 @@
                         <td>
                             {{ ($userLoginLog->is_login == 1?"Login":"Logout") ?? '' }}
                         </td>
-
-
                     </tr>
                     @endforeach
                 </tbody>
@@ -80,17 +77,12 @@
     </div>
 </div>
 
-
-
 @endsection
 @section('scripts')
 @parent
 <script>
     $(function() {
         let dtButtons = $.extend(true, [], $.fn.dataTable.defaults.buttons)
-
-
-
         $.extend(true, $.fn.dataTable.defaults, {
             orderCellsTop: true,
             order: [
@@ -102,10 +94,7 @@
         $('.datatable-LoginLogs:not(.ajaxTable) thead tr:eq(1) th').each(function(i) {
             $('input', this).on('keyup change', function() {
                 if (table.column(i).search() !== this.value) {
-                    table
-                        .column(i)
-                        .search(this.value)
-                        .draw();
+                    table.column(i).search(this.value).draw();
                 }
             });
         })
@@ -113,10 +102,8 @@
             buttons: dtButtons
         })
         $('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
-            $($.fn.dataTable.tables(true)).DataTable()
-                .columns.adjust();
+            $($.fn.dataTable.tables(true)).DataTable().columns.adjust();
         });
-
     })
 </script>
 @endsection

@@ -400,7 +400,7 @@ class CustomerOrders extends Model
                 ' .  $product->item_quantity . '
                 </td>
                 <td style="text-align: center;padding: 5px;vertical-align: border-bottom: 1px solid #eee;">
-                ' . (($product->special_price != 0) ? $product->special_price : $product->selling_price) . '
+                ' . (($product->special_price != 0) ? $product->special_price * $product->item_quantity : $product->selling_price * $product->item_quantity) . '
                 </td>
             </tr>
             ';

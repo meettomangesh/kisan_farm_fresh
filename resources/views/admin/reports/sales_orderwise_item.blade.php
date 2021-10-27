@@ -75,54 +75,39 @@
             processing: true,
             serverSide: true,
             // buttons: dtButtons,
-            columns: [{
-                    data: null,
-                    name: 'rownum',
-                    searchable: false
+            buttons: [
+                {
+                    extend: 'csv',
+                    text: 'CSV',
+                    className: 'btn btn-default',
+                    exportOptions: {
+                        columns: 'th:not(:last-child,:first-child)'
+                    }
                 },
                 {
-                    data: 'order_id',
-                    name: 'order_id'
-                },
-                {
-                    data: 'product_name',
-                    name: 'product_name'
-                },
-                /* {
-                    data: 'selling_price',
-                    name: 'selling_price'
-                },
-                {
-                    data: 'special_price',
-                    name: 'special_price'
-                }, */
-                {
-                    data: 'item_quantity',
-                    name: 'item_quantity'
-                },
-                {
-                    data: 'cat_name',
-                    name: 'cat_name'
-                },
-                {
-                    data: 'order_status',
-                    name: 'order_status'
-                },
-                {
-                    data: 'order_date',
-                    name: 'order_date'
-                },
-                {
-                    data: null,
-                    name: 'action',
-                    sortable: false
+                    extend: 'excel',
+                    text: 'EXCEL',
+                    className: 'btn btn-default',
+                    exportOptions: {
+                        columns: 'th:not(:last-child,:first-child)'
+                    }
                 }
+            ],
+            columns: [
+                {data: null,name: 'rownum',searchable: false},
+                {data: 'order_id',name: 'order_id'},
+                {data: 'product_name',name: 'product_name'},
+                /* {data: 'selling_price',name: 'selling_price'},
+                {data: 'special_price',name: 'special_price'}, */
+                {data: 'item_quantity',name: 'item_quantity'},
+                {data: 'cat_name',name: 'cat_name'},
+                {data: 'order_status',name: 'order_status'},
+                {data: 'order_date',name: 'order_date'},
+                {data: null,name: 'action',sortable: false}
             ],
             drawCallback: function(settings) {
                 var api = this.api();
-                var rows = api.rows({
-                    page: 'current'
-                }).nodes();
+                var rows = api.rows({page: 'current'}).nodes();
                 var last = null;
                 var page = api.page();
                 var recNum = null;
@@ -133,9 +118,7 @@
                     // recNum = ((page * displayLength) + i + 1);
                     $(rows).eq(i).children('td:first-child').html(recNum);
                 });
-                /* api.column(6, {
-                    page: 'current'
-                }).data().each(function(data, i) {
+                /* api.column(6, {page: 'current'}).data().each(function(data, i) {
                     var orderStatus = "";
                     if (data.order_status == 0) {
                         orderStatus = 'Pending';
@@ -152,9 +135,7 @@
                     }
                     $(rows).eq(i).children('td:nth-child(6)').html(orderStatus);
                 }); */
-                api.column(7, {
-                    page: 'current'
-                }).data().each(function(group, i) {
+                api.column(7, {page: 'current'}).data().each(function(group, i) {
                     // recNum = ((page * displayLength) + i + 1);
                     $(rows).eq(i).children('td:nth-child(8)').html(null);
                 });

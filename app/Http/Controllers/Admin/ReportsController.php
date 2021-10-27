@@ -293,7 +293,72 @@ class ReportsController extends Controller
         // To print query
         // echo $salesItemsData->toSql(); exit;
 
-        return datatables()->collection($salesItemsData->get())->toJson();
+        return datatables()->collection($salesItemsData->get())
+        ->addColumn('final', function($salesItemsData) {
+            $units = $salesItemsData->prod_units;
+            $qty = $salesItemsData->product_units_qty;
+            $unitsSplit = explode(",", $units);
+            $qtySplit = explode(",", $qty);
+            $finalOP = 0;
+            $finalUnit = "";
+            if(sizeof($unitsSplit) > 0) {
+                for($j = 0; $j < sizeof($unitsSplit); $j++) {
+                    if($unitsSplit[$j] == "200gm") {
+                        $finalOP = $finalOP + ((200/1000) * $qtySplit[$j]);
+                        $finalUnit = "kg";
+                    } else if($unitsSplit[$j] == "250gm") {
+                        $finalOP = $finalOP + ((250/1000) * $qtySplit[$j]);
+                        $finalUnit = "kg";
+                    } else if($unitsSplit[$j] == "400gm") {
+                        $finalOP = $finalOP + ((400/1000) * $qtySplit[$j]);
+                        $finalUnit = "kg";
+                    } else if($unitsSplit[$j] == "500gm") {
+                        $finalOP = $finalOP + ((500/1000) * $qtySplit[$j]);
+                        $finalUnit = "kg";
+                    } else if($unitsSplit[$j] == "1kg") {
+                        $finalOP = $finalOP + (1 * $qtySplit[$j]);
+                        $finalUnit = "kg";
+                    } else if($unitsSplit[$j] == "2kg") {
+                        $finalOP = $finalOP + (2 * $qtySplit[$j]);
+                        $finalUnit = "kg";
+                    } else if($unitsSplit[$j] == "3kg") {
+                        $finalOP = $finalOP + (3 * $qtySplit[$j]);
+                        $finalUnit = "kg";
+                    } else if($unitsSplit[$j] == "5kg") {
+                        $finalOP = $finalOP + (5 * $qtySplit[$j]);
+                        $finalUnit = "kg";
+                    } else if($unitsSplit[$j] == "250ml") {
+                        $finalOP = $finalOP + ((250/1000) * $qtySplit[$j]);
+                        $finalUnit = "ltr";
+                    } else if($unitsSplit[$j] == "500ml") {
+                        $finalOP = $finalOP + ((500/1000) * $qtySplit[$j]);
+                        $finalUnit = "ltr";
+                    } else if($unitsSplit[$j] == "1ltr") {
+                        $finalOP = $finalOP + (1 * $qtySplit[$j]);
+                        $finalUnit = "ltr";
+                    } else if($unitsSplit[$j] == "1pc") {
+                        $finalOP = $finalOP + (1 * $qtySplit[$j]);
+                        $finalUnit = "pc(s)";
+                    } else if($unitsSplit[$j] == "4pc") {
+                        $finalOP = $finalOP + (4 * $qtySplit[$j]);
+                        $finalUnit = "pc(s)";
+                    } else if($unitsSplit[$j] == "6pc") {
+                        $finalOP = $finalOP + (6 * $qtySplit[$j]);
+                        $finalUnit = "pc(s)";
+                    } else if($unitsSplit[$j] == "12pc") {
+                        $finalOP = $finalOP + (12 * $qtySplit[$j]);
+                        $finalUnit = "pc(s)";
+                    } else if($unitsSplit[$j] == "1Dozen") {
+                        $finalOP = $finalOP + (1 * $qtySplit[$j]);
+                        $finalUnit = "Dozen(s)";
+                    } else if($unitsSplit[$j] == "Half Dozen") {
+                        $finalOP = $finalOP + (12 * $qtySplit[$j]);
+                        $finalUnit = "Dozen(s)";
+                    }
+                }
+            }
+            return $finalOP.$finalUnit;
+        })->toJson();
         // return Datatables::of($salesItemsData)->make(true);
     }
 }

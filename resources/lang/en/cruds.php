@@ -878,7 +878,8 @@ return [
             'cat_name' => 'Category',
             'order_date' => 'Order Date',
             'prod_units' => 'Units',
-            'prod_units_qty' => 'Product Units Qty'
+            'prod_units_qty' => 'Product Units Qty',
+            'final' => 'Final'
         ],
     ],
     'loginlogs' => [

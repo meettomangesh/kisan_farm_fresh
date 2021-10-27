@@ -253,6 +253,7 @@ class ReportsController extends Controller
             // DB::raw('IF(cod.is_basket = 0, cod.product_units_id, codb.product_units_id) AS product_units_id'),
             DB::raw('p.product_name'),
             DB::raw('cm.cat_name'),
+            DB::raw('"" AS final'),
             DB::raw('DATE(cod.created_at) AS order_date'),
             DB::raw('ROUND(SUM(IFNULL(codb.item_quantity / 2, cod.item_quantity))) AS total_unit'),
             DB::raw('GROUP_CONCAT(um.unit) AS prod_units'),
@@ -285,8 +286,9 @@ class ReportsController extends Controller
         }
 
         $salesItemsData->whereRaw('cod.order_status = 1');
-        $salesItemsData->groupBy('cod.products_id');
-        $salesItemsData->groupBy('codb.products_id');
+        /* $salesItemsData->groupBy('cod.products_id');
+        $salesItemsData->groupBy('codb.products_id'); */
+        $salesItemsData->groupBy('p.id');
 
         // To print query
         // echo $salesItemsData->toSql(); exit;

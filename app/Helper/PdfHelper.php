@@ -41,9 +41,14 @@ class PdfHelper
             PDF::Reset();
             PDF::SetTitle('');
             PDF::AddPage();
-            PDF::SetFont('freesans','',1);
-            PDF::writeHTML($html,true,false,true,false,'');
-            PDF::Output($finalFileNameWithPath,'F');
+            PDF::SetMargins(15, 27, 15);
+            PDF::SetHeaderMargin(5);
+            PDF::SetFooterMargin(10);
+            PDF::SetAutoPageBreak(TRUE, 25);
+            PDF::SetImageScale(1.25);
+            PDF::SetFont('freesans', '', 10);
+            PDF::writeHTML($html, true, false, true, false, '');
+            PDF::Output($finalFileNameWithPath, 'F');
 
             if (file_exists($finalFileNameWithPath)) {
                 //send mail of newly generated quotation pdf.
@@ -52,7 +57,7 @@ class PdfHelper
                 $path = ''; //not generated successfully  
             }
         } catch (Exception $e) {
-           // echo $e->getMessage();
+            // echo $e->getMessage();
             $path = '';
         }
         return $path;
@@ -61,8 +66,7 @@ class PdfHelper
     public static function getUplodedPath($obj)
     {
         if ($obj) {
-            return config('services.ses.bucket_url').''.$obj;
-           
+            return config('services.ses.bucket_url') . '' . $obj;
         } else {
             return "";
         }

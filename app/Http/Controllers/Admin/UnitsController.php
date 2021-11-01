@@ -11,6 +11,7 @@ use Gate;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use App\Models\Category;
+use App\Models\UnitMeasurements;
 
 class UnitsController extends Controller
 {
@@ -25,7 +26,8 @@ class UnitsController extends Controller
     {
         abort_if(Gate::denies('unit_create'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $categories = Category::all()->where('status', 1)->pluck('cat_name', 'id')->prepend(trans('global.pleaseSelect'), '');
-        return view('admin.units.create', compact('categories'));
+        $unitMeasurements = UnitMeasurements::all()->where('status', 1)->pluck('unit', 'id')->prepend(trans('global.pleaseSelect'), '');
+        return view('admin.units.create', compact('categories','unitMeasurements'));
     }
 
     public function store(StoreUnitRequest $request)
@@ -38,8 +40,9 @@ class UnitsController extends Controller
     {
         abort_if(Gate::denies('unit_edit'), Response::HTTP_FORBIDDEN, '403 Forbidden');
         $categories = Category::all()->where('status', 1)->pluck('cat_name', 'id')->prepend(trans('global.pleaseSelect'), '');
+        $unitMeasurements = UnitMeasurements::all()->where('status', 1)->pluck('unit', 'id')->prepend(trans('global.pleaseSelect'), '');
         $unit->load('category');
-        return view('admin.units.edit', compact('unit','categories'));
+        return view('admin.units.edit', compact('unit','categories','unitMeasurements'));
     }
 
     public function update(UpdateUnitRequest $request, Unit $unit)

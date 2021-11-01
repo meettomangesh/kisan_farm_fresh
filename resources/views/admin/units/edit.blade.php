@@ -12,7 +12,7 @@
             @csrf
             <div class="form-body">
                 <div class="form-group">
-                    <label class="col-md-3 required" for="cat_id">{{ trans('cruds.product.fields.category') }}</label>
+                    <label class="col-md-3 required" for="cat_id">{{ trans('cruds.unit.fields.category') }}</label>
                     <div class="col-md-4">
                         <select class="form-control select2 {{ $errors->has('category') ? 'is-invalid' : '' }}" name="cat_id" id="cat_id" required>
                             @foreach($categories as $id => $category)
@@ -25,9 +25,9 @@
                         {{ $errors->first('category') }}
                     </div>
                     @endif
-                    <span class="help-block">{{ trans('cruds.product.fields.category_helper') }}</span>
+                    <span class="help-block">{{ trans('cruds.unit.fields.category_helper') }}</span>
                 </div>
-                <div class="form-group">
+                <!-- div class="form-group">
                     <label class="col-md-3 required" for="unit">{{ trans('cruds.unit.fields.unit') }}</label>
                     <div class="col-md-4">
                         <input class="form-control {{ $errors->has('unit') ? 'is-invalid' : '' }}" type="text" name="unit" id="unit" value="{{ old('unit', $unit->unit) }}" required>
@@ -38,6 +38,22 @@
                         @endif
                         <span class="help-block">{{ trans('cruds.unit.fields.unit_helper') }}</span>
                     </div>
+                </div -->
+                <div class="form-group">
+                    <label class="col-md-3 required" for="unit">{{ trans('cruds.unit.fields.unit') }}</label>
+                    <div class="col-md-4">
+                        <select class="form-control select2 {{ $errors->has('unit') ? 'is-invalid' : '' }}" name="unit" id="unit" required>
+                            @foreach($unitMeasurements as $id => $un)
+                                <option value="{{ $un }}" {{ ($unit->category ? $unit->unit : old('unit')) == $un ? 'selected' : '' }}>{{ $un }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    @if($errors->has('unit'))
+                    <div class="invalid-feedback">
+                        {{ $errors->first('unit') }}
+                    </div>
+                    @endif
+                    <span class="help-block">{{ trans('cruds.unit.fields.unit_helper') }}</span>
                 </div>
                 <div class="form-group">
                     <label class="col-md-3" for="description">{{ trans('cruds.unit.fields.description') }}</label>

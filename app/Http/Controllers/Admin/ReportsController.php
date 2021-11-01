@@ -339,6 +339,9 @@ class ReportsController extends Controller
                     } else if($unitsSplit[$j] == "1pc") {
                         $finalOP = $finalOP + (1 * $qtySplit[$j]);
                         $finalUnit = "pc(s)";
+                    } else if($unitsSplit[$j] == "3pc") {
+                        $finalOP = $finalOP + (3 * $qtySplit[$j]);
+                        $finalUnit = "pc(s)";
                     } else if($unitsSplit[$j] == "4pc") {
                         $finalOP = $finalOP + (4 * $qtySplit[$j]);
                         $finalUnit = "pc(s)";

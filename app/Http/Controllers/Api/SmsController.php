@@ -10,6 +10,7 @@ use App\Models\Message;
 use Exception;
 use Validator;
 use Carbon\Carbon;
+use App\User;
 
 class SmsController extends BaseController
 {
@@ -51,9 +52,9 @@ class SmsController extends BaseController
             $sendMessage = 0;
             if ($smsgTemplatesData) {
                 $data = [
-                    "symbol"=> " ".config('services.miscellaneous.SMS_SYMBOL'),
-                    "OTP"=> $otpNumber,
-                    "code"=> config('services.miscellaneous.SMS_CODE')
+                    "symbol" => " " . config('services.miscellaneous.SMS_SYMBOL'),
+                    "OTP" => $otpNumber,
+                    "code" => config('services.miscellaneous.SMS_CODE')
                 ];
                 $jsonData = json_encode($data);
                 $requestedParams['template_id'] = $smsgTemplatesData['flow_id'];
@@ -61,7 +62,7 @@ class SmsController extends BaseController
                 //Call function to send message
                 $sendMessage = $message->sendOtp($request->mobile_number, $requestedParams, $jsonData);
                 // $sendMessage = $message->sendMessage($jsonData);
-            }            
+            }
 
             $requestedParams['from_no'] = config('services.miscellaneous.from_no');
             $requestedParams['SMS_VALIDITY_TIME_MINUTES'] = $smsValidityTime;
@@ -125,7 +126,18 @@ class SmsController extends BaseController
                 $mobileNumber = $request->mobile_number;
             }
             $smsValidityTime = getenv('SMS_VALIDITY_TIME_MINUTES');
-
+            // 201 => "APP_REGISTER_OTP", 202 => "APP_LOGIN_OTP", 203 => "APP_RESET_PASSWORD", 204 => "APP_FORGET_PASSWORD"
+            if ($request->transactionType == "201") {
+                $customer = User::where('mobile_number', $request->mobile_number)->first();
+                if (isset($customer)) {
+                    return $this->sendError(
+                        "Customer is already exists.",
+                        [],
+                        404,
+                        []
+                    );
+                }
+            }
             //$customerOtp = new CustomerOtp();
             //$result = $customerOtp->validateOtp($request->otp, $mobileNumber, $request->id, $request->platform, $ismobilePresent, $smsValidityTime);
             $message = new Message($this->pdo, $this->redis);

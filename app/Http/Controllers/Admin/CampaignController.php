@@ -14,6 +14,7 @@ use App\Models\CampaignCategoriesMaster;
 use App\Models\CampaignMaster;
 use DB;
 use App\Http\Requests\StoreCampaignRequest;
+use App\Http\Requests\MassDestroyCampaignRequest;
 
 class CampaignController extends Controller
 {
@@ -118,5 +119,20 @@ class CampaignController extends Controller
         $response['message'] = '';
 
         return response()->json($response);
+    }
+
+    public function destroy($id)
+    {
+        abort_if(Gate::denies('campaign_delete'), Response::HTTP_FORBIDDEN, '403 Forbidden');
+        $promoCodeMaster=PromoCodeMaster::find($id);
+        $promoCodeMaster->delete();
+        return back();
+    }
+
+    public function massDestroy(MassDestroyCampaignRequest $request)
+    {
+        PromoCodeMaster::whereIn('id', request('ids'))->delete();
+
+        return response(null, Response::HTTP_NO_CONTENT);
     }
 }

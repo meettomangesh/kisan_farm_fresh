@@ -36,17 +36,17 @@ class SmsController extends BaseController
             $smsTemplatesValue = parent::SMS_MSG_TEMPLATES;
             $transActionType = $request->transactionType;
             // 201 => "APP_REGISTER_OTP", 202 => "APP_LOGIN_OTP", 203 => "APP_RESET_PASSWORD", 204 => "APP_FORGET_PASSWORD"
-            // if ($request->transactionType == "201") {
-            //     $customer = User::where('mobile_number', $request->mobile_number)->first();
-            //     if (isset($customer)) {
-            //         return $this->sendError(
-            //             "Customer is already exists.",
-            //             [],
-            //             404,
-            //             []
-            //         );
-            //     }
-            // }
+            if ($request->transactionType == "201") {
+                $customer = User::where('mobile_number', $request->mobile_number)->first();
+                if (isset($customer)) {
+                    return $this->sendError(
+                        "Customer is already exists.",
+                        [],
+                        404,
+                        []
+                    );
+                }
+            }
 
             $smsTemplateName = "";
             foreach ($smsTemplatesValue as $key => $value) {

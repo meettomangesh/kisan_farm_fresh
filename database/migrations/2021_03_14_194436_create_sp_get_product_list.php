@@ -78,7 +78,7 @@ class CreateSpGetProductList extends Migration
             WHERE p.deleted_at IS NULL AND p.status = 1 AND p.stock_availability = 1 AND pli.current_quantity > 0 AND IF(p.expiry_date IS NOT NULL, p.expiry_date >= CURDATE(), 1=1) AND '
             , @whrCategory, ' AND ', @whrSearch, ' ORDER BY ', @orderBy, ' LIMIT ', noOfRecords, ' OFFSET ', pageNumber); */
         
-            SET @sqlStmt = CONCAT('SELECT p.id,p.product_name,p.short_description,p.expiry_date,TRUNCATE(p.selling_price, 2) AS selling_price,TRUNCATE(p.special_price, 2) AS special_price,p.special_price_start_date,p.special_price_end_date,p.is_basket,p.min_quantity,p.max_quantity
+            SET @sqlStmt = CONCAT('SELECT p.id,p.product_name,p.short_description,p.expiry_date,TRUNCATE(p.selling_price, 2) AS selling_price,IF(p.special_price > 0 AND p.special_price_start_date <= CURDATE() AND p.special_price_end_date >= CURDATE(), TRUNCATE(p.special_price, 2), 0.00) AS special_price,p.special_price_start_date,p.special_price_end_date,p.is_basket,p.min_quantity,p.max_quantity
             FROM products AS p
             LEFT JOIN categories_master AS c ON c.id = p.category_id AND c.status = 1
             WHERE p.deleted_at IS NULL AND p.status = 1 AND p.stock_availability = 1 AND IF(p.expiry_date IS NOT NULL, p.expiry_date >= CURDATE(), 1=1) AND '

@@ -53,7 +53,7 @@ class CreateSpGetProductList extends Migration
             IF subCategoryId > 0 AND subCategoryId IS NOT NULL THEN
                 SET @whrCategory = CONCAT(' p.category_id = ', subCategoryId, ' ');
             ELSEIF categoryId > 0 AND categoryId IS NOT NULL THEN
-                SELECT id INTO basketCategoryId FROM categories_master WHERE cat_name = 'Basket';
+                SELECT id INTO basketCategoryId FROM categories_master WHERE cat_name = 'Baskets';
                 IF categoryId = basketCategoryId THEN 
                     SET @whrCategory = CONCAT(' p.is_basket = 1 ');
                 ELSE

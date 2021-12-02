@@ -833,9 +833,9 @@ return [
         'title'          => 'Reports',
         'title_singular' => 'Report',
         'fields'         => [
-            'sales_itemwise' => 'Sales Itemwise',
-            'sales_orderwise_item' => 'Sales Orderwise Item',
-            'sales_for_supplier' => 'Sales For Supplier',
+            'sales_itemwise' => 'Sales order wise',
+            'sales_orderwise_item' => 'Packaging list',
+            'sales_for_supplier' => 'Supplier list',
         ],
     ],
     'sales_itemwise' => [

@@ -26,16 +26,19 @@ Route::post('verifyOtp', 'Api\SmsController@verifyOtp');
 Route::post('pinCodes', 'Api\RegisterController@getPinCodeList');
 Route::post('forgotPassword', 'Api\RegisterController@forgotPassword');
 Route::post('paymentCallbackUrl', 'Api\OrdersController@paymentCallbackUrl');
+Route::post('categories', 'Api\CategoryController@getCategoryList');
+Route::post('banners', 'Api\BannersController@getBannerList');
+Route::post('products', 'Api\ProductsController@getProductList');
 Route::middleware('auth:api')->group(function () {
     // Route::resource('products', 'API\ProductsController');
     // Route::post('updateCustomer', 'API\RegisterController@updateCustomer');
     Route::post('logout', 'Api\RegisterController@logout');
     Route::post('changePassword', 'Api\RegisterController@changePassword');
     Route::post('getUserDetails', 'Api\RegisterController@getUserDetails');
-    Route::post('categories', 'Api\CategoryController@getCategoryList');
+    // Route::post('categories', 'Api\CategoryController@getCategoryList');
     Route::post('subCategories', 'Api\CategoryController@getSubCategoryList');
-    Route::post('products', 'Api\ProductsController@getProductList');
-    Route::post('banners', 'Api\BannersController@getBannerList');
+    // Route::post('products', 'Api\ProductsController@getProductList');
+    // Route::post('banners', 'Api\BannersController@getBannerList');
 
     Route::post('placeOrder', 'Api\OrdersController@placeOrder');
     Route::post('updateCustomer', 'API\RegisterController@updateCustomer');

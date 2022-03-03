@@ -4,7 +4,6 @@
     <div class="card-header">
         {{ trans('cruds.order.title_singular') }} {{ trans('global.list') }}
     </div>
-
     <div class="card-body">
         <div class="table-responsive">
             <table class=" table table-bordered table-striped table-hover datatable datatable-Order">
@@ -19,10 +18,11 @@
                         <th>{{ trans('cruds.order.fields.discounted_amount') }}</th>
                         <th>{{ trans('cruds.order.fields.delivery_charge') }}</th>
                         <th>{{ trans('cruds.order.fields.payment_type') }}</th>
-                        <th>{{ trans('cruds.order.fields.delivery_date') }}</th>
+                        <th width="30%">{{ trans('cruds.order.fields.delivery_date') }}</th>
+                        <th width="30%">{{ trans('cruds.order.fields.order_date') }}</th>
                         <th>{{ trans('cruds.order.fields.status') }}</th>
                         <th>Needs Attention</th>
-                        <th  width="30%">{{ trans('cruds.order.fields.actions') }}</th>
+                        <th width="30%">{{ trans('cruds.order.fields.actions') }}</th>
                     </tr>
                     <tr>
                         <th></th>
@@ -34,6 +34,7 @@
                         <th><input type="text" placeholder="Search" /></th>
                         <th><input type="text" placeholder="Search" /></th>
                         <th><input type="text" placeholder="Search" /></th>
+                        <th></th>
                         <th></th>
                         <th><input type="text" placeholder="Search" /></th>
                         <th></th>
@@ -53,12 +54,20 @@
                         <td>{{ round($customerOrder->delivery_charge, 2) ?? '' }}</td>
                         <td>{{ $customerOrder->payment_type ?? '' }}</td>
                         <td>
-                        @if($customerOrder->needAttention == 1)
+                            @if($customerOrder->needAttention == 1)
+                            <p style="color:red">{{ $customerOrder->delivery_date ?? '' }}</p>
+                            @else
+                            {{ $customerOrder->delivery_date ?? '' }}
+                            @endif
+                        </td>
+                        <td>
+                            {{ date('Y-m-d', strtotime($customerOrder->created_at))  ?? '' }}
+                            <!-- @if($customerOrder->needAttention == 1)
                         <p style="color:red">{{ $customerOrder->delivery_date ?? '' }}</p>
                         @else
                         {{ $customerOrder->delivery_date ?? '' }}
-                        @endif
-                            
+                        @endif -->
+
                         </td>
                         <td>
                             @if($customerOrder->order_status == 0)
@@ -89,27 +98,27 @@
                             <a class="cancel_order" data-toggle="tooltip" data-placement="top" title="{{ trans('cruds.order.fields.cancel_order') }}" data-id="{{ $customerOrder->id }}" href="javascript:void(0);">
                                 <!-- {{ trans('cruds.order.fields.cancel_order') }} -->
                                 <i class="fa fa-times" aria-hidden="true"></i>
-                            <!-- </button> -->
+                                <!-- </button> -->
                             </a>
                             @endif
-                            @endcan  
-                            @can('assign_order_delivery_boy')         
-                           <?php /* @if($customerOrder->needAttention == 1) */ ?>
+                            @endcan
+                            @can('assign_order_delivery_boy')
+                            <?php /* @if($customerOrder->needAttention == 1) */ ?>
                             <a class="" data-toggle="tooltip" data-placement="top" title="{{ trans('cruds.order.fields.re_assign_delivery_boy') }}" href="{{ route('admin.orders.reAssign', $customerOrder->id) }}">
                                 <!-- {{ trans('cruds.order.fields.re_assign_delivery_boy') }} -->
                                 <i class="fa fa-refresh" aria-hidden="true"></i>
                             </a>
-                           <?php /* @endif */ ?>
+                            <?php /* @endif */ ?>
                             @endcan
                             @if($customerOrder->customer_invoice_url)
-                            <a class=""  target="_blank" data-toggle="tooltip" data-placement="top" title="{{ trans('cruds.order.fields.customer_invoice_url') }}" href="{{ $customerOrder->customer_invoice_url }}">
+                            <a class="" target="_blank" data-toggle="tooltip" data-placement="top" title="{{ trans('cruds.order.fields.customer_invoice_url') }}" href="{{ $customerOrder->customer_invoice_url }}">
                                 <!-- {{ trans('cruds.order.fields.customer_invoice_url') }} -->
                                 <i class="fa fa-money" aria-hidden="true"></i>
-                                
+
                             </a>
                             @endif
                             @if($customerOrder->delivery_boy_invoice_url)
-                            <a class=""  target="_blank" data-toggle="tooltip" data-placement="top" title="{{ trans('cruds.order.fields.delivery_boy_invoice_url') }}" href="{{ $customerOrder->delivery_boy_invoice_url }}">
+                            <a class="" target="_blank" data-toggle="tooltip" data-placement="top" title="{{ trans('cruds.order.fields.delivery_boy_invoice_url') }}" href="{{ $customerOrder->delivery_boy_invoice_url }}">
                                 <!-- {{ trans('cruds.order.fields.delivery_boy_invoice_url') }} -->
                                 <i class="fa fa-file-pdf-o" aria-hidden="true"></i>
                             </a>
@@ -135,7 +144,8 @@
         $.extend(true, $.fn.dataTable.defaults, {
             orderCellsTop: true,
             order: [
-                [9, 'desc'],[7,'asc']
+                [9, 'desc'],
+                [7, 'asc']
             ],
             pageLength: 50,
         });
@@ -153,11 +163,21 @@
 
         let table = $('.datatable-Order:not(.ajaxTable)').DataTable({
             buttons: dtButtons,
-            "columnDefs": [
+            "columnDefs": [{
+                    "targets": [9],
+                    "visible": false,
+                    //  "sortable":false,
+                },
                 {
-                "targets": [ 9 ],
-                "visible": false
-            }
+                    "targets": [10],
+                    //"visible": false,
+                    "sortable": false,
+                },
+                {
+                    "targets": [0],
+                    "visible": false,
+
+                }
             ]
         })
         $('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {

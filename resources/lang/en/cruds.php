@@ -604,6 +604,8 @@ return [
             'delivery_boy_invoice_url' => 'Delivery invoice',
             'delivery_date' => 'Delivery Date',
             'delivery_date_helper' => '',
+            'order_date' => 'Order Date',
+            'order_date_helper' => '',
         ],
     ],
     'campaign'           => [

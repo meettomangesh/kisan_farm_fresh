@@ -180,7 +180,8 @@ class ReportsController extends Controller
 
         $salesItemsData->select([
             // DB::raw('IF(cod.is_basket = 0, cod.product_units_id, codb.product_units_id) AS product_units_id'),
-            DB::raw('p.product_name'),
+            // DB::raw('p.product_name'),
+            DB::raw('IF(codb.products_id IS NOT NULL, (SELECT product_name FROM products WHERE id = cod.products_id), p.product_name) AS product_name'),
             DB::raw('um.unit'),
             DB::raw('cm.cat_name'),
             DB::raw('DATE(cod.created_at) AS order_date'),
@@ -286,6 +287,7 @@ class ReportsController extends Controller
         }
 
         $salesItemsData->whereRaw('cod.order_status = 1');
+        $salesItemsData->whereRaw('IF(p.is_basket = 0, true, false)');
         /* $salesItemsData->groupBy('cod.products_id');
         $salesItemsData->groupBy('codb.products_id'); */
         $salesItemsData->groupBy('p.id');

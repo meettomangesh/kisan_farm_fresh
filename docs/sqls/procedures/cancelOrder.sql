@@ -21,7 +21,7 @@ cancelOrder:BEGIN
         LEAVE cancelOrder;
     END IF;
 
-    SELECT IF(now() between created_at and concat(DATE(created_at)," 22:00:00"),1,0) INTO isValidForCancel FROM customer_orders WHERE id = orderId;
+    SELECT IF(now() between created_at and concat(DATE(DATE_SUB(delivery_date, INTERVAL 1 DAY))," 22:00:00"),1,0) INTO isValidForCancel FROM customer_orders WHERE id = orderId;
 
     IF isValidForCancel = 0 THEN 
         SELECT JSON_OBJECT('status', 'FAILURE', 'message', 'Order can not be cancelled after 10PM.','data',JSON_OBJECT(),'statusCode',520) AS response;

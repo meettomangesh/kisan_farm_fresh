@@ -181,6 +181,7 @@ return [
             'status_helper'         => '',
             'active'                => 'Active',
             'inactive'                => 'InActive',
+            'customer_address'                => 'Customer Address',
 
         ],
     ],

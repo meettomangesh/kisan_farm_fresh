@@ -24,6 +24,7 @@
                         <th>{{ trans('cruds.customers.fields.name') }}</th>
                         <th>{{ trans('cruds.customers.fields.mobile_number') }}</th>
                         <th>{{ trans('cruds.customers.fields.email') }}</th>
+                        <th>{{ trans('cruds.customers.fields.customer_address') }}</th>
                         <th>{{ trans('cruds.customers.fields.status') }}</th>
                         <th>&nbsp;</th>
                     </tr>
@@ -36,6 +37,15 @@
                             <td>{{ $customer->first_name.' '.$customer->last_name ?? '' }}</td>
                             <td>{{ $customer->mobile_number ?? '' }}</td>
                             <td>{{ $customer->email ?? '' }}</td>
+                            <td>
+                            <address>
+                            {{ $customer->address ?? '' }} {{ $customer->landmark ?? '' }} <br>
+                           
+                            {{ $customer->area ?? '' }}<br>
+                            {{ $customer->pin_code ?? '' }} {{ $customer->city ?? '' }} {{ $customer->state ?? '' }}<br>
+                           
+                            </address>
+                            </td>
                             <td><span class="{{ $customer->status == 1 ? 'btn btn-success':'btn btn-danger' }}"> {{ ($customer->status == 1 ?trans('cruds.customers.fields.active'):trans('cruds.customers.fields.inactive')) ?? '' }}</span></td>
                             <td>
                                 @can('customers_show')

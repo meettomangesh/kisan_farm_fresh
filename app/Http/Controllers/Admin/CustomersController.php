@@ -14,6 +14,7 @@ use Symfony\Component\HttpFoundation\Response;
 use App\Models\CustomerLoyalty;
 use App\Region;
 use App\Helper\NotificationHelper;
+use Illuminate\Support\Facades\DB;
 
 class CustomersController extends Controller
 {
@@ -33,11 +34,25 @@ class CustomersController extends Controller
         // //app(FcmChannel)
         // print_r($user->notify($notifyHelper));
         // exit;
-        $customers = User::whereHas(
-            'roles', function($q){
-                $q->where('title', 'Customer');
-            }
-        )->get();
+        // $customers = User::whereHas(
+        //     'roles', function($q){
+        //         $q->where('title', 'Customer');
+        //     }
+        // )->get();
+        
+        $customerSql = 'select *,';
+        $customerSql .= 'IFNULL((select address from user_address WHERE user_id = users.id AND user_address.status=1  order by user_address.id desc limit 1),"") as address,';
+        $customerSql .= 'IFNULL((select landmark from user_address WHERE user_id = users.id AND user_address.status=1  order by user_address.id desc limit 1),"") as landmark,';
+        $customerSql .= 'IFNULL((select pin_code from user_address WHERE user_id = users.id AND user_address.status=1  order by user_address.id desc limit 1),"") as pin_code ,';
+        $customerSql .= 'IFNULL((select area from user_address WHERE user_id = users.id AND user_address.status=1  order by user_address.id desc limit 1),"") as area,';
+        $customerSql .= 'IFNULL((select mobile_number from user_address WHERE user_id = users.id AND user_address.status=1  order by user_address.id desc limit 1),"") as address_mobile_number,';
+        $customerSql .= 'IFNULL((select cities.name from user_address JOIN cities ON cities.id = user_address.city_id WHERE user_id = users.id AND user_address.status=1  order by user_address.id desc limit 1),"") as city,';
+        $customerSql .= 'IFNULL((select states.name from user_address JOIN states ON states.id = user_address.state_id WHERE user_id = users.id AND user_address.status=1  order by user_address.id desc limit 1),"") as state ';
+        $customerSql .= 'from users where exists (select * from roles inner join role_user on roles.id = role_user.role_id where users.id = role_user.user_id and title = ? and roles.deleted_at is null) and users.deleted_at is null';
+
+$customers = DB::select( DB::raw( $customerSql), array(
+            'Customer'
+          ));
         $regions = Region::all()->where('status', 1)->pluck('region_name', 'id');
 
         return view('admin.customers.index', compact('customers','regions'));

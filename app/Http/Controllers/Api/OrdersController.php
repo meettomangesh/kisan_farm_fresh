@@ -123,11 +123,18 @@ class OrdersController extends BaseController
             $customerOrders = new CustomerOrders();
             // Function call to cancel order
             $responseDetails = $customerOrders->cancelOrderAPI($params);
-            $message = 'Failed to order cancel.';
-            if ($responseDetails) {
+            //echo "126"; print_r($responseDetails); exit;
+            if ($responseDetails->status == "FAILURE" && $responseDetails->statusCode != 200) {
+                $response = $this->sendError($responseDetails->status, $responseDetails->message);
+            } else {
                 $message = 'Order cancelled successfully';
-            }
-            $response = $this->sendResponse([], $message);
+                $response = $this->sendResponse([], $message);
+            }    
+            // $message = 'Failed to order cancel.';
+            // if ($responseDetails) {
+            //     $message = 'Order cancelled successfully';
+            // }
+            // $response = $this->sendResponse([], $message);
         } catch (Exception $e) {
             $response = $this->sendResponse(array(), $e->getMessage());
         }

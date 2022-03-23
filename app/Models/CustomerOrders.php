@@ -80,11 +80,12 @@ class CustomerOrders extends Model
         $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
         $stmt->closeCursor();
         $reponse = json_decode($result['response']);
+        //echo "123"; print_r($reponse); exit;
         if ($reponse->status == "FAILURE" && $reponse->statusCode != 200) {
-            return false;
+            return $reponse;
         }
         $this->sendOrderTransactionNotification($cancelData);
-        return true;
+        return $reponse;
         /* $statusCancelled = 5;
         $statusIds = explode(',', '1');        
         $codData = CustomerOrderDetails::select('id','product_units_id','item_quantity','is_basket')->where('order_id', $orderId)->whereIn('order_status', $statusIds)->get()->toArray();

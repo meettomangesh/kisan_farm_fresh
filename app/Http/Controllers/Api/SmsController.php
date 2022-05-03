@@ -46,6 +46,16 @@ class SmsController extends BaseController
                         []
                     );
                 }
+            } else {
+                $customer = User::where('mobile_number', $request->mobile_number)->first();
+                if (!isset($customer)) {
+                    return $this->sendError(
+                        "Customer does not exists.",
+                        [],
+                        404,
+                        []
+                    );
+                }  
             }
 
             $smsTemplateName = "";

@@ -144,8 +144,9 @@
         $.extend(true, $.fn.dataTable.defaults, {
             orderCellsTop: true,
             order: [
-                [9, 'desc'],
-                [7, 'asc']
+                //[9, 'desc'],
+                //[7, 'asc'],
+                [1, 'desc']
             ],
             pageLength: 50,
         });

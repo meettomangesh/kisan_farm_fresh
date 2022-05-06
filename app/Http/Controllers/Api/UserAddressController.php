@@ -35,12 +35,12 @@ class UserAddressController extends BaseController
             }
 
             $responseDetails = DB::table('user_address')
-            ->leftJoin('states', 'user_address.state_id', '=', 'states.id')
-            ->leftJoin('cities', 'user_address.city_id', '=', 'cities.id')
-            ->select('user_address.*', 'states.name AS state_name', 'cities.name AS city_name')
-            ->where('user_address.user_id', $request->user_id)->orderByDesc('id')->get();
+                ->leftJoin('states', 'user_address.state_id', '=', 'states.id')
+                ->leftJoin('cities', 'user_address.city_id', '=', 'cities.id')
+                ->select('user_address.*', 'states.name AS state_name', 'cities.name AS city_name')
+                ->where('user_address.user_id', $request->user_id)->orderByDesc('id')->get();
 
-             $message = 'Address list.';
+            $message = 'Address list.';
             if (sizeof($responseDetails) == 0) {
                 $message = 'No record found.';
             }
@@ -70,7 +70,9 @@ class UserAddressController extends BaseController
         }
 
         try {
-
+            if ($request->pin_code == "undefined") {
+                return $this->sendError('Please provide valid pincode details.', []);
+            }
             $user = User::where('id', '=', $request->user_id)->first();
             if ($user === null) {
                 return $this->sendError('Please provide valid customer details.', []);
@@ -107,7 +109,9 @@ class UserAddressController extends BaseController
         }
 
         try {
-            
+            if ($request->pin_code == "undefined") {
+                return $this->sendError('Please provide valid pincode details.', []);
+            }
             $user = User::where('id', '=', $request->user_id)->first();
             if ($user === null) {
                 return $this->sendError('Please provide valid customer details.', []);
@@ -116,7 +120,7 @@ class UserAddressController extends BaseController
             if ($userAddress === null) {
                 return $this->sendError('Please provide valid address details.', []);
             }
-            $customerOrders = CustomerOrders::where('shipping_address_id', $request->user_address_id)->whereIn('order_status', [0,1,2,3])->get()->toArray();
+            $customerOrders = CustomerOrders::where('shipping_address_id', $request->user_address_id)->whereIn('order_status', [0, 1, 2, 3])->get()->toArray();
             if (sizeof($customerOrders) > 0) {
                 return $this->sendError('You have some order(s) which are in transition, so we can not update your address.', []);
             }
@@ -153,7 +157,7 @@ class UserAddressController extends BaseController
         }
 
         try {
-            
+
             $user = User::where('id', '=', $request->user_id)->first();
             if ($user === null) {
                 return $this->sendError('Please provide valid customer details.', []);
@@ -162,7 +166,7 @@ class UserAddressController extends BaseController
             if ($userAddress === null) {
                 return $this->sendError('Please provide valid address details.', []);
             }
-            $customerOrders = CustomerOrders::where('shipping_address_id', $request->user_address_id)->whereIn('order_status', [0,1,2,3])->get()->toArray();
+            $customerOrders = CustomerOrders::where('shipping_address_id', $request->user_address_id)->whereIn('order_status', [0, 1, 2, 3])->get()->toArray();
             if (sizeof($customerOrders) > 0) {
                 return $this->sendError('You have some order(s) which are in transition, so we can not delete your address.', []);
             }

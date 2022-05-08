@@ -422,7 +422,7 @@ class CustomerOrders extends Model
             'paymentMethod' => $orderDetails->payment_type,
             'paymentReference' => ($orderDetails->paytm_transaction_id) ? $orderDetails->paytm_transaction_id : '-',
             'productList' => $productStr,
-            'grossAmount' => round($orderDetails->gross_amount, 2),
+            'grossAmount' => round(($orderDetails->net_amount - ($orderDetails->delivery_charge + $orderDetails->discounted_amount)), 2),
             'discount' => round($orderDetails->discounted_amount, 2),
             'deliveryCharge' => round($orderDetails->delivery_charge, 2),
             'total' => round($orderDetails->net_amount, 2),

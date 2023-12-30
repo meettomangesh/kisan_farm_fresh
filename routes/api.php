@@ -18,8 +18,8 @@ use Illuminate\Support\Facades\Route;
 //     return $request->user();
 // });
 
-Route::post('register', 'API\RegisterController@register');
-Route::post('login', 'API\RegisterController@login');
+Route::post('register', 'Api\RegisterController@register');
+Route::post('login', 'Api\RegisterController@login');
 Route::post('getOtp', 'Api\SmsController@getOtp');
 Route::post('verifyOtp', 'Api\SmsController@verifyOtp');
 // Route::post('getOtp',\Api\SmsController::class . '@getOtp');

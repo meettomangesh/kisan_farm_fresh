@@ -41,7 +41,7 @@ Route::middleware('auth:api')->group(function () {
     // Route::post('banners', 'Api\BannersController@getBannerList');
 
     Route::post('placeOrder', 'Api\OrdersController@placeOrder');
-    Route::post('updateCustomer', 'API\RegisterController@updateCustomer');
+    Route::post('updateCustomer', 'Api\RegisterController@updateCustomer');
     Route::post('orders', 'Api\OrdersController@getOrderList');
     Route::post('cancelOrder', 'Api\OrdersController@cancelOrder');
     Route::post('orderList', 'Api\OrdersController@getOrderListForDeliveryBoy');

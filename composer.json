@@ -24,7 +24,7 @@
         "laravel/tinker": "^2.0",
         "laravel/ui": "^2.0",
         "laravelcollective/html": "^6.2",
-        "league/flysystem-aws-s3-v3": "~1",
+        "league/flysystem-aws-s3-v3": "^1.0",
         "mpdf/mpdf": "^8.2",
         "phpmailer/phpmailer": "^6.3",
         "yajra/laravel-datatables-oracle": "^9.18"

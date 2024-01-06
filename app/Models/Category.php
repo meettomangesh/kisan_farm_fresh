@@ -86,7 +86,8 @@ class Category extends Model
         $catParentId = Category::select('cat_parent_id')->where('id', $id)->where('status', 1)->get()->toArray();
         if(!empty($catParentId[0])) {
             $categoryName = Category::select('cat_name')->where('id', $catParentId[0]['cat_parent_id'])->where('status', 1)->get()->toArray();
-            return $categoryName[0]['cat_name'];
+            //return $categoryName[0]['cat_name'];
+	return ($categoryName)?$categoryName[0]['cat_name']:'';
         }
         return '';
     }
